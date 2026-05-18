@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum BookingStatus {
+  DRAFT
+  QUOTE_REQUESTED
+  PRICING_IN_PROGRESS
+  QUOTE_SENT
+  REVISION_REQUESTED
+  CONFIRMED
+  BALANCE_DUE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum BookingItemType {
+  ACCOMMODATION
+  ACTIVITY
+  TRANSPORT
+  ADDON
+}
+
+enum QuoteResponse {
+  ACCEPTED
+  REVISION
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  emailVerified   DateTime?
+  passwordHash    String?
+  name            String?
+  phone           String?
+  country         String?
+  image           String?
+  role            UserRole  @default(CUSTOMER)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLogin       DateTime?
+
+  accounts Account[]
+  sessions Session[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Destination {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  region      String
+  description String
+  highlights  String[]
+  photos      String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  packageItems PackageItem[]
+  bookingItems BookingItem[]
+  rateCards    RateCard[]
+
+  @@map("destinations")
+}
+
+model Package {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String
+  durationDays Int
+  highlights   String[]
+  difficulty   String?
+  region       String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  items PackageItem[]
+
+  @@map("packages")
+}
+
+model PackageItem {
+  id            String          @id @default(cuid())
+  packageId     String
+  type          BookingItemType
+  destinationId String?
+  description   String
+  sortOrder     Int
+
+  package     Package      @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  destination Destination? @relation(fields: [destinationId], references: [id])
+
+  @@map("package_items")
+}
+
+model RateCard {
+  id            String   @id @default(cuid())
+  itemType      BookingItemType
+  destinationId String?
+  tier          String?
+  season        String
+  minPrice      Float
+  maxPrice      Float
+  currency      String   @default("USD")
+  updatedAt     DateTime @updatedAt
+
+  destination Destination? @relation(fields: [destinationId], references: [id])
+
+  @@map("rate_cards")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  userId         String
+  status         BookingStatus @default(DRAFT)
+  arrivalDate    DateTime?
+  departureDate  DateTime?
+  numTravelers   Int           @default(1)
+  flightNumber   String?
+  sourceChannel  String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmContent     String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id])
+  items    BookingItem[]
+  quotes   Quote[]
+  payments Payment[]
+  reviews  Review[]
+
+  @@map("bookings")
+}
+
+model BookingItem {
+  id            String          @id @default(cuid())
+  bookingId     String
+  type          BookingItemType
+  destinationId String?
+  description   String
+  dates         String?
+  nights        Int?
+  tier          String?
+  estimateMin   Float?
+  estimateMax   Float?
+  actualPrice   Float?
+  notes         String?
+  sortOrder     Int             @default(0)
+
+  booking     Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  destination Destination? @relation(fields: [destinationId], references: [id])
+
+  @@map("booking_items")
+}
+
+model Quote {
+  id          String         @id @default(cuid())
+  bookingId   String
+  version     Int
+  totalPrice  Float
+  deposit     Float
+  validUntil  DateTime
+  adminNotes  String?
+  sentAt      DateTime?
+  respondedAt DateTime?
+  response    QuoteResponse?
+  createdAt   DateTime       @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("quotes")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String
+  amount          Float
+  currency        String        @default("USD")
+  method          String?
+  webxpayRef      String?
+  status          PaymentStatus @default(PENDING)
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  title           String
+  slug            String    @unique
+  content         String
+  excerpt         String?
+  coverImage      String?
+  author          String
+  metaTitle       String?
+  metaDescription String?
+  isPublished     Boolean   @default(false)
+  publishedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("blog_posts")
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  bookingId   String
+  rating      Int
+  title       String?
+  body        String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  @@map("reviews")
+}
+
+model AnalyticsEvent {
+  id            String   @id @default(cuid())
+  sessionId     String?
+  userId        String?
+  eventType     String
+  eventData     Json?
+  sourceChannel String?
+  utmParams     Json?
+  createdAt     DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
