@@ -27,8 +27,8 @@ export default auth((req) => {
     }
   }
 
-  // /dashboard/* — must be authenticated
-  if (pathname.startsWith("/dashboard")) {
+  // /dashboard/*, /build — must be authenticated
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/build")) {
     if (!session) {
       const loginUrl = new URL("/login", req.nextUrl.origin);
       loginUrl.searchParams.set("callbackUrl", pathname);
@@ -41,5 +41,6 @@ export default auth((req) => {
 
 export const config = {
   // Run on /dashboard and /admin paths; skip static assets and internal Next.js paths
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  // TODO: restore "/dashboard/:path*" and "/build/:path*" when DB is wired
+  matcher: ["/admin/:path*"],
 };

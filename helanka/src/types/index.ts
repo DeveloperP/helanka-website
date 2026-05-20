@@ -6,7 +6,7 @@
  * We extend `User`, `Session`, and the JWT via `@auth/core/jwt`.
  */
 
-import type { UserRole } from ".prisma/client/enums";
+import type { UserRole } from "@prisma/client";
 
 // Augment next-auth's User / Session shapes
 declare module "next-auth" {

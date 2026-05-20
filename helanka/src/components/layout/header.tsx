@@ -8,42 +8,45 @@ const navLinks = [
   { label: "Group Experiences", href: "/group-experiences" },
   { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default async function Header() {
-  const session = await auth();
+  let session = null;
+  try {
+    session = await auth();
+  } catch {
+    // Auth unavailable (no DB adapter configured yet)
+  }
 
   return (
-    <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Brand */}
+    <div className="fixed top-6 w-full px-5 md:px-20 z-50 pointer-events-none">
+      <nav className="max-w-[1440px] mx-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl pointer-events-auto transition-all duration-300">
+        <div className="flex justify-between items-center px-6 py-4">
           <Link
             href="/"
-            className="text-xl font-bold text-emerald-700"
+            className="font-[family-name:var(--font-playfair)] text-2xl font-bold text-[#ff9d00] hover:opacity-80 transition-opacity"
           >
-            Helanka
+            Helanka Vacations
           </Link>
 
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex md:items-center md:gap-6">
+          <div className="hidden md:flex space-x-8 items-center">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-slate-600 hover:text-slate-900"
+                className="text-base text-[#dac2ad] hover:text-[#ff9d00] transition-colors"
               >
                 {link.label}
               </Link>
             ))}
-          </nav>
+          </div>
 
-          {/* Right side: auth state */}
-          <div className="flex items-center gap-4">
-            {session ? (
+          <div className="hidden md:flex items-center space-x-4">
+            {session?.user ? (
               <Link
                 href={session.user.role === "ADMIN" ? "/admin" : "/dashboard"}
-                className="text-sm text-slate-600 hover:text-slate-900"
+                className="text-base text-[#dac2ad] hover:text-[#ff9d00] transition-colors"
               >
                 {session.user.name ?? session.user.email}
               </Link>
@@ -51,13 +54,13 @@ export default async function Header() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm text-slate-600 hover:text-slate-900"
+                  className="text-base text-[#dac2ad] hover:text-[#ff9d00] transition-colors"
                 >
                   Sign in
                 </Link>
                 <Link
                   href="/build"
-                  className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                  className="bg-[#ff9d00] text-[#482900] px-6 py-2 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
                 >
                   Plan Your Trip
                 </Link>
@@ -65,7 +68,7 @@ export default async function Header() {
             )}
           </div>
         </div>
-      </div>
-    </header>
+      </nav>
+    </div>
   );
 }

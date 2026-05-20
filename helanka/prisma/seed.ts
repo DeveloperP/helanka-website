@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, BookingItemType } from "../node_modules/.prisma/client/client";
+import { PrismaClient, UserRole, BookingItemType } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 // Prisma 7 requires an adapter or accelerateUrl at runtime, but the seed runs
