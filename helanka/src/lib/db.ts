@@ -1,13 +1,17 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient(): PrismaClient {
+  const adapter = new PrismaPg(process.env.DATABASE_URL!);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const opts: any =
-    process.env.NODE_ENV === "development" ? { log: ["query"] } : {};
+  const opts: any = {
+    adapter,
+    ...(process.env.NODE_ENV === "development" ? { log: ["query"] } : {}),
+  };
   return new PrismaClient(opts);
 }
 

@@ -92,10 +92,10 @@ export default function GroupExperiencesPage() {
               </ul>
 
               <Link
-                href={`/build?experience=${exp.slug}`}
+                href="/build"
                 className="inline-block bg-[#ff9d00] text-[#482900] px-10 py-4 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
               >
-                Plan This Experience
+                Sign In to Book
               </Link>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function GroupExperiencesPage() {
             We design custom group experiences for any occasion. Tell us your vision and we&apos;ll make it happen.
           </p>
           <Link
-            href="/build"
+            href="/contact"
             className="inline-block bg-[#ff9d00] text-[#482900] px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
           >
             Get in Touch

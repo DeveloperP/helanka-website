@@ -6,11 +6,12 @@
  * These are called from client-side forms. They validate input with Zod,
  * interact with the database via Prisma, and invoke Auth.js signIn.
  */
-import { signIn } from "@/lib/auth";
+import { signIn, signOut, auth } from "@/lib/auth";
 import { registerSchema, loginSchema } from "@/lib/validations";
 import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,7 +76,7 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
     throw err;
   }
 
-  return { success: true };
+  redirect("/dashboard");
 }
 
 // ---------------------------------------------------------------------------
@@ -112,5 +113,19 @@ export async function loginUser(formData: FormData): Promise<ActionResult> {
     throw err;
   }
 
-  return { success: true };
+  const session = await auth();
+  const role = session?.user?.role;
+  if (role === "ADMIN" || role === "SPECIALIST") {
+    redirect("/admin/sessions");
+  }
+  redirect("/dashboard");
+}
+
+// ---------------------------------------------------------------------------
+// logoutUser
+// ---------------------------------------------------------------------------
+
+export async function logoutUser(): Promise<void> {
+  await signOut({ redirect: false });
+  redirect("/login");
 }

@@ -1,42 +1,48 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { posts, getPostBySlug } from "@/lib/blog";
+import { getPublishedPostBySlug, getPublishedPosts } from "@/actions/blog-actions";
+import { db } from "@/lib/db";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
+  if (!db) return [];
+  const posts = await db.blogPost.findMany({
+    where: { isPublished: true },
+    select: { slug: true },
+  });
   return posts.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPublishedPostBySlug(slug);
   if (!post) return { title: "Post Not Found" };
   return {
-    title: post.title,
-    description: post.excerpt,
+    title: post.metaTitle || post.title,
+    description: post.metaDescription || post.excerpt,
   };
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPostBySlug(slug);
+  const post = await getPublishedPostBySlug(slug);
   if (!post) notFound();
 
-  const related = posts.filter((p) => p.slug !== post.slug && p.category === post.category).slice(0, 2);
-
-  const paragraphs = post.body.split("\n\n");
+  const allPosts = await getPublishedPosts();
+  const related = allPosts
+    .filter((p) => p.slug !== post.slug && p.category === post.category)
+    .slice(0, 2);
 
   return (
     <>
-      {/* Hero */}
       <section className="relative h-[60vh] min-h-[450px] flex items-end overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${post.image}')` }}
+          style={{ backgroundImage: `url('${post.coverImage}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
@@ -58,40 +64,20 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="flex items-center gap-4 text-sm text-white/50">
             <span>{post.author}</span>
             <span className="w-1 h-1 rounded-full bg-white/30" />
-            <span>{post.date}</span>
+            <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ""}</span>
             <span className="w-1 h-1 rounded-full bg-white/30" />
             <span>{post.readTime} read</span>
           </div>
         </div>
       </section>
 
-      {/* Article body */}
       <article className="py-16 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
-        <div className="max-w-3xl mx-auto space-y-6">
-          {paragraphs.map((p, i) => {
-            if (p.startsWith("**") && p.includes(":**")) {
-              const [heading, ...rest] = p.split(":**");
-              const label = heading.replace(/^\*\*/, "");
-              const content = rest.join(":**").replace(/\*\*$/, "");
-              return (
-                <div key={i}>
-                  <h3 className="font-[family-name:var(--font-manrope)] text-lg font-bold text-white mb-2">
-                    {label}
-                  </h3>
-                  <p className="text-[#dac2ad] leading-relaxed">{content}</p>
-                </div>
-              );
-            }
-            return (
-              <p key={i} className="text-[#dac2ad] leading-relaxed text-lg">
-                {p}
-              </p>
-            );
-          })}
-        </div>
+        <div
+          className="prose prose-invert prose-lg max-w-3xl mx-auto prose-headings:font-[family-name:var(--font-manrope)] prose-p:text-[#dac2ad] prose-p:leading-relaxed prose-h2:text-white prose-h3:text-white prose-a:text-[#ff9d00] prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl"
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
       </article>
 
-      {/* Related posts */}
       {related.length > 0 && (
         <section className="py-16 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto border-t border-white/10">
           <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-white mb-10">
@@ -107,7 +93,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <div className="shrink-0 w-32 h-24 rounded-xl overflow-hidden">
                   <div
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
-                    style={{ backgroundImage: `url('${r.image}')` }}
+                    style={{ backgroundImage: `url('${r.coverImage}')` }}
                   />
                 </div>
                 <div>

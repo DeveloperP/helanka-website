@@ -237,10 +237,10 @@ export default async function PackageDetailPage({ params }: Props) {
               Sign in to build your custom itinerary with this package as a starting point. Our travel specialists will refine every detail.
             </p>
             <Link
-              href={`/build?package=${pkg.slug}`}
+              href="/build"
               className="inline-block bg-[#ff9d00] text-[#482900] px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
             >
-              Start Building Your Trip
+              Book Now
             </Link>
           </div>
         </div>

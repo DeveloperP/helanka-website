@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(try { $response = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 15; \"Status: $\\($response.StatusCode\\)\"; \"Length: $\\($response.Content.Length\\) chars\"; $response.Content.Substring\\(0, [Math]::Min\\(500, $response.Content.Length\\)\\) } catch { $_.Exception.Message })",
+      "PowerShell(Start-Sleep -Seconds 8; try { $response = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 15; \"Status: $\\($response.StatusCode\\)\"; \"Length: $\\($response.Content.Length\\) chars\" } catch { $_.Exception.Message })",
+      "PowerShell(taskkill /PID 51000 /F /T 2>$null)",
+      "PowerShell(\"Killed\")",
+      "PowerShell(try { Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 15 } catch { $_.Exception.Response.StatusCode; $reader = [System.IO.StreamReader]::new\\($_.Exception.Response.GetResponseStream\\(\\)\\); $body = $reader.ReadToEnd\\(\\); $reader.Close\\(\\); $body.Substring\\(0, [Math]::Min\\(2000, $body.Length\\)\\) })",
+      "PowerShell(Get-Content \"c:\\\\Users\\\\Ingress\\\\Documents\\\\Ingress\\\\Dev\\\\Helanka Website revamp\\\\helanka\\\\node_modules\\\\@prisma\\\\client\\\\package.json\" -Raw | Select-String '\"main\"|\"types\"|\"exports\"' -AllMatches | ForEach-Object { $_.Line })",
+      "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(\"Done\")",
+      "PowerShell(Start-Sleep -Seconds 10; try { $response = Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 15; \"Status: $\\($response.StatusCode\\)\"; \"Length: $\\($response.Content.Length\\) chars\" } catch { $_.Exception.Message })"
+    ]
+  }
+}

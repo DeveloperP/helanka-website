@@ -1,954 +1,1109 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { destinations } from "@/lib/destinations";
 import {
   packages,
-  STANDARD_INCLUSIONS,
   getExcursionCap,
+  getExcursionsForDestination,
   type TransportTier,
   type Excursion,
 } from "@/lib/packages";
-import {
-  COMMON_ALLERGIES,
-  MEAL_PLANS,
-  type CommonAllergy,
-  type MealPlanId,
-} from "@/lib/dietary";
+import { COMMON_ALLERGIES, MEAL_PLANS, type CommonAllergy, type MealPlanId } from "@/lib/dietary";
+import { GUIDE_LANGUAGES } from "@/lib/guide-languages";
+import { ACCOMMODATION_TIERS } from "@/lib/accommodation";
 
-const STEP_DESTINATIONS = 1;
-const STEP_EXPERIENCES = 2;
-const STEP_CUSTOMIZE = 3;
-const STEP_DETAILS = 4;
-const STEP_REVIEW = 5;
+type TripType = "package" | "custom" | "mice";
 
-const steps = [
-  { id: STEP_DESTINATIONS, label: "Destinations" },
-  { id: STEP_EXPERIENCES, label: "Experiences" },
-  { id: STEP_CUSTOMIZE, label: "Customize" },
-  { id: STEP_DETAILS, label: "Details" },
-  { id: STEP_REVIEW, label: "Review" },
-];
-
-const experiences = [
-  "Cultural & Heritage Sites",
-  "Wildlife Safaris",
-  "Hiking & Trekking",
-  "Beach & Coastal",
-  "Tea Plantation Tours",
-  "Ayurveda & Wellness",
-  "Food & Cooking Classes",
-  "Train Journeys",
-  "Water Sports & Diving",
-  "Photography Tours",
-];
+interface WizardState {
+  tripType: TripType | null;
+  packageSlug: string | null;
+  destinations: string[];
+  excursionIds: string[];
+  transport: TransportTier;
+  mealPlan: MealPlanId;
+  allergies: CommonAllergy[];
+  dietaryNotes: string;
+  guests: number;
+  arrivalDate: string;
+  departureDate: string;
+  miceEventType: string;
+  miceGroupSize: number;
+  miceVenuePrefs: string[];
+  miceRequirements: string;
+  miceBudgetRange: string;
+  guideLanguage: string;
+  accommodation: string;
+}
 
 interface TripWizardProps {
   user: { name: string; email: string };
+  initialDestination?: string;
+  initialGuests?: string;
+  initialArrival?: string;
 }
 
-export default function TripWizard({ user }: TripWizardProps) {
-  const [step, setStep] = useState(STEP_DESTINATIONS);
-  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
-  const [selectedExperiences, setSelectedExperiences] = useState<string[]>([]);
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+const MICE_EVENT_TYPES = [
+  "Conference",
+  "Incentive Trip",
+  "Team Building",
+  "Product Launch",
+  "Wedding",
+  "Gala Dinner",
+] as const;
 
-  const [transportTier, setTransportTier] = useState<TransportTier>("standard");
-  const [selectedExcursionIds, setSelectedExcursionIds] = useState<string[]>([]);
-  const [mealPlan, setMealPlan] = useState<MealPlanId>("full-board");
-  const [allergies, setAllergies] = useState<CommonAllergy[]>([]);
-  const [dietaryNotes, setDietaryNotes] = useState("");
+const MICE_VENUE_PREFS = [
+  "Beach Resort",
+  "Mountain Lodge",
+  "Heritage Hotel",
+  "City Conference Center",
+  "Tea Estate",
+  "National Park Lodge",
+] as const;
 
-  const [details, setDetails] = useState({
-    name: user.name,
-    email: user.email,
-    phone: "",
-    travelers: "",
-    dates: "",
-    duration: "",
-    budget: "",
-    notes: "",
+const MICE_BUDGET_RANGES = [
+  "Under $10,000",
+  "$10,000 – $25,000",
+  "$25,000 – $50,000",
+  "$50,000 – $100,000",
+  "Over $100,000",
+] as const;
+
+const STEP_LABELS = ["Trip Type", "Destination", "Customize", "Review"];
+
+const SvgIcon = ({ d, className = "w-8 h-8" }: { d: string | string[]; className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    {(Array.isArray(d) ? d : [d]).map((path, i) => (
+      <path key={i} strokeLinecap="round" strokeLinejoin="round" d={path} />
+    ))}
+  </svg>
+);
+
+const MAP_PATH = "M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z";
+const COMPASS_PATH = "M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418";
+const USERS_PATH = "M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z";
+
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className ?? "w-4 h-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+    </svg>
+  );
+}
+
+export default function TripWizard({ initialDestination, initialGuests, initialArrival }: TripWizardProps) {
+  const router = useRouter();
+
+  const initialTripType: TripType | null = initialDestination ? "custom" : null;
+  const initialStep = initialDestination ? 2 : 1;
+
+  const [step, setStep] = useState(initialStep);
+  const [state, setState] = useState<WizardState>({
+    tripType: initialTripType,
+    packageSlug: null,
+    destinations: initialDestination ? [initialDestination] : [],
+    excursionIds: [],
+    transport: "standard",
+    mealPlan: "full-board",
+    allergies: [],
+    dietaryNotes: "",
+    guests: initialGuests ? parseInt(initialGuests, 10) : 2,
+    arrivalDate: initialArrival ?? "",
+    departureDate: "",
+    miceEventType: "",
+    miceGroupSize: 30,
+    miceVenuePrefs: [],
+    miceRequirements: "",
+    miceBudgetRange: "",
+    guideLanguage: "english",
+    accommodation: "boutique",
   });
-  const [submitted, setSubmitted] = useState(false);
 
-  const activePackage = selectedPackage
-    ? packages.find((p) => p.slug === selectedPackage) ?? null
-    : null;
+  const update = useCallback(<K extends keyof WizardState>(key: K, value: WizardState[K]) => {
+    setState((prev) => ({ ...prev, [key]: value }));
+  }, []);
 
-  function toggleDestination(slug: string) {
-    setSelectedDestinations((prev) =>
-      prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
-    );
-  }
+  const activePackage = state.packageSlug ? packages.find((p) => p.slug === state.packageSlug) ?? null : null;
 
-  function toggleExperience(exp: string) {
-    setSelectedExperiences((prev) =>
-      prev.includes(exp) ? prev.filter((e) => e !== exp) : [...prev, exp]
-    );
-  }
+  const excursionCap = activePackage
+    ? getExcursionCap(activePackage.durationDays)
+    : state.destinations.length > 0
+    ? getExcursionCap(state.destinations.length * 2 + 2)
+    : 4;
 
-  function toggleExcursion(id: string) {
-    setSelectedExcursionIds((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
-      const cap = activePackage ? getExcursionCap(activePackage.durationDays) : 4;
-      if (prev.length >= cap) return prev;
-      return [...prev, id];
+  const availableExcursions: Excursion[] = activePackage
+    ? activePackage.excursions
+    : state.destinations.flatMap((slug) => getExcursionsForDestination(slug));
+
+  const excursionsByDestination: Record<string, Excursion[]> = {};
+  if (state.tripType === "custom") {
+    state.destinations.forEach((slug) => {
+      excursionsByDestination[slug] = getExcursionsForDestination(slug);
     });
   }
 
-  function toggleAllergy(a: CommonAllergy) {
-    setAllergies((prev) =>
-      prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
-    );
+  function toggleExcursion(id: string) {
+    setState((prev) => {
+      const has = prev.excursionIds.includes(id);
+      if (!has && prev.excursionIds.length >= excursionCap) return prev;
+      return {
+        ...prev,
+        excursionIds: has ? prev.excursionIds.filter((e) => e !== id) : [...prev.excursionIds, id],
+      };
+    });
   }
 
-  function handleSubmit() {
-    setSubmitted(true);
+  function toggleDestination(slug: string) {
+    setState((prev) => {
+      const has = prev.destinations.includes(slug);
+      if (!has && prev.destinations.length >= 6) return prev;
+      return {
+        ...prev,
+        destinations: has ? prev.destinations.filter((d) => d !== slug) : [...prev.destinations, slug],
+        excursionIds: [],
+      };
+    });
   }
 
-  if (submitted) {
-    return (
-      <>
-        <section className="relative min-h-screen flex items-center justify-center bg-[#020617] pt-32 pb-20">
-          <div className="max-w-lg mx-auto px-8 text-center">
-            <div className="w-20 h-20 bg-[#ff9d00] rounded-full flex items-center justify-center mx-auto mb-8">
-              <svg className="w-10 h-10 text-[#482900]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl text-white mb-4">
-              Your Trip Is Being Crafted
-            </h1>
-            <p className="text-white/60 mb-8">
-              A Helanka travel specialist will review your selections and reach out
-              within 24 hours with a personalized itinerary and quote.
-            </p>
-            <a
-              href="/"
-              className="inline-block bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
-            >
-              Back to Home
-            </a>
-          </div>
-        </section>
-      </>
-    );
+  function toggleAllergy(allergy: CommonAllergy) {
+    setState((prev) => {
+      const has = prev.allergies.includes(allergy);
+      return {
+        ...prev,
+        allergies: has ? prev.allergies.filter((a) => a !== allergy) : [...prev.allergies, allergy],
+      };
+    });
   }
 
-  const excursionCap = activePackage ? getExcursionCap(activePackage.durationDays) : 4;
+  function toggleVenuePref(venue: string) {
+    setState((prev) => {
+      const has = prev.miceVenuePrefs.includes(venue);
+      return {
+        ...prev,
+        miceVenuePrefs: has ? prev.miceVenuePrefs.filter((v) => v !== venue) : [...prev.miceVenuePrefs, venue],
+      };
+    });
+  }
+
+  function handleSignInContinue() {
+    const payload = {
+      tripType: state.tripType,
+      packageSlug: state.packageSlug,
+      destinations: state.destinations,
+      excursionIds: state.excursionIds,
+      transport: state.transport,
+      mealPlan: state.mealPlan,
+      allergies: state.allergies,
+      dietaryNotes: state.dietaryNotes,
+      guests: state.guests,
+      arrivalDate: state.arrivalDate,
+      departureDate: state.departureDate,
+      miceEventType: state.miceEventType,
+      miceGroupSize: state.miceGroupSize,
+      miceVenuePrefs: state.miceVenuePrefs,
+      miceRequirements: state.miceRequirements,
+      miceBudgetRange: state.miceBudgetRange,
+      guideLanguage: state.guideLanguage,
+      accommodation: state.accommodation,
+    };
+    sessionStorage.setItem("helanka-wizard-state", JSON.stringify(payload));
+    router.push("/login?callbackUrl=/dashboard");
+  }
+
+  const estimatedPrice = (() => {
+    if (state.tripType === "mice") return null;
+    const accommodationAddon = ACCOMMODATION_TIERS.find((t) => t.id === state.accommodation)?.priceModifier ?? 0;
+    if (state.tripType === "package" && activePackage) {
+      const transportExtra = state.transport === "super-luxury" ? 400 : 0;
+      const accommodationExtra = accommodationAddon * activePackage.durationDays;
+      return (activePackage.price + transportExtra + accommodationExtra) * state.guests;
+    }
+    if (state.tripType === "custom") {
+      const base = state.destinations.length * 350;
+      const excExtra = state.excursionIds.length * 40;
+      const transportExtra = state.transport === "super-luxury" ? 400 : 0;
+      const accommodationExtra = accommodationAddon * (state.destinations.length * 2 + 1);
+      return (base + excExtra + transportExtra + accommodationExtra) * state.guests;
+    }
+    return null;
+  })();
 
   return (
-    <>
-      {/* Hero — compact */}
-      <section className="relative bg-[#020617] pt-32 pb-8">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
-          <span className="inline-block bg-[#ff9d00] text-[#482900] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
-            Trip Builder
-          </span>
-          <h1 className="font-[family-name:var(--font-playfair)] text-3xl md:text-5xl text-white mb-3">
-            Build Your Dream Trip
-          </h1>
-          <p className="text-white/50 max-w-lg">
-            Choose your destinations, pick experiences, and tell us your
-            preferences. We&apos;ll handle the rest.
-          </p>
-        </div>
-      </section>
+    <div className="min-h-screen bg-[#020617] pt-32 pb-20 font-[family-name:var(--font-manrope)]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+        <ProgressBar currentStep={step} />
 
-      {/* Progress Bar */}
-      <section className="bg-[#020617] sticky top-0 z-40 border-b border-white/5">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 py-4">
-          <div className="flex items-center gap-2 md:gap-4">
-            {steps.map((s, i) => (
-              <div key={s.id} className="flex items-center gap-2 md:gap-4">
-                <button
-                  onClick={() => {
-                    if (s.id < step) setStep(s.id);
-                  }}
-                  className={`flex items-center gap-2 transition-colors ${
-                    s.id === step
-                      ? "text-[#ff9d00]"
-                      : s.id < step
-                      ? "text-white/80 cursor-pointer hover:text-[#ff9d00]"
-                      : "text-white/30 cursor-default"
-                  }`}
-                >
-                  <span
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border transition-colors ${
-                      s.id === step
-                        ? "bg-[#ff9d00] text-[#482900] border-[#ff9d00]"
-                        : s.id < step
-                        ? "bg-[#ff9d00]/20 border-[#ff9d00]/40 text-[#ff9d00]"
-                        : "border-white/20 text-white/30"
-                    }`}
-                  >
-                    {s.id < step ? (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      s.id
-                    )}
-                  </span>
-                  <span className="hidden md:inline text-sm">{s.label}</span>
-                </button>
-                {i < steps.length - 1 && (
-                  <div
-                    className={`w-8 md:w-16 h-px ${
-                      s.id < step ? "bg-[#ff9d00]/40" : "bg-white/10"
-                    }`}
-                  />
+        <div className="mt-10">
+          {step === 1 && <Step1TripType onSelect={(type) => { update("tripType", type); setStep(2); }} />}
+
+          {step === 2 && state.tripType === "package" && (
+            <Step2Packages
+              selectedSlug={state.packageSlug}
+              onSelect={(slug) => { update("packageSlug", slug); update("excursionIds", []); setStep(3); }}
+              onBack={() => setStep(1)}
+            />
+          )}
+
+          {step === 2 && state.tripType === "custom" && (
+            <Step2Destinations
+              selected={state.destinations}
+              onToggle={toggleDestination}
+              onBack={() => setStep(1)}
+              onContinue={() => setStep(3)}
+            />
+          )}
+
+          {step === 2 && state.tripType === "mice" && (
+            <Step2Mice
+              eventType={state.miceEventType}
+              groupSize={state.miceGroupSize}
+              onEventType={(v) => update("miceEventType", v)}
+              onGroupSize={(v) => update("miceGroupSize", v)}
+              onBack={() => setStep(1)}
+              onContinue={() => setStep(3)}
+            />
+          )}
+
+          {step === 3 && state.tripType === "package" && (
+            <Step3Package
+              pkg={activePackage}
+              selectedExcursions={state.excursionIds}
+              excursionCap={excursionCap}
+              onToggleExcursion={toggleExcursion}
+              transport={state.transport}
+              mealPlan={state.mealPlan}
+              allergies={state.allergies}
+              dietaryNotes={state.dietaryNotes}
+              onTransport={(v) => update("transport", v)}
+              onMealPlan={(v) => update("mealPlan", v)}
+              onToggleAllergy={toggleAllergy}
+              onDietaryNotes={(v) => update("dietaryNotes", v)}
+              accommodation={state.accommodation}
+              guideLanguage={state.guideLanguage}
+              onAccommodation={(v) => update("accommodation", v)}
+              onGuideLanguage={(v) => update("guideLanguage", v)}
+              onBack={() => setStep(2)}
+              onContinue={() => setStep(4)}
+            />
+          )}
+
+          {step === 3 && state.tripType === "custom" && (
+            <Step3Custom
+              excursionsByDestination={excursionsByDestination}
+              selectedExcursions={state.excursionIds}
+              excursionCap={excursionCap}
+              onToggleExcursion={toggleExcursion}
+              transport={state.transport}
+              mealPlan={state.mealPlan}
+              allergies={state.allergies}
+              dietaryNotes={state.dietaryNotes}
+              onTransport={(v) => update("transport", v)}
+              onMealPlan={(v) => update("mealPlan", v)}
+              onToggleAllergy={toggleAllergy}
+              onDietaryNotes={(v) => update("dietaryNotes", v)}
+              accommodation={state.accommodation}
+              guideLanguage={state.guideLanguage}
+              onAccommodation={(v) => update("accommodation", v)}
+              onGuideLanguage={(v) => update("guideLanguage", v)}
+              onBack={() => setStep(2)}
+              onContinue={() => setStep(4)}
+            />
+          )}
+
+          {step === 3 && state.tripType === "mice" && (
+            <Step3Mice
+              venuePrefs={state.miceVenuePrefs}
+              requirements={state.miceRequirements}
+              budgetRange={state.miceBudgetRange}
+              onToggleVenue={toggleVenuePref}
+              onRequirements={(v) => update("miceRequirements", v)}
+              onBudgetRange={(v) => update("miceBudgetRange", v)}
+              onBack={() => setStep(2)}
+              onContinue={() => setStep(4)}
+            />
+          )}
+
+          {step === 4 && (
+            <Step4Review
+              state={state}
+              activePackage={activePackage}
+              availableExcursions={availableExcursions}
+              estimatedPrice={estimatedPrice}
+              onBack={() => setStep(3)}
+              onConfirm={handleSignInContinue}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProgressBar({ currentStep }: { currentStep: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      {STEP_LABELS.map((label, i) => {
+        const stepNum = i + 1;
+        const isCompleted = currentStep > stepNum;
+        const isCurrent = currentStep === stepNum;
+        return (
+          <div key={label} className="flex items-center gap-2 flex-1 last:flex-none">
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 transition-colors ${
+                  isCompleted
+                    ? "bg-[#ff9d00] text-[#482900]"
+                    : isCurrent
+                    ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
+                    : "bg-white/10 text-white/40"
+                }`}
+              >
+                {isCompleted ? <CheckIcon className="w-3.5 h-3.5" /> : stepNum}
+              </div>
+              <span
+                className={`text-xs font-medium hidden sm:block truncate transition-colors ${
+                  isCurrent ? "text-white" : isCompleted ? "text-white/60" : "text-white/30"
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+            {i < STEP_LABELS.length - 1 && (
+              <div className={`flex-1 h-px mx-1 transition-colors ${isCompleted ? "bg-[#ff9d00]/40" : "bg-white/10"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function StepHeading({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div className="mb-8">
+      <h1 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl text-white">{title}</h1>
+      {subtitle && <p className="mt-2 text-white/60 text-base">{subtitle}</p>}
+    </div>
+  );
+}
+
+function StepNav({ onBack, onContinue, continueLabel = "Continue", continueDisabled = false }: {
+  onBack: () => void;
+  onContinue: () => void;
+  continueLabel?: string;
+  continueDisabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between mt-10 pt-6 border-t border-white/10">
+      <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
+        Back
+      </button>
+      <button
+        onClick={onContinue}
+        disabled={continueDisabled}
+        className="bg-[#ff9d00] text-[#482900] px-7 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#ffb340] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {continueLabel}
+      </button>
+    </div>
+  );
+}
+
+function Step1TripType({ onSelect }: { onSelect: (type: TripType) => void }) {
+  const cards = [
+    { type: "package" as TripType, title: "Curated Package", description: "Choose from our expert-designed itineraries", icon: MAP_PATH },
+    { type: "custom" as TripType, title: "Custom Tour", description: "Pick your own destinations and excursions", icon: COMPASS_PATH },
+    { type: "mice" as TripType, title: "MICE & Groups", description: "Corporate events, incentives, and group travel", icon: USERS_PATH },
+  ];
+
+  return (
+    <div>
+      <StepHeading title="What kind of trip?" subtitle="Tell us how you'd like to travel and we'll tailor everything to you." />
+      <div className="grid gap-4 sm:grid-cols-3">
+        {cards.map(({ type, title, description, icon }) => (
+          <button
+            key={type}
+            onClick={() => onSelect(type)}
+            className="liquid-glass p-7 rounded-2xl text-left group hover:border-[#ff9d00] border border-white/10 transition-all hover:ring-1 hover:ring-[#ff9d00]/20"
+          >
+            <div className="text-[#ff9d00] mb-4 group-hover:scale-110 transition-transform">
+              <SvgIcon d={icon} />
+            </div>
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg text-white mb-1">{title}</h3>
+            <p className="text-white/60 text-sm leading-relaxed">{description}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Step2Packages({
+  selectedSlug,
+  onSelect,
+  onBack,
+}: {
+  selectedSlug: string | null;
+  onSelect: (slug: string) => void;
+  onBack: () => void;
+}) {
+  return (
+    <div>
+      <StepHeading title="Where to?" subtitle="Choose a curated package designed by our travel experts." />
+      <div className="grid gap-4 sm:grid-cols-2">
+        {packages.map((pkg) => {
+          const isSelected = selectedSlug === pkg.slug;
+          return (
+            <button
+              key={pkg.slug}
+              onClick={() => onSelect(pkg.slug)}
+              className={`liquid-glass rounded-2xl overflow-hidden text-left transition-all ${
+                isSelected
+                  ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20 border"
+                  : "border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <div className="relative h-36 overflow-hidden">
+                <img src={pkg.image} alt={pkg.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
+                  <span className="text-white font-semibold text-sm">{pkg.durationDays} days</span>
+                  <span className="text-[#ff9d00] font-semibold text-sm">from ${pkg.price.toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-[family-name:var(--font-playfair)] text-white text-base mb-1">{pkg.name}</h3>
+                <p className="text-white/60 text-xs leading-relaxed line-clamp-2 mb-3">{pkg.description}</p>
+                <div className="flex flex-wrap gap-1">
+                  {pkg.excursions.slice(0, 3).map((exc) => (
+                    <span key={exc.id} className="bg-white/10 text-white/60 text-xs px-2 py-0.5 rounded-full">
+                      {destinations.find((d) => d.slug === exc.destinationSlug)?.name ?? exc.destinationSlug}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex justify-start mt-10 pt-6 border-t border-white/10">
+        <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
+          Back
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Step2Destinations({
+  selected,
+  onToggle,
+  onBack,
+  onContinue,
+}: {
+  selected: string[];
+  onToggle: (slug: string) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  const atMax = selected.length >= 6;
+  return (
+    <div>
+      <StepHeading
+        title="Where to?"
+        subtitle={`Pick up to 6 destinations. ${selected.length > 0 ? `${selected.length} selected.` : ""}`}
+      />
+      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+        {destinations.map((dest) => {
+          const isSelected = selected.includes(dest.slug);
+          const isDisabled = !isSelected && atMax;
+          return (
+            <button
+              key={dest.slug}
+              onClick={() => !isDisabled && onToggle(dest.slug)}
+              disabled={isDisabled}
+              className={`liquid-glass rounded-2xl overflow-hidden text-left transition-all ${
+                isDisabled ? "opacity-40 cursor-not-allowed" : ""
+              } ${
+                isSelected
+                  ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20 border"
+                  : "border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <div className="relative h-28 overflow-hidden">
+                <img src={dest.image} alt={dest.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                {isSelected && (
+                  <div className="absolute top-2 right-2 bg-[#ff9d00] rounded-full w-5 h-5 flex items-center justify-center">
+                    <CheckIcon className="w-3 h-3 text-[#482900]" />
+                  </div>
                 )}
               </div>
+              <div className="p-3">
+                <h3 className="text-white text-sm font-semibold">{dest.name}</h3>
+                <p className="text-white/50 text-xs">{dest.region}</p>
+                <p className="text-white/60 text-xs mt-0.5 italic">{dest.tagline}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} continueDisabled={selected.length === 0} />
+    </div>
+  );
+}
+
+function Step2Mice({
+  eventType,
+  groupSize,
+  onEventType,
+  onGroupSize,
+  onBack,
+  onContinue,
+}: {
+  eventType: string;
+  groupSize: number;
+  onEventType: (v: string) => void;
+  onGroupSize: (v: number) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  return (
+    <div>
+      <StepHeading title="Tell us about your event" subtitle="We'll build a proposal around your requirements." />
+      <div className="space-y-8">
+        <div>
+          <p className="text-white/60 text-sm mb-3">Event Type</p>
+          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
+            {MICE_EVENT_TYPES.map((type) => (
+              <button
+                key={type}
+                onClick={() => onEventType(type)}
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  eventType === type
+                    ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
+                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                }`}
+              >
+                {type}
+              </button>
             ))}
           </div>
         </div>
-      </section>
 
-      {/* Step Content */}
-      <section className="bg-[#020617] py-12 min-h-[60vh]">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
-          {/* Step 1 — Destinations */}
-          {step === STEP_DESTINATIONS && (
-            <div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                Where Do You Want to Go?
-              </h2>
-              <p className="text-white/50 text-sm mb-8">
-                Select one or more destinations for your trip.
-              </p>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {destinations.map((d) => {
-                  const selected = selectedDestinations.includes(d.slug);
-                  return (
-                    <button
-                      key={d.slug}
-                      onClick={() => toggleDestination(d.slug)}
-                      className={`relative h-48 rounded-2xl overflow-hidden text-left group transition-all ${
-                        selected
-                          ? "ring-2 ring-[#ff9d00] ring-offset-2 ring-offset-[#020617]"
-                          : "hover:ring-1 hover:ring-white/20"
-                      }`}
-                    >
-                      <div
-                        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                        style={{ backgroundImage: `url('${d.image}')` }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                      {selected && (
-                        <div className="absolute top-3 right-3 w-7 h-7 bg-[#ff9d00] rounded-full flex items-center justify-center z-10">
-                          <svg className="w-4 h-4 text-[#482900]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      )}
-                      <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-                        <p className="text-[#ff9d00] text-xs font-medium tracking-wider uppercase mb-1">
-                          {d.region}
-                        </p>
-                        <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white">
-                          {d.name}
-                        </h3>
-                        <p className="text-white/50 text-sm mt-1">{d.tagline}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Suggested Packages */}
-              {selectedDestinations.length > 0 && (
-                <div className="mt-12">
-                  <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-4">
-                    Suggested Packages
-                  </h3>
-                  <p className="text-white/50 text-sm mb-6">
-                    Based on your destinations. Select one to pre-fill your trip,
-                    or skip to fully customize.
-                  </p>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {packages.map((pkg) => (
-                      <button
-                        key={pkg.slug}
-                        onClick={() => {
-                          setSelectedPackage(
-                            selectedPackage === pkg.slug ? null : pkg.slug
-                          );
-                          setSelectedExcursionIds([]);
-                        }}
-                        className={`text-left rounded-2xl border p-5 transition-all ${
-                          selectedPackage === pkg.slug
-                            ? "bg-[#ff9d00]/10 border-[#ff9d00]/40"
-                            : "bg-white/5 border-white/10 hover:border-white/20"
-                        }`}
-                      >
-                        <p className="text-[#ff9d00] text-xs font-medium tracking-wider uppercase mb-1">
-                          {pkg.durationDays} Days &middot; {pkg.minGuests}–{pkg.maxGuests} Guests &middot; {pkg.region}
-                        </p>
-                        <h4 className="font-[family-name:var(--font-playfair)] text-lg text-white mb-2">
-                          {pkg.name}
-                        </h4>
-                        <p className="text-white/40 text-sm line-clamp-2">
-                          {pkg.description}
-                        </p>
-                        <p className="text-[#ff9d00] font-semibold mt-3">
-                          From ${pkg.price.toLocaleString()}
-                        </p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Step 2 — Experiences */}
-          {step === STEP_EXPERIENCES && (
-            <div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                What Experiences Interest You?
-              </h2>
-              <p className="text-white/50 text-sm mb-8">
-                Pick as many as you like — we&apos;ll weave them into your
-                itinerary.
-              </p>
-              <div className="grid md:grid-cols-2 gap-4">
-                {experiences.map((exp) => {
-                  const selected = selectedExperiences.includes(exp);
-                  return (
-                    <button
-                      key={exp}
-                      onClick={() => toggleExperience(exp)}
-                      className={`text-left rounded-2xl border p-6 transition-all flex items-center gap-4 ${
-                        selected
-                          ? "bg-[#ff9d00]/10 border-[#ff9d00]/40"
-                          : "bg-white/5 border-white/10 hover:border-white/20"
-                      }`}
-                    >
-                      <span
-                        className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                          selected
-                            ? "bg-[#ff9d00] border-[#ff9d00]"
-                            : "border-white/20"
-                        }`}
-                      >
-                        {selected && (
-                          <svg className="w-3.5 h-3.5 text-[#482900]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </span>
-                      <span className={`text-base ${selected ? "text-white" : "text-white/60"}`}>
-                        {exp}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Step 3 — Customize */}
-          {step === STEP_CUSTOMIZE && (
-            <div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                Customize Your Package
-              </h2>
-              <p className="text-white/50 text-sm mb-10">
-                Tailor your transport, excursions, and dining preferences.
-              </p>
-
-              {/* Standard Inclusions Banner */}
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 mb-10">
-                <h3 className="text-emerald-400 text-sm font-semibold uppercase tracking-wider mb-4">
-                  Included as Standard
-                </h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {STANDARD_INCLUSIONS.map((inc) => (
-                    <div key={inc.name} className="flex items-start gap-3">
-                      <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-white text-sm font-medium">{inc.name}</p>
-                        <p className="text-white/40 text-xs mt-0.5">{inc.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Transport Tier */}
-              <div className="mb-10">
-                <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-2">
-                  Transport Tier
-                </h3>
-                <p className="text-white/50 text-sm mb-6">
-                  Choose your vehicle class for the entire trip.
-                </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {(activePackage?.transportTiers ?? [
-                    {
-                      tier: "standard" as TransportTier,
-                      label: "Standard",
-                      description: "Comfortable air-conditioned transport for your journey.",
-                      vehicleType: "Toyota KDH Van",
-                      features: ["Air conditioning", "Ample luggage space", "Bottled water on board", "Phone charging ports"],
-                      priceModifier: 0,
-                    },
-                    {
-                      tier: "super-luxury" as TransportTier,
-                      label: "Super Luxury",
-                      description: "Premium vehicle with luxury amenities for a first-class experience.",
-                      vehicleType: "Mercedes V-Class",
-                      features: ["Leather reclining seats", "On-board Wi-Fi", "Mini fridge with refreshments", "Noise-cancelling cabin", "Premium sound system", "Tinted privacy glass"],
-                      priceModifier: 400,
-                    },
-                  ]).map((t) => (
-                    <button
-                      key={t.tier}
-                      onClick={() => setTransportTier(t.tier)}
-                      className={`text-left rounded-2xl border p-6 transition-all ${
-                        transportTier === t.tier
-                          ? "bg-[#ff9d00]/10 border-[#ff9d00]/40 ring-1 ring-[#ff9d00]/30"
-                          : "bg-white/5 border-white/10 hover:border-white/20"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-[family-name:var(--font-playfair)] text-lg text-white">
-                          {t.label}
-                        </h4>
-                        {t.priceModifier > 0 ? (
-                          <span className="text-[#ff9d00] text-sm font-semibold">
-                            +${t.priceModifier}
-                          </span>
-                        ) : (
-                          <span className="text-emerald-400 text-sm font-semibold">
-                            Included
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-white/50 text-sm mb-1">{t.vehicleType}</p>
-                      <p className="text-white/40 text-xs mb-4">{t.description}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {t.features.map((f) => (
-                          <span
-                            key={f}
-                            className="px-2.5 py-1 bg-white/5 rounded-full text-xs text-white/60"
-                          >
-                            {f}
-                          </span>
-                        ))}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Excursion Picker */}
-              {activePackage && (
-                <div className="mb-10">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white">
-                      Choose Your Excursions
-                    </h3>
-                    <span
-                      className={`text-sm font-semibold px-3 py-1 rounded-full ${
-                        selectedExcursionIds.length === excursionCap
-                          ? "bg-emerald-500/20 text-emerald-400"
-                          : "bg-[#ff9d00]/20 text-[#ff9d00]"
-                      }`}
-                    >
-                      {selectedExcursionIds.length} / {excursionCap} selected
-                    </span>
-                  </div>
-                  <p className="text-white/50 text-sm mb-6">
-                    Pick {excursionCap} excursion{excursionCap !== 1 ? "s" : ""} from
-                    the {activePackage.excursions.length} available with {activePackage.name}.
-                  </p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {activePackage.excursions.map((exc: Excursion) => {
-                      const picked = selectedExcursionIds.includes(exc.id);
-                      const atCap =
-                        selectedExcursionIds.length >= excursionCap && !picked;
-                      return (
-                        <button
-                          key={exc.id}
-                          onClick={() => toggleExcursion(exc.id)}
-                          disabled={atCap}
-                          className={`text-left rounded-2xl border p-5 transition-all ${
-                            picked
-                              ? "bg-[#ff9d00]/10 border-[#ff9d00]/40"
-                              : atCap
-                              ? "bg-white/[0.02] border-white/5 opacity-40 cursor-not-allowed"
-                              : "bg-white/5 border-white/10 hover:border-white/20"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <span
-                              className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                                picked
-                                  ? "bg-[#ff9d00] border-[#ff9d00]"
-                                  : "border-white/20"
-                              }`}
-                            >
-                              {picked && (
-                                <svg className="w-3 h-3 text-[#482900]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </span>
-                            <div className="min-w-0">
-                              <h4 className="text-white text-sm font-medium">
-                                {exc.name}
-                              </h4>
-                              <p className="text-white/40 text-xs mt-1 line-clamp-2">
-                                {exc.description}
-                              </p>
-                              <span className="inline-block mt-2 text-[10px] text-white/30 uppercase tracking-wider">
-                                {exc.durationHours}h
-                              </span>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {!activePackage && (
-                <div className="mb-10 bg-white/5 border border-white/10 rounded-2xl p-6 text-center">
-                  <p className="text-white/40 text-sm">
-                    Select a package in Step 1 to choose excursions, or skip to
-                    let our team curate your trip.
-                  </p>
-                </div>
-              )}
-
-              {/* Meal & Dietary Preferences */}
-              <div>
-                <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-2">
-                  Meal &amp; Dietary Preferences
-                </h3>
-                <p className="text-white/50 text-sm mb-6">
-                  Let us know how you&apos;d like your meals arranged and any dietary needs.
-                </p>
-
-                {/* Meal Plan Radios */}
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  {MEAL_PLANS.map((mp) => (
-                    <button
-                      key={mp.id}
-                      onClick={() => setMealPlan(mp.id)}
-                      className={`text-left rounded-2xl border p-5 transition-all ${
-                        mealPlan === mp.id
-                          ? "bg-[#ff9d00]/10 border-[#ff9d00]/40 ring-1 ring-[#ff9d00]/30"
-                          : "bg-white/5 border-white/10 hover:border-white/20"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <span
-                          className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                            mealPlan === mp.id
-                              ? "border-[#ff9d00]"
-                              : "border-white/20"
-                          }`}
-                        >
-                          {mealPlan === mp.id && (
-                            <span className="w-2 h-2 rounded-full bg-[#ff9d00]" />
-                          )}
-                        </span>
-                        <span className="text-white text-sm font-medium">
-                          {mp.label}
-                        </span>
-                      </div>
-                      <p className="text-white/40 text-xs pl-7">
-                        {mp.description}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-
-                {/* Allergy Checkboxes */}
-                <p className="text-white/60 text-sm mb-3">Allergies</p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {COMMON_ALLERGIES.map((a) => {
-                    const on = allergies.includes(a);
-                    return (
-                      <button
-                        key={a}
-                        onClick={() => toggleAllergy(a)}
-                        className={`px-3.5 py-1.5 rounded-full text-sm border transition-colors ${
-                          on
-                            ? "bg-red-500/15 border-red-500/40 text-red-300"
-                            : "bg-white/5 border-white/10 text-white/50 hover:border-white/20"
-                        }`}
-                      >
-                        {a}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Free Text */}
-                <textarea
-                  rows={3}
-                  value={dietaryNotes}
-                  onChange={(e) => setDietaryNotes(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors resize-none text-sm"
-                  placeholder="Any other dietary notes — vegan, halal, kosher, specific brand preferences..."
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Step 4 — Details */}
-          {step === STEP_DETAILS && (
-            <div className="max-w-2xl">
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                Tell Us About Your Trip
-              </h2>
-              <p className="text-white/50 text-sm mb-8">
-                The more we know, the better we can tailor your experience.
-              </p>
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={details.name}
-                      onChange={(e) => setDetails({ ...details, name: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors"
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">Email *</label>
-                    <input
-                      type="email"
-                      required
-                      value={details.email}
-                      onChange={(e) => setDetails({ ...details, email: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={details.phone}
-                      onChange={(e) => setDetails({ ...details, phone: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors"
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">
-                      Number of Travelers
-                      {activePackage && (
-                        <span className="text-white/40 ml-1">
-                          ({activePackage.minGuests}–{activePackage.maxGuests} for this package)
-                        </span>
-                      )}
-                    </label>
-                    <input
-                      type="number"
-                      min={activePackage?.minGuests ?? 1}
-                      max={activePackage?.maxGuests ?? 50}
-                      value={details.travelers}
-                      onChange={(e) => setDetails({ ...details, travelers: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors"
-                      placeholder={activePackage ? String(activePackage.minGuests) : "2"}
-                    />
-                    {activePackage && details.travelers && (
-                      Number(details.travelers) < activePackage.minGuests ? (
-                        <p className="text-red-400 text-xs mt-1.5">
-                          Minimum {activePackage.minGuests} guests required for {activePackage.name}
-                        </p>
-                      ) : Number(details.travelers) > activePackage.maxGuests ? (
-                        <p className="text-red-400 text-xs mt-1.5">
-                          Maximum {activePackage.maxGuests} guests for {activePackage.name}. Contact us for larger groups.
-                        </p>
-                      ) : null
-                    )}
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">Preferred Travel Dates</label>
-                    <input
-                      type="text"
-                      value={details.dates}
-                      onChange={(e) => setDetails({ ...details, dates: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors"
-                      placeholder="e.g. Dec 2026, flexible"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-white/70 mb-2">Trip Duration</label>
-                    <select
-                      value={details.duration}
-                      onChange={(e) => setDetails({ ...details, duration: e.target.value })}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff9d00]/50 transition-colors appearance-none"
-                    >
-                      <option value="" className="bg-[#020617]">Select duration</option>
-                      <option value="3-5" className="bg-[#020617]">3–5 days</option>
-                      <option value="6-8" className="bg-[#020617]">6–8 days</option>
-                      <option value="9-12" className="bg-[#020617]">9–12 days</option>
-                      <option value="13+" className="bg-[#020617]">13+ days</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm text-white/70 mb-2">Budget Range (per person)</label>
-                  <select
-                    value={details.budget}
-                    onChange={(e) => setDetails({ ...details, budget: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#ff9d00]/50 transition-colors appearance-none"
-                  >
-                    <option value="" className="bg-[#020617]">Select budget range</option>
-                    <option value="under-1000" className="bg-[#020617]">Under $1,000</option>
-                    <option value="1000-2000" className="bg-[#020617]">$1,000 – $2,000</option>
-                    <option value="2000-3500" className="bg-[#020617]">$2,000 – $3,500</option>
-                    <option value="3500-5000" className="bg-[#020617]">$3,500 – $5,000</option>
-                    <option value="5000+" className="bg-[#020617]">$5,000+</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-white/70 mb-2">Anything Else?</label>
-                  <textarea
-                    rows={4}
-                    value={details.notes}
-                    onChange={(e) => setDetails({ ...details, notes: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 transition-colors resize-none"
-                    placeholder="Special requests, accessibility requirements, must-see spots..."
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 5 — Review */}
-          {step === STEP_REVIEW && (
-            <div className="max-w-2xl">
-              <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                Review Your Trip
-              </h2>
-              <p className="text-white/50 text-sm mb-8">
-                Here&apos;s a summary of your selections. Hit submit and we&apos;ll
-                start building your itinerary.
-              </p>
-              <div className="space-y-6">
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-sm text-white/50 uppercase tracking-wider mb-3">Destinations</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedDestinations.length > 0 ? (
-                      selectedDestinations.map((slug) => {
-                        const d = destinations.find((x) => x.slug === slug);
-                        return (
-                          <span
-                            key={slug}
-                            className="px-3 py-1.5 bg-[#ff9d00]/10 border border-[#ff9d00]/30 rounded-full text-sm text-[#ff9d00]"
-                          >
-                            {d?.name ?? slug}
-                          </span>
-                        );
-                      })
-                    ) : (
-                      <span className="text-white/30 text-sm">No destinations selected</span>
-                    )}
-                  </div>
-                </div>
-
-                {selectedPackage && (
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                    <h3 className="text-sm text-white/50 uppercase tracking-wider mb-3">Selected Package</h3>
-                    <p className="text-white font-medium">
-                      {packages.find((p) => p.slug === selectedPackage)?.name}
-                    </p>
-                  </div>
-                )}
-
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-sm text-white/50 uppercase tracking-wider mb-3">Experiences</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedExperiences.length > 0 ? (
-                      selectedExperiences.map((exp) => (
-                        <span
-                          key={exp}
-                          className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm text-white/70"
-                        >
-                          {exp}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="text-white/30 text-sm">No experiences selected</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Customization Summary */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-sm text-white/50 uppercase tracking-wider mb-3">Customization</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Transport</p>
-                      <p className="text-white text-sm">
-                        {transportTier === "super-luxury" ? "Super Luxury — Mercedes V-Class" : "Standard — Toyota KDH Van"}
-                        {transportTier === "super-luxury" && (
-                          <span className="ml-2 text-[#ff9d00] text-xs font-semibold">+$400</span>
-                        )}
-                      </p>
-                    </div>
-                    {selectedExcursionIds.length > 0 && activePackage && (
-                      <div>
-                        <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Excursions</p>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedExcursionIds.map((id) => {
-                            const exc = activePackage.excursions.find((e: Excursion) => e.id === id);
-                            return (
-                              <span
-                                key={id}
-                                className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-sm text-white/70"
-                              >
-                                {exc?.name ?? id}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Meal Plan</p>
-                      <p className="text-white text-sm">
-                        {MEAL_PLANS.find((m) => m.id === mealPlan)?.label}
-                      </p>
-                    </div>
-                    {allergies.length > 0 && (
-                      <div>
-                        <p className="text-white/40 text-xs uppercase tracking-wider mb-2">Allergies</p>
-                        <div className="flex flex-wrap gap-2">
-                          {allergies.map((a) => (
-                            <span
-                              key={a}
-                              className="px-3 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full text-sm text-red-300"
-                            >
-                              {a}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {dietaryNotes && (
-                      <div>
-                        <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Dietary Notes</p>
-                        <p className="text-white/70 text-sm">{dietaryNotes}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <h3 className="text-sm text-white/50 uppercase tracking-wider mb-3">Trip Details</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    {details.name && (
-                      <div>
-                        <p className="text-white/40">Name</p>
-                        <p className="text-white">{details.name}</p>
-                      </div>
-                    )}
-                    {details.email && (
-                      <div>
-                        <p className="text-white/40">Email</p>
-                        <p className="text-white">{details.email}</p>
-                      </div>
-                    )}
-                    {details.phone && (
-                      <div>
-                        <p className="text-white/40">Phone</p>
-                        <p className="text-white">{details.phone}</p>
-                      </div>
-                    )}
-                    {details.travelers && (
-                      <div>
-                        <p className="text-white/40">Travelers</p>
-                        <p className="text-white">{details.travelers}</p>
-                      </div>
-                    )}
-                    {details.dates && (
-                      <div>
-                        <p className="text-white/40">Dates</p>
-                        <p className="text-white">{details.dates}</p>
-                      </div>
-                    )}
-                    {details.duration && (
-                      <div>
-                        <p className="text-white/40">Duration</p>
-                        <p className="text-white">{details.duration} days</p>
-                      </div>
-                    )}
-                    {details.budget && (
-                      <div>
-                        <p className="text-white/40">Budget</p>
-                        <p className="text-white">{details.budget}</p>
-                      </div>
-                    )}
-                  </div>
-                  {details.notes && (
-                    <div className="mt-4 pt-4 border-t border-white/10">
-                      <p className="text-white/40 text-sm">Notes</p>
-                      <p className="text-white/70 text-sm mt-1">{details.notes}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-12 pt-8 border-t border-white/10">
-            {step > STEP_DESTINATIONS ? (
-              <button
-                onClick={() => setStep(step - 1)}
-                className="text-white/60 hover:text-white transition-colors text-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-                Back
-              </button>
-            ) : (
-              <div />
-            )}
-            {step < STEP_REVIEW ? (
-              <button
-                onClick={() => setStep(step + 1)}
-                className="bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors flex items-center gap-2"
-              >
-                Continue
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                className="bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
-              >
-                Submit My Trip
-              </button>
-            )}
+        <div>
+          <p className="text-white/60 text-sm mb-3">Group Size</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => onGroupSize(Math.max(10, groupSize - 10))}
+              className="bg-white/10 border border-white/20 text-white w-10 h-10 rounded-lg flex items-center justify-center text-lg hover:bg-white/15 transition-colors"
+            >
+              −
+            </button>
+            <span className="text-white text-2xl font-semibold w-16 text-center">{groupSize}</span>
+            <button
+              onClick={() => onGroupSize(Math.min(500, groupSize + 10))}
+              className="bg-white/10 border border-white/20 text-white w-10 h-10 rounded-lg flex items-center justify-center text-lg hover:bg-white/15 transition-colors"
+            >
+              +
+            </button>
+            <span className="text-white/40 text-sm">people (10–500)</span>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} continueDisabled={!eventType} />
+    </div>
+  );
+}
+
+function ExcursionSection({
+  excursions,
+  selectedIds,
+  cap,
+  onToggle,
+  groupLabel,
+}: {
+  excursions: Excursion[];
+  selectedIds: string[];
+  cap: number;
+  onToggle: (id: string) => void;
+  groupLabel?: string;
+}) {
+  return (
+    <div>
+      {groupLabel && <h4 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3">{groupLabel}</h4>}
+      <div className="grid gap-2 sm:grid-cols-2">
+        {excursions.map((exc) => {
+          const isSelected = selectedIds.includes(exc.id);
+          const isDisabled = !isSelected && selectedIds.length >= cap;
+          return (
+            <button
+              key={exc.id}
+              onClick={() => !isDisabled && onToggle(exc.id)}
+              disabled={isDisabled}
+              className={`rounded-xl p-3 text-left transition-all ${
+                isDisabled ? "opacity-40 cursor-not-allowed" : ""
+              } ${
+                isSelected
+                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/10"
+                  : "liquid-glass border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <div className="flex items-start gap-2">
+                <div className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border flex items-center justify-center ${isSelected ? "bg-[#ff9d00] border-[#ff9d00]" : "border-white/30"}`}>
+                  {isSelected && <CheckIcon className="w-2.5 h-2.5 text-[#482900]" />}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-medium leading-tight">{exc.name}</p>
+                  <p className="text-white/50 text-xs mt-0.5 leading-relaxed line-clamp-2">{exc.description}</p>
+                  <p className="text-white/40 text-xs mt-1">{exc.durationHours}h</p>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface DietProps {
+  transport: TransportTier;
+  mealPlan: MealPlanId;
+  allergies: CommonAllergy[];
+  dietaryNotes: string;
+  onTransport: (v: TransportTier) => void;
+  onMealPlan: (v: MealPlanId) => void;
+  onToggleAllergy: (a: CommonAllergy) => void;
+  onDietaryNotes: (v: string) => void;
+  accommodation: string;
+  guideLanguage: string;
+  onAccommodation: (v: string) => void;
+  onGuideLanguage: (v: string) => void;
+}
+
+function TransportAndDining({
+  transport, mealPlan, allergies, dietaryNotes,
+  onTransport, onMealPlan, onToggleAllergy, onDietaryNotes,
+  accommodation, guideLanguage, onAccommodation, onGuideLanguage,
+}: DietProps) {
+  return (
+    <div className="space-y-8">
+      <div>
+        <p className="text-white text-sm font-semibold mb-3">Transport</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {(["standard", "super-luxury"] as TransportTier[]).map((tier) => (
+            <button
+              key={tier}
+              onClick={() => onTransport(tier)}
+              className={`rounded-xl p-4 text-left transition-all ${
+                transport === tier
+                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/10"
+                  : "liquid-glass border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <p className="text-white text-sm font-semibold">{tier === "standard" ? "Standard" : "Super Luxury"}</p>
+              <p className="text-white/50 text-xs mt-1">
+                {tier === "standard" ? "Toyota KDH Van — A/C, water, charging" : "Mercedes V-Class — Wi-Fi, leather, fridge"}
+              </p>
+              {tier === "super-luxury" && <p className="text-[#ff9d00] text-xs mt-1">+$400 per trip</p>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-white text-sm font-semibold mb-3">Accommodation</p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {ACCOMMODATION_TIERS.map((tier) => (
+            <button
+              key={tier.id}
+              onClick={() => onAccommodation(tier.id)}
+              className={`rounded-xl p-4 text-left transition-all ${
+                accommodation === tier.id
+                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
+                  : "liquid-glass border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <p className="text-white text-sm font-semibold">{tier.name}</p>
+              <p className="text-white/50 text-xs mt-1 leading-relaxed">{tier.description}</p>
+              <p className={`text-xs mt-2 font-medium ${tier.priceModifier === 0 ? "text-white/40" : "text-[#ff9d00]"}`}>
+                {tier.priceModifier === 0 ? "Included" : `+$${tier.priceModifier}/night`}
+              </p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-white text-sm font-semibold mb-1">Multilingual Guide</p>
+        <p className="text-white/50 text-xs mb-3">Your personal guide speaks your language throughout the trip</p>
+        <select
+          value={guideLanguage}
+          onChange={(e) => onGuideLanguage(e.target.value)}
+          className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] focus:outline-none focus:border-[#ff9d00]/50"
+        >
+          {GUIDE_LANGUAGES.map((lang) => (
+            <option key={lang.id} value={lang.id} className="bg-[#020617] text-[#e5e2e1]">
+              {lang.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <p className="text-white text-sm font-semibold mb-3">Meal Plan</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {MEAL_PLANS.map((plan) => (
+            <button
+              key={plan.id}
+              onClick={() => onMealPlan(plan.id)}
+              className={`rounded-xl p-3 text-left transition-all ${
+                mealPlan === plan.id
+                  ? "bg-[#ff9d00]/10 border border-[#ff9d00]"
+                  : "liquid-glass border border-white/10 hover:border-white/25"
+              }`}
+            >
+              <p className="text-white text-sm font-medium">{plan.label}</p>
+              <p className="text-white/50 text-xs mt-0.5">{plan.description}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-white text-sm font-semibold mb-3">Dietary Restrictions</p>
+        <div className="flex flex-wrap gap-2">
+          {COMMON_ALLERGIES.map((allergy) => (
+            <button
+              key={allergy}
+              onClick={() => onToggleAllergy(allergy)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                allergies.includes(allergy)
+                  ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
+                  : "bg-white/10 border border-white/20 text-white/60 hover:border-white/35"
+              }`}
+            >
+              {allergy}
+            </button>
+          ))}
+        </div>
+        <textarea
+          value={dietaryNotes}
+          onChange={(e) => onDietaryNotes(e.target.value)}
+          placeholder="Any other dietary notes..."
+          rows={2}
+          className="mt-3 w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 resize-none"
+        />
+      </div>
+    </div>
+  );
+}
+
+function Step3Package({
+  pkg, selectedExcursions, excursionCap, onToggleExcursion, onBack, onContinue, ...dietProps
+}: DietProps & {
+  pkg: typeof packages[number] | null;
+  selectedExcursions: string[];
+  excursionCap: number;
+  onToggleExcursion: (id: string) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  if (!pkg) return null;
+
+  return (
+    <div>
+      <StepHeading
+        title="Customize your trip"
+        subtitle={`Select up to ${excursionCap} excursions for ${pkg.name}.`}
+      />
+      <div className="space-y-8">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-white text-sm font-semibold">Excursions</p>
+            <span className="text-white/40 text-xs">{selectedExcursions.length} / {excursionCap} selected</span>
+          </div>
+          <ExcursionSection excursions={pkg.excursions} selectedIds={selectedExcursions} cap={excursionCap} onToggle={onToggleExcursion} />
+        </div>
+        <TransportAndDining {...dietProps} />
+      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} />
+    </div>
+  );
+}
+
+function Step3Custom({
+  excursionsByDestination, selectedExcursions, excursionCap, onToggleExcursion, onBack, onContinue, ...dietProps
+}: DietProps & {
+  excursionsByDestination: Record<string, Excursion[]>;
+  selectedExcursions: string[];
+  excursionCap: number;
+  onToggleExcursion: (id: string) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  return (
+    <div>
+      <StepHeading title="Customize your trip" subtitle={`Select up to ${excursionCap} excursions across your destinations.`} />
+      <div className="space-y-8">
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-white text-sm font-semibold">Excursions</p>
+            <span className="text-white/40 text-xs">{selectedExcursions.length} / {excursionCap} selected</span>
+          </div>
+          <div className="space-y-6">
+            {Object.entries(excursionsByDestination).map(([slug, excursions]) => {
+              const dest = destinations.find((d) => d.slug === slug);
+              return (
+                <ExcursionSection
+                  key={slug}
+                  excursions={excursions}
+                  selectedIds={selectedExcursions}
+                  cap={excursionCap}
+                  onToggle={onToggleExcursion}
+                  groupLabel={dest?.name ?? slug}
+                />
+              );
+            })}
+          </div>
+        </div>
+        <TransportAndDining {...dietProps} />
+      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} />
+    </div>
+  );
+}
+
+function Step3Mice({
+  venuePrefs,
+  requirements,
+  budgetRange,
+  onToggleVenue,
+  onRequirements,
+  onBudgetRange,
+  onBack,
+  onContinue,
+}: {
+  venuePrefs: string[];
+  requirements: string;
+  budgetRange: string;
+  onToggleVenue: (v: string) => void;
+  onRequirements: (v: string) => void;
+  onBudgetRange: (v: string) => void;
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  return (
+    <div>
+      <StepHeading title="Venue & Requirements" subtitle="Help us match you with the right spaces and partners." />
+      <div className="space-y-8">
+        <div>
+          <p className="text-white text-sm font-semibold mb-3">Venue Preferences</p>
+          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+            {MICE_VENUE_PREFS.map((venue) => (
+              <button
+                key={venue}
+                onClick={() => onToggleVenue(venue)}
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                  venuePrefs.includes(venue)
+                    ? "bg-[#ff9d00]/10 border border-[#ff9d00] text-[#ff9d00]"
+                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                }`}
+              >
+                {venue}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-white text-sm font-semibold mb-3">Budget Range</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {MICE_BUDGET_RANGES.map((range) => (
+              <button
+                key={range}
+                onClick={() => onBudgetRange(range)}
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
+                  budgetRange === range
+                    ? "bg-[#ff9d00]/10 border border-[#ff9d00] text-[#ff9d00]"
+                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                }`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-white text-sm font-semibold mb-3">Special Requirements</p>
+          <textarea
+            value={requirements}
+            onChange={(e) => onRequirements(e.target.value)}
+            placeholder="AV equipment, accessibility needs, themed décor, catering preferences..."
+            rows={4}
+            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 resize-none"
+          />
+        </div>
+      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} />
+    </div>
+  );
+}
+
+function Step4Review({
+  state,
+  activePackage,
+  availableExcursions,
+  estimatedPrice,
+  onBack,
+  onConfirm,
+}: {
+  state: WizardState;
+  activePackage: typeof packages[number] | null;
+  availableExcursions: Excursion[];
+  estimatedPrice: number | null;
+  onBack: () => void;
+  onConfirm: () => void;
+}) {
+  const selectedExcursionNames = availableExcursions
+    .filter((e) => state.excursionIds.includes(e.id))
+    .map((e) => e.name);
+
+  const selectedDestinationNames = destinations
+    .filter((d) => state.destinations.includes(d.slug))
+    .map((d) => d.name);
+
+  const mealPlanLabel = MEAL_PLANS.find((m) => m.id === state.mealPlan)?.label ?? state.mealPlan;
+  const accommodationTier = ACCOMMODATION_TIERS.find((t) => t.id === state.accommodation);
+  const guideLanguageLabel = GUIDE_LANGUAGES.find((l) => l.id === state.guideLanguage)?.label ?? state.guideLanguage;
+
+  const tripTypeBadge: Record<string, string> = {
+    package: "Curated Package",
+    custom: "Custom Tour",
+    mice: "MICE & Groups",
+  };
+
+  return (
+    <div>
+      <StepHeading title="Review your trip" subtitle="Everything looks right? Sign in to receive your quote." />
+
+      <div className="liquid-glass border border-white/10 rounded-2xl p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <span className="bg-[#ff9d00]/20 text-[#ff9d00] text-xs font-semibold px-3 py-1 rounded-full">
+            {tripTypeBadge[state.tripType ?? "package"]}
+          </span>
+        </div>
+
+        {state.tripType !== "mice" && (
+          <>
+            <ReviewRow label={state.tripType === "package" ? "Package" : "Destinations"}>
+              {state.tripType === "package" && activePackage ? (
+                <span className="text-white">{activePackage.name}</span>
+              ) : (
+                <span className="text-white">{selectedDestinationNames.join(", ") || "—"}</span>
+              )}
+            </ReviewRow>
+
+            {selectedExcursionNames.length > 0 && (
+              <ReviewRow label="Excursions">
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedExcursionNames.map((name) => (
+                    <span key={name} className="bg-white/10 text-white/80 text-xs px-2 py-0.5 rounded-full">{name}</span>
+                  ))}
+                </div>
+              </ReviewRow>
+            )}
+
+            <ReviewRow label="Transport">
+              <span className="text-white">{state.transport === "super-luxury" ? "Super Luxury (Mercedes V-Class)" : "Standard (Toyota KDH Van)"}</span>
+            </ReviewRow>
+
+            <ReviewRow label="Accommodation">
+              <span className="text-white">
+                {accommodationTier?.name ?? state.accommodation}
+                {accommodationTier && accommodationTier.priceModifier > 0 && (
+                  <span className="text-[#ff9d00] ml-2 text-xs">+${accommodationTier.priceModifier}/night</span>
+                )}
+              </span>
+            </ReviewRow>
+
+            <ReviewRow label="Guide Language">
+              <span className="text-white">{guideLanguageLabel}</span>
+            </ReviewRow>
+
+            <ReviewRow label="Meal Plan">
+              <span className="text-white">{mealPlanLabel}</span>
+            </ReviewRow>
+
+            {state.allergies.length > 0 && (
+              <ReviewRow label="Dietary Restrictions">
+                <span className="text-white">{state.allergies.join(", ")}</span>
+              </ReviewRow>
+            )}
+          </>
+        )}
+
+        {state.tripType === "mice" && (
+          <>
+            <ReviewRow label="Event Type">
+              <span className="text-white">{state.miceEventType || "—"}</span>
+            </ReviewRow>
+            <ReviewRow label="Group Size">
+              <span className="text-white">{state.miceGroupSize} people</span>
+            </ReviewRow>
+            {state.miceVenuePrefs.length > 0 && (
+              <ReviewRow label="Venue Preferences">
+                <span className="text-white">{state.miceVenuePrefs.join(", ")}</span>
+              </ReviewRow>
+            )}
+            {state.miceBudgetRange && (
+              <ReviewRow label="Budget Range">
+                <span className="text-white">{state.miceBudgetRange}</span>
+              </ReviewRow>
+            )}
+            {state.miceRequirements && (
+              <ReviewRow label="Special Requirements">
+                <span className="text-white/80 text-sm">{state.miceRequirements}</span>
+              </ReviewRow>
+            )}
+          </>
+        )}
+
+        <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+          <span className="text-white/60 text-sm">Estimated Price</span>
+          {estimatedPrice !== null ? (
+            <span className="font-[family-name:var(--font-playfair)] text-2xl text-[#ff9d00]">
+              ${estimatedPrice.toLocaleString()}
+            </span>
+          ) : (
+            <span className="text-white/60 italic text-sm">Custom quote</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+        <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
+          Back
+        </button>
+        <button
+          onClick={onConfirm}
+          className="bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-sm font-bold hover:bg-[#ffb340] transition-colors"
+        >
+          Get My Quote — Sign In to Continue
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ReviewRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-4">
+      <span className="text-white/40 text-sm w-36 flex-shrink-0">{label}</span>
+      <div className="flex-1 text-sm">{children}</div>
+    </div>
   );
 }

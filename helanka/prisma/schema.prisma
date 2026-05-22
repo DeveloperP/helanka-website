@@ -9,6 +9,26 @@ datasource db {
 enum UserRole {
   CUSTOMER
   ADMIN
+  SPECIALIST
+}
+
+enum TripSessionStatus {
+  ACTIVE
+  IDLE
+  QUOTE_REQUESTED
+  CLOSED
+}
+
+enum ChatMessageType {
+  TEXT
+  SUGGESTION
+  SYSTEM
+}
+
+enum SuggestionStatus {
+  PENDING
+  ACCEPTED
+  DISMISSED
 }
 
 enum BookingStatus {
@@ -58,10 +78,15 @@ model User {
   updatedAt       DateTime  @updatedAt
   lastLogin       DateTime?
 
-  accounts Account[]
-  sessions Session[]
-  bookings Booking[]
-  reviews  Review[]
+  specialty String?
+
+  accounts           Account[]
+  sessions           Session[]
+  bookings           Booking[]
+  reviews            Review[]
+  customerTripSessions  TripSession[] @relation("CustomerSessions")
+  specialistTripSessions TripSession[] @relation("SpecialistSessions")
+  chatMessages       ChatMessage[]
 
   @@map("users")
 }
@@ -189,11 +214,12 @@ model Booking {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  user     User          @relation(fields: [userId], references: [id])
-  items    BookingItem[]
-  quotes   Quote[]
-  payments Payment[]
-  reviews  Review[]
+  user         User          @relation(fields: [userId], references: [id])
+  items        BookingItem[]
+  quotes       Quote[]
+  payments     Payment[]
+  reviews      Review[]
+  tripSessions TripSession[]
 
   @@map("bookings")
 }
@@ -261,6 +287,9 @@ model BlogPost {
   excerpt         String?
   coverImage      String?
   author          String
+  category        String    @default("Travel Tips")
+  readTime        String    @default("5 min")
+  featured        Boolean   @default(false)
   metaTitle       String?
   metaDescription String?
   isPublished     Boolean   @default(false)
@@ -300,4 +329,47 @@ model AnalyticsEvent {
   @@index([eventType])
   @@index([createdAt])
   @@map("analytics_events")
+}
+
+model TripSession {
+  id             String            @id @default(cuid())
+  customerId     String
+  specialistId   String?
+  bookingId      String?
+  tripType       String
+  state          Json
+  activeTab      String            @default("overview")
+  status         TripSessionStatus @default(ACTIVE)
+  lastActivityAt DateTime          @default(now())
+  idleSince      DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  customer   User     @relation("CustomerSessions", fields: [customerId], references: [id])
+  specialist User?    @relation("SpecialistSessions", fields: [specialistId], references: [id])
+  booking    Booking? @relation(fields: [bookingId], references: [id])
+  messages   ChatMessage[]
+
+  @@index([customerId, status])
+  @@index([specialistId, status])
+  @@index([status, lastActivityAt])
+  @@map("trip_sessions")
+}
+
+model ChatMessage {
+  id               String            @id @default(cuid())
+  sessionId        String
+  senderId         String
+  senderRole       UserRole
+  content          String
+  messageType      ChatMessageType   @default(TEXT)
+  suggestionData   Json?
+  suggestionStatus SuggestionStatus?
+  createdAt        DateTime          @default(now())
+
+  session TripSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender  User        @relation(fields: [senderId], references: [id])
+
+  @@index([sessionId, createdAt])
+  @@map("chat_messages")
 }

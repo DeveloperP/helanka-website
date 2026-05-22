@@ -14,8 +14,8 @@ export default function CtaSection() {
           Tell us your dream trip and our local experts will craft a bespoke itinerary just for you.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/build" className="bg-[#ff9d00] text-[#482900] px-12 py-5 text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95 rounded-lg">
-            Start Planning
+          <Link href="/login" className="bg-[#ff9d00] text-[#482900] px-12 py-5 text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95 rounded-lg">
+            Sign In to Start
           </Link>
           <Link href="/packages" className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-12 py-5 text-xs font-bold tracking-[0.1em] uppercase hover:bg-white/20 transition-all rounded-lg">
             Browse Packages

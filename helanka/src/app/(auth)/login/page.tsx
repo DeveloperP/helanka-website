@@ -1,13 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { loginUser } from "@/actions/auth-actions";
-import { signIn } from "@/lib/auth";
+import { signIn, auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Sign In — Helanka Vacations",
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await auth();
+  if (session?.user) {
+    const role = session.user.role;
+    if (role === "ADMIN" || role === "SPECIALIST") {
+      redirect("/admin/sessions");
+    }
+    redirect("/dashboard");
+  }
+
   async function handleGoogleSignIn() {
     "use server";
     await signIn("google", { redirectTo: "/dashboard" });

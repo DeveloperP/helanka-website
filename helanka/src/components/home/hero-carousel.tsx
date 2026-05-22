@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { destinations } from "@/lib/destinations";
 
 interface Slide {
   destination: string;
@@ -74,8 +76,20 @@ const navLabels = [
 ];
 
 export default function HeroCarousel() {
+  const router = useRouter();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [tripDest, setTripDest] = useState("");
+  const [tripGuests, setTripGuests] = useState("2");
+  const [tripDates, setTripDates] = useState("");
+
+  function handleBuildTrip() {
+    const params = new URLSearchParams();
+    if (tripDest) params.set("destination", tripDest);
+    if (tripGuests) params.set("guests", tripGuests);
+    if (tripDates) params.set("arrival", tripDates);
+    router.push(`/build${params.toString() ? `?${params}` : ""}`);
+  }
 
   const next = useCallback(() => {
     setActive((prev) => (prev + 1) % slides.length);
@@ -137,32 +151,42 @@ export default function HeroCarousel() {
             </div>
           </div>
 
-          {/* Right: Trip planner form */}
+          {/* Right: Trip builder teaser */}
           <div className="w-full max-w-[440px] liquid-glass p-8 md:p-10 rounded-2xl shadow-2xl">
             <h2 className="font-[family-name:var(--font-playfair)] text-[32px] leading-10 text-white mb-2">
-              Plan Your Trip
+              Build Your Trip
             </h2>
             <div className="w-12 h-1 bg-[#ff9d00] mb-10" />
-            <form className="space-y-6">
+            <div className="space-y-6">
               <div>
                 <label className="block text-[10px] font-semibold text-[#dac2ad] mb-2 uppercase tracking-widest">
                   Destination
                 </label>
-                <input
-                  className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] placeholder:text-[#dac2ad] focus:ring-1 focus:ring-[#ff9d00] focus:border-[#ff9d00] transition-all"
-                  placeholder="Where to?"
-                  type="text"
-                />
+                <select
+                  value={tripDest}
+                  onChange={(e) => setTripDest(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] appearance-none focus:ring-1 focus:ring-[#ff9d00] focus:border-[#ff9d00] transition-all"
+                >
+                  <option value="" className="bg-[#020617]">Where to?</option>
+                  {destinations.map((d) => (
+                    <option key={d.slug} value={d.slug} className="bg-[#020617]">{d.name}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-[10px] font-semibold text-[#dac2ad] mb-2 uppercase tracking-widest">
                   Travelers
                 </label>
-                <select className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] appearance-none focus:ring-1 focus:ring-[#ff9d00] focus:border-[#ff9d00] transition-all">
-                  <option>2 Guests</option>
-                  <option>1 Guest</option>
-                  <option>3 Guests</option>
-                  <option>4+ Guests</option>
+                <select
+                  value={tripGuests}
+                  onChange={(e) => setTripGuests(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] appearance-none focus:ring-1 focus:ring-[#ff9d00] focus:border-[#ff9d00] transition-all"
+                >
+                  <option value="1" className="bg-[#020617]">1 Guest</option>
+                  <option value="2" className="bg-[#020617]">2 Guests</option>
+                  <option value="3" className="bg-[#020617]">3 Guests</option>
+                  <option value="4" className="bg-[#020617]">4 Guests</option>
+                  <option value="5" className="bg-[#020617]">5+ Guests</option>
                 </select>
               </div>
               <div>
@@ -170,18 +194,20 @@ export default function HeroCarousel() {
                   Travel Dates
                 </label>
                 <input
+                  type="date"
+                  value={tripDates}
+                  onChange={(e) => setTripDates(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] placeholder:text-[#dac2ad] focus:ring-1 focus:ring-[#ff9d00] focus:border-[#ff9d00] transition-all"
-                  placeholder="Select Dates"
-                  type="text"
                 />
               </div>
               <button
                 type="button"
+                onClick={handleBuildTrip}
                 className="w-full bg-[#ff9d00] text-[#482900] py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-[1.02] active:scale-[0.98] mt-4"
               >
-                Plan Trip
+                Build My Trip
               </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>

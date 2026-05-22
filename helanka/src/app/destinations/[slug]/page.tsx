@@ -28,7 +28,8 @@ export default async function DestinationDetailPage({ params }: Props) {
   if (!dest) notFound();
 
   const relatedPackages = packages.filter(
-    (p) => p.region.toLowerCase().includes(dest.region.toLowerCase().split(" ")[0])
+    (p) => p.excursions.some((exc) => exc.destinationSlug === dest.slug) ||
+      p.region.toLowerCase().includes(dest.region.toLowerCase().split(" ")[0])
   );
 
   return (
@@ -112,7 +113,7 @@ export default async function DestinationDetailPage({ params }: Props) {
               Excursions in {dest.name}
             </h2>
             <p className="text-[#dac2ad] mb-10 max-w-2xl">
-              Hand-picked activities available as part of our curated packages.
+              {excursions.length} activities available — include them in a curated package or build a custom tour.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {excursions.map((exc) => (
@@ -131,12 +132,18 @@ export default async function DestinationDetailPage({ params }: Props) {
                   <p className="text-[#dac2ad] text-sm leading-relaxed">
                     {exc.description}
                   </p>
-                  <Link
-                    href={`/packages/${exc.packageSlug}`}
-                    className="text-[#ff9d00] text-xs font-semibold tracking-wider uppercase hover:text-[#e68d00] transition-colors self-start"
-                  >
-                    Part of {exc.packageName} →
-                  </Link>
+                  {exc.packageSlug ? (
+                    <Link
+                      href={`/packages/${exc.packageSlug}`}
+                      className="text-[#ff9d00] text-xs font-semibold tracking-wider uppercase hover:text-[#e68d00] transition-colors self-start"
+                    >
+                      Part of {exc.packageName} →
+                    </Link>
+                  ) : (
+                    <span className="text-white/30 text-xs font-semibold tracking-wider uppercase self-start">
+                      Available in custom tours
+                    </span>
+                  )}
                 </div>
               ))}
             </div>

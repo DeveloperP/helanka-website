@@ -313,10 +313,10 @@ export default function AboutPage() {
             templates, no compromises — just your dream trip, handled.
           </p>
           <a
-            href="/build"
+            href="/login"
             className="inline-block bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
           >
-            Start Planning
+            Sign In to Start
           </a>
         </div>
       </section>

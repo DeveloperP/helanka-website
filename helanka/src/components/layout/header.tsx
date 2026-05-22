@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { UserMenu } from "./user-menu";
 
 const navLinks = [
   { label: "Packages", href: "/packages" },
@@ -44,27 +45,21 @@ export default async function Header() {
 
           <div className="hidden md:flex items-center space-x-4">
             {session?.user ? (
-              <Link
-                href={session.user.role === "ADMIN" ? "/admin" : "/dashboard"}
-                className="text-base text-[#dac2ad] hover:text-[#ff9d00] transition-colors"
-              >
-                {session.user.name ?? session.user.email}
-              </Link>
+              <UserMenu
+                user={{
+                  name: session.user.name,
+                  email: session.user.email,
+                  image: session.user.image,
+                  role: session.user.role ?? "CUSTOMER",
+                }}
+              />
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-base text-[#dac2ad] hover:text-[#ff9d00] transition-colors"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/build"
-                  className="bg-[#ff9d00] text-[#482900] px-6 py-2 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
-                >
-                  Plan Your Trip
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className="bg-[#ff9d00] text-[#482900] px-6 py-2 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
+              >
+                Sign In
+              </Link>
             )}
           </div>
         </div>

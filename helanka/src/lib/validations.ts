@@ -89,3 +89,82 @@ export const quoteResponseSchema = z.object({
 });
 
 export type QuoteResponseInput = z.infer<typeof quoteResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// Trip session schemas
+// ---------------------------------------------------------------------------
+
+export const tripSessionStateSchema = z.object({
+  tripType: z.enum(["package", "custom", "mice"]),
+  packageSlug: z.string().nullable(),
+  destinations: z.array(z.string()),
+  excursionIds: z.array(z.string()),
+  transport: z.enum(["standard", "super-luxury"]),
+  mealPlan: z.string(),
+  allergies: z.array(z.string()),
+  dietaryNotes: z.string(),
+  guests: z.number().int().positive(),
+  arrivalDate: z.string(),
+  departureDate: z.string(),
+  guideLanguage: z.string(),
+  accommodation: z.string(),
+  miceEventType: z.string(),
+  miceGroupSize: z.number().int().nonnegative(),
+  miceVenuePrefs: z.array(z.string()),
+  miceRequirements: z.string(),
+  miceBudgetRange: z.string(),
+});
+
+export type TripSessionState = z.infer<typeof tripSessionStateSchema>;
+
+export const createTripSessionSchema = z.object({
+  state: tripSessionStateSchema,
+  activeTab: z.string().default("overview"),
+});
+
+export type CreateTripSessionInput = z.infer<typeof createTripSessionSchema>;
+
+export const updateTripSessionStateSchema = z.object({
+  sessionId: z.string(),
+  state: tripSessionStateSchema,
+  activeTab: z.string().optional(),
+});
+
+export type UpdateTripSessionStateInput = z.infer<typeof updateTripSessionStateSchema>;
+
+// ---------------------------------------------------------------------------
+// Chat schemas
+// ---------------------------------------------------------------------------
+
+export const sendChatMessageSchema = z.object({
+  sessionId: z.string(),
+  content: z.string().min(1, { error: "Message cannot be empty." }).max(2000),
+  messageType: z.enum(["TEXT", "SUGGESTION", "SYSTEM"]).default("TEXT"),
+});
+
+export type SendChatMessageInput = z.infer<typeof sendChatMessageSchema>;
+
+export const suggestionDataSchema = z.object({
+  type: z.enum(["add_excursion", "add_destination", "change_accommodation", "change_transport"]),
+  itemId: z.string().optional(),
+  title: z.string(),
+  description: z.string().optional(),
+  price: z.number().optional(),
+});
+
+export type SuggestionData = z.infer<typeof suggestionDataSchema>;
+
+export const sendSuggestionSchema = z.object({
+  sessionId: z.string(),
+  content: z.string().min(1),
+  suggestionData: suggestionDataSchema,
+});
+
+export type SendSuggestionInput = z.infer<typeof sendSuggestionSchema>;
+
+export const respondToSuggestionSchema = z.object({
+  messageId: z.string(),
+  action: z.enum(["ACCEPTED", "DISMISSED"]),
+});
+
+export type RespondToSuggestionInput = z.infer<typeof respondToSuggestionSchema>;

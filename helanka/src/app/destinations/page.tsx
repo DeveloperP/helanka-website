@@ -192,10 +192,10 @@ export default function DestinationsPage() {
             Every hour of driving opens a new world — ancient ruins, misty peaks, golden coasts, and untamed jungle.
           </p>
           <Link
-            href="/build"
+            href="/login"
             className="inline-block bg-[#ff9d00] text-[#482900] px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
           >
-            Start Planning
+            Sign In to Start
           </Link>
         </div>
       </section>
