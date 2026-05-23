@@ -174,7 +174,7 @@ export function ReportsClient({
                   <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                   <Tooltip
                     contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", fontSize: "13px", background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)" }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
                   />
                   <Area type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={2.5} fill="url(#revGrad)" dot={{ fill: "#6366f1", r: 4, strokeWidth: 2, stroke: "#fff" }} activeDot={{ r: 6 }} />
                 </AreaChart>
@@ -236,7 +236,7 @@ export function ReportsClient({
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} width={85} />
                   <Tooltip
                     contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", fontSize: "12px", background: "rgba(255,255,255,0.95)" }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, "Revenue"]}
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
                   />
                   <Bar dataKey="revenue" radius={[0, 6, 6, 0]} barSize={16}>
                     {revenue.topDestinations.map((_, i) => (

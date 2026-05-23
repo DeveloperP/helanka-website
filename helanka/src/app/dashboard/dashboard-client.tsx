@@ -99,6 +99,28 @@ function getTabsForTripType(type: TripType): SidebarTab[] {
   }
 }
 
+function TabNavigation({ tabs, activeTab, onNavigate }: { tabs: SidebarTab[]; activeTab: TabId; onNavigate: (id: TabId) => void }) {
+  const idx = tabs.findIndex((t) => t.id === activeTab);
+  const prev = idx > 0 ? tabs[idx - 1] : null;
+  const next = idx < tabs.length - 1 ? tabs[idx + 1] : null;
+  return (
+    <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
+      {prev ? (
+        <button onClick={() => onNavigate(prev.id)} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors group">
+          <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          {prev.label}
+        </button>
+      ) : <span />}
+      {next ? (
+        <button onClick={() => onNavigate(next.id)} className="flex items-center gap-2 text-sm font-semibold text-[#ff9d00] hover:text-[#e68d00] transition-colors group">
+          {next.label}
+          <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      ) : <span />}
+    </div>
+  );
+}
+
 const MICE_EVENT_TYPES = ["Conference", "Incentive Trip", "Meeting", "Exhibition", "Team Building", "Gala Dinner", "Product Launch"] as const;
 
 // Static sidebarTabs removed — using getTabsForTripType() instead
@@ -647,7 +669,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-slate-900">Itinerary</h3>
-                      <button onClick={() => setActiveTab("itinerary")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                      <button onClick={() => setActiveTab("itinerary")} className="text-xs text-[#ff9d00] font-semibold hover:underline">View</button>
                     </div>
                     <p className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900">{tripInfo.days}</p>
                     <p className="text-xs text-slate-400 mt-1">days &middot; {tripInfo.destinations.length} destinations</p>
@@ -1089,6 +1111,22 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
             {/* ========== ITINERARY TAB ========== */}
             {activeTab === "itinerary" && (
               <div className="space-y-4">
+                <div className="bg-blue-50 rounded-2xl p-5 flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Your itinerary is curated by our experts</p>
+                    <p className="text-xs text-blue-700/70 mt-1">
+                      Want to swap a stop, add a rest day, or rearrange the order? Message {specialist.name.split(" ")[0]} in the chat and we&apos;ll adjust it for you.
+                    </p>
+                    <button
+                      onClick={() => setChatOpen(true)}
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
+                      Chat with {specialist.name.split(" ")[0]}
+                    </button>
+                  </div>
+                </div>
                 {itineraryDays.map((day) => (
                   <div key={day.day} className="bg-white rounded-2xl p-6 shadow-sm flex gap-5">
                     <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">
@@ -1100,9 +1138,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                   </div>
                 ))}
-                <p className="text-xs text-slate-400 text-center pt-2">
-                  Itinerary is set by your package. Contact {specialist.name.split(" ")[0]} to request changes.
-                </p>
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1259,6 +1295,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     })}
                   </div>
                 )}
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1383,6 +1420,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     ))}
                   </select>
                 </div>
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1449,6 +1487,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     placeholder="Any other dietary notes — vegan, halal, kosher, specific preferences..."
                   />
                 </div>
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1536,11 +1575,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       {selectedDestinationSlugs.length} destination{selectedDestinationSlugs.length !== 1 ? "s" : ""} selected &middot;{" "}
                       {customExcursions.length} excursions available
                     </p>
-                    <button onClick={() => setActiveTab("excursions")} className="mt-3 bg-[#ff9d00] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e68d00] transition-colors">
-                      Next: Pick Excursions
-                    </button>
                   </div>
                 )}
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1621,6 +1658,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   </div>
                   {datesValid && <p className="text-xs text-slate-400 mt-2">{nights} day{nights !== 1 ? "s" : ""}</p>}
                 </div>
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1668,6 +1706,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     );
                   })}
                 </div>
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 
@@ -1707,13 +1746,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   />
                 </div>
 
-                {miceEventType && miceVenuePrefs.length > 0 && (
-                  <div className="bg-white rounded-2xl p-5 shadow-sm text-center">
-                    <button onClick={() => setActiveTab("review")} className="bg-[#ff9d00] text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-[#e68d00] transition-colors">
-                      Review &amp; Submit Inquiry
-                    </button>
-                  </div>
-                )}
+                <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
               </div>
             )}
 

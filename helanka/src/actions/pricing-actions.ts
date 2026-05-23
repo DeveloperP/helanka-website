@@ -12,16 +12,22 @@ export interface PackagePriceEstimate {
 export async function getPackagePriceEstimates(
   travelDate?: Date,
 ): Promise<Record<string, number>> {
-  if (!db) {
-    return Object.fromEntries(packages.map((p) => [p.slug, p.price]));
-  }
+  const fallback = Object.fromEntries(packages.map((p) => [p.slug, p.price]));
+  if (!db) return fallback;
 
   const date = travelDate ?? new Date();
   const season = determineSeason(date);
 
-  const rateCards = await db.rateCard.findMany({
-    where: { OR: [{ season }, { season: "all" }, { season: "off-peak" }] },
-  });
+  let rateCards: Awaited<ReturnType<typeof db.rateCard.findMany>>;
+  try {
+    rateCards = await db.rateCard.findMany({
+      where: { OR: [{ season }, { season: "all" }, { season: "off-peak" }] },
+    });
+  } catch {
+    return fallback;
+  }
+
+  if (rateCards.length === 0) return fallback;
 
   function findRate(itemType: string, tier: string): { min: number; max: number } | null {
     const match =

@@ -119,12 +119,15 @@ export async function updateRateCard(
   const parsed = rateCardUpdateSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Invalid data" };
 
-  await db.rateCard.update({
-    where: { id },
-    data: { minPrice: parsed.data.minPrice, maxPrice: parsed.data.maxPrice, perKmRate: parsed.data.perKmRate ?? undefined },
-  });
-
-  return { success: true };
+  try {
+    await db.rateCard.update({
+      where: { id },
+      data: { minPrice: parsed.data.minPrice, maxPrice: parsed.data.maxPrice, perKmRate: parsed.data.perKmRate ?? undefined },
+    });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to update rate card" };
+  }
 }
 
 export async function createRateCard(
@@ -145,27 +148,34 @@ export async function createRateCard(
   const parsed = rateCardCreateSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Invalid data" };
 
-  await db.rateCard.create({
-    data: {
-      itemType: parsed.data.itemType as BookingItemType,
-      tier: parsed.data.tier,
-      season: parsed.data.season,
-      destinationId: parsed.data.destinationId || null,
-      minPrice: parsed.data.minPrice,
-      maxPrice: parsed.data.maxPrice,
-      perKmRate: parsed.data.perKmRate ?? null,
-      currency: parsed.data.currency ?? "USD",
-    },
-  });
-
-  return { success: true };
+  try {
+    await db.rateCard.create({
+      data: {
+        itemType: parsed.data.itemType as BookingItemType,
+        tier: parsed.data.tier,
+        season: parsed.data.season,
+        destinationId: parsed.data.destinationId || null,
+        minPrice: parsed.data.minPrice,
+        maxPrice: parsed.data.maxPrice,
+        perKmRate: parsed.data.perKmRate ?? null,
+        currency: parsed.data.currency ?? "USD",
+      },
+    });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to create rate card" };
+  }
 }
 
 export async function deleteRateCard(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
-  await db.rateCard.delete({ where: { id } });
-  return { success: true };
+  try {
+    await db.rateCard.delete({ where: { id } });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to delete rate card" };
+  }
 }
 
 // ─── Rate Card Export / Import ──────────────────────────────────────────────
@@ -260,33 +270,37 @@ export async function applyRateCardImport(
   await requireAdmin();
   if (!db) return { success: false, created: 0, updated: 0, error: "Database not available" };
 
-  // Resolve destination names to IDs for creates
-  const destNames = [...new Set(toCreate.map((r) => r.destination).filter(Boolean))];
-  const dests = destNames.length > 0
-    ? await db.destination.findMany({ where: { name: { in: destNames } }, select: { id: true, name: true } })
-    : [];
-  const destMap = new Map(dests.map((d) => [d.name, d.id]));
+  try {
+    // Resolve destination names to IDs for creates
+    const destNames = [...new Set(toCreate.map((r) => r.destination).filter(Boolean))];
+    const dests = destNames.length > 0
+      ? await db.destination.findMany({ where: { name: { in: destNames } }, select: { id: true, name: true } })
+      : [];
+    const destMap = new Map(dests.map((d) => [d.name, d.id]));
 
-  if (toCreate.length > 0) {
-    await db.rateCard.createMany({
-      data: toCreate.map((r) => ({
-        itemType: r.itemType as BookingItemType,
-        tier: r.tier,
-        season: r.season,
-        destinationId: destMap.get(r.destination) ?? null,
-        minPrice: r.minPrice,
-        maxPrice: r.maxPrice,
-        perKmRate: r.perKmRate ?? null,
-        currency: r.currency ?? "USD",
-      })),
-    });
+    if (toCreate.length > 0) {
+      await db.rateCard.createMany({
+        data: toCreate.map((r) => ({
+          itemType: r.itemType as BookingItemType,
+          tier: r.tier,
+          season: r.season,
+          destinationId: destMap.get(r.destination) ?? null,
+          minPrice: r.minPrice,
+          maxPrice: r.maxPrice,
+          perKmRate: r.perKmRate ?? null,
+          currency: r.currency ?? "USD",
+        })),
+      });
+    }
+
+    for (const u of toUpdate) {
+      await db.rateCard.update({ where: { id: u.id }, data: u.data });
+    }
+
+    return { success: true, created: toCreate.length, updated: toUpdate.length };
+  } catch (e) {
+    return { success: false, created: 0, updated: 0, error: e instanceof Error ? e.message : "Failed to import rate cards" };
   }
-
-  for (const u of toUpdate) {
-    await db.rateCard.update({ where: { id: u.id }, data: u.data });
-  }
-
-  return { success: true, created: toCreate.length, updated: toUpdate.length };
 }
 
 // ─── Destination Distances ──────────────────────────────────────────────────
@@ -333,8 +347,12 @@ export async function updateDestinationDistance(
   if (!db) return { success: false, error: "Database not available" };
   if (distanceKm <= 0) return { success: false, error: "Distance must be positive" };
 
-  await db.destinationDistance.update({ where: { id }, data: { distanceKm } });
-  return { success: true };
+  try {
+    await db.destinationDistance.update({ where: { id }, data: { distanceKm } });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to update distance" };
+  }
 }
 
 export async function updateDestinationColomboDistance(
@@ -344,8 +362,12 @@ export async function updateDestinationColomboDistance(
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
 
-  await db.destination.update({ where: { id }, data: { distanceFromColomboKm: distanceKm } });
-  return { success: true };
+  try {
+    await db.destination.update({ where: { id }, data: { distanceFromColomboKm: distanceKm } });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to update distance" };
+  }
 }
 
 // ─── Excursions ─────────────────────────────────────────────────────────────
@@ -381,8 +403,12 @@ export async function updateExcursion(
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
 
-  await db.excursion.update({ where: { id }, data });
-  return { success: true };
+  try {
+    await db.excursion.update({ where: { id }, data });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to update excursion" };
+  }
 }
 
 export async function createExcursion(
@@ -394,13 +420,21 @@ export async function createExcursion(
   const parsed = excursionCreateSchema.safeParse(data);
   if (!parsed.success) return { success: false, error: "Invalid data" };
 
-  await db.excursion.create({ data: { ...parsed.data, isActive: true } });
-  return { success: true };
+  try {
+    await db.excursion.create({ data: { ...parsed.data, isActive: true } });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to create excursion" };
+  }
 }
 
 export async function deleteExcursion(id: string): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
-  await db.excursion.delete({ where: { id } });
-  return { success: true };
+  try {
+    await db.excursion.delete({ where: { id } });
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to delete excursion" };
+  }
 }

@@ -257,24 +257,28 @@ export async function priceBookingItems(
   await requireAdminOrSpecialist();
   if (!db) return { success: false, error: "Database not available" };
 
-  for (const item of lineItems) {
-    await db.bookingItem.update({
-      where: { id: item.bookingItemId },
-      data: {
-        estimateMin: item.estimateMin,
-        estimateMax: item.estimateMax,
-        actualPrice: item.actualPrice ?? null,
-        notes: item.notes ?? null,
-      },
+  try {
+    for (const item of lineItems) {
+      await db.bookingItem.update({
+        where: { id: item.bookingItemId },
+        data: {
+          estimateMin: item.estimateMin,
+          estimateMax: item.estimateMax,
+          actualPrice: item.actualPrice ?? null,
+          notes: item.notes ?? null,
+        },
+      });
+    }
+
+    await db.booking.update({
+      where: { id: bookingId },
+      data: { status: "PRICING_IN_PROGRESS" },
     });
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to save pricing" };
   }
-
-  await db.booking.update({
-    where: { id: bookingId },
-    data: { status: "PRICING_IN_PROGRESS" },
-  });
-
-  return { success: true };
 }
 
 // ─── Admin: Send quote ──────────────────────────────────────────────────────
@@ -288,44 +292,48 @@ export async function sendQuote(input: SendQuoteInput): Promise<{ success: boole
 
   const { bookingId, totalPrice, deposit, validUntil, adminNotes, lineItems } = parsed.data;
 
-  // Update line item prices
-  for (const item of lineItems) {
-    await db.bookingItem.update({
-      where: { id: item.bookingItemId },
+  try {
+    // Update line item prices
+    for (const item of lineItems) {
+      await db.bookingItem.update({
+        where: { id: item.bookingItemId },
+        data: {
+          estimateMin: item.estimateMin,
+          estimateMax: item.estimateMax,
+          actualPrice: item.actualPrice ?? null,
+          notes: item.notes ?? null,
+        },
+      });
+    }
+
+    // Get next version number
+    const lastQuote = await db.quote.findFirst({
+      where: { bookingId },
+      orderBy: { version: "desc" },
+    });
+    const version = (lastQuote?.version ?? 0) + 1;
+
+    const quote = await db.quote.create({
       data: {
-        estimateMin: item.estimateMin,
-        estimateMax: item.estimateMax,
-        actualPrice: item.actualPrice ?? null,
-        notes: item.notes ?? null,
+        bookingId,
+        version,
+        totalPrice,
+        deposit,
+        validUntil: new Date(validUntil),
+        adminNotes: adminNotes ?? null,
+        sentAt: new Date(),
       },
     });
+
+    await db.booking.update({
+      where: { id: bookingId },
+      data: { status: "QUOTE_SENT" },
+    });
+
+    return { success: true, quoteId: quote.id };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to send quote" };
   }
-
-  // Get next version number
-  const lastQuote = await db.quote.findFirst({
-    where: { bookingId },
-    orderBy: { version: "desc" },
-  });
-  const version = (lastQuote?.version ?? 0) + 1;
-
-  const quote = await db.quote.create({
-    data: {
-      bookingId,
-      version,
-      totalPrice,
-      deposit,
-      validUntil: new Date(validUntil),
-      adminNotes: adminNotes ?? null,
-      sentAt: new Date(),
-    },
-  });
-
-  await db.booking.update({
-    where: { id: bookingId },
-    data: { status: "QUOTE_SENT" },
-  });
-
-  return { success: true, quoteId: quote.id };
 }
 
 // ─── Customer: Respond to quote ─────────────────────────────────────────────
@@ -346,26 +354,30 @@ export async function respondToQuote(input: QuoteResponseInput): Promise<{ succe
   if (!quote) return { success: false, error: "Quote not found" };
   if (quote.booking.userId !== session.user.id) return { success: false, error: "Unauthorized" };
 
-  await db.quote.update({
-    where: { id: quote.id },
-    data: { response: parsed.data.response, respondedAt: new Date() },
-  });
-
-  const statusMap: Record<string, string> = {
-    ACCEPTED: "CONFIRMED",
-    REVISION: "REVISION_REQUESTED",
-    EXPIRED: "EXPIRED",
-  };
-
-  const newStatus = statusMap[parsed.data.response];
-  if (newStatus) {
-    await db.booking.update({
-      where: { id: quote.booking.id },
-      data: { status: newStatus as "CONFIRMED" | "REVISION_REQUESTED" | "EXPIRED" },
+  try {
+    await db.quote.update({
+      where: { id: quote.id },
+      data: { response: parsed.data.response, respondedAt: new Date() },
     });
-  }
 
-  return { success: true };
+    const statusMap: Record<string, string> = {
+      ACCEPTED: "CONFIRMED",
+      REVISION: "REVISION_REQUESTED",
+      EXPIRED: "EXPIRED",
+    };
+
+    const newStatus = statusMap[parsed.data.response];
+    if (newStatus) {
+      await db.booking.update({
+        where: { id: quote.booking.id },
+        data: { status: newStatus as "CONFIRMED" | "REVISION_REQUESTED" | "EXPIRED" },
+      });
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to respond to quote" };
+  }
 }
 
 // ─── Customer: Get quote for review ─────────────────────────────────────────
@@ -431,19 +443,23 @@ export async function recordPayment(data: {
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
 
-  await db.payment.create({
-    data: {
-      bookingId: data.bookingId,
-      amount: data.amount,
-      currency: data.currency ?? "USD",
-      method: data.method,
-      webxpayRef: data.webxpayRef ?? null,
-      status: "SUCCESS",
-      paidAt: new Date(),
-    },
-  });
+  try {
+    await db.payment.create({
+      data: {
+        bookingId: data.bookingId,
+        amount: data.amount,
+        currency: data.currency ?? "USD",
+        method: data.method,
+        webxpayRef: data.webxpayRef ?? null,
+        status: "SUCCESS",
+        paidAt: new Date(),
+      },
+    });
 
-  return { success: true };
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to record payment" };
+  }
 }
 
 // ─── Customer: Get bookings list ────────────────────────────────────────────
