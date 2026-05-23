@@ -1,50 +1,50 @@
 "use client";
 
 const stats = [
-  { value: "8+", label: "Years of Experience" },
-  { value: "2,500+", label: "Happy Travelers" },
-  { value: "50+", label: "Curated Itineraries" },
-  { value: "98%", label: "Satisfaction Rate" },
+  { value: "8+", label: "Years in Sri Lanka" },
+  { value: "2,500+", label: "Travelers Hosted" },
+  { value: "50+", label: "Designed Itineraries" },
+  { value: "98%", label: "Would Recommend Us" },
 ];
 
 const values = [
   {
-    title: "Authentic Experiences",
+    title: "Real Connections",
     description:
-      "We go beyond tourist trails to connect you with the real Sri Lanka — its people, traditions, and hidden gems that only locals know.",
+      "You will eat with local families, learn about tea farming from the people who do it, and see why places matter to the people who live there.",
   },
   {
-    title: "Personalized Service",
+    title: "Local Expertise",
     description:
-      "No two travelers are alike. Every itinerary is handcrafted by our specialists to match your pace, interests, and travel style.",
+      "Our guides live in the regions they show you. They know which trains to catch, which restaurants are worth your time, and where most visitors never go.",
   },
   {
     title: "Responsible Travel",
     description:
-      "We partner with local communities, eco-lodges, and conservation projects to ensure tourism benefits the places and people we visit.",
+      "We partner with conservation projects and local communities. We limit group sizes, support small businesses, and make sure our presence adds value.",
   },
   {
-    title: "Seamless Journeys",
+    title: "No Rushing",
     description:
-      "From airport pickup to your last sunset, every detail is handled — so you can focus on making memories, not managing logistics.",
+      "We build itineraries that give you time to actually experience places. Long breakfasts, afternoon tea, real conversations. Not boxes to tick.",
   },
 ];
 
 const team = [
   {
     name: "Kasun Perera",
-    role: "Founder & Lead Travel Designer",
-    bio: "Born in Kandy, Kasun has spent over a decade crafting journeys that reveal Sri Lanka's soul to the world.",
+    role: "Founder and Head of Operations",
+    bio: "Kasun is from Kandy. He spent years taking friends on trips across the island before turning it into a business. He still designs every itinerary personally.",
   },
   {
-    name: "Dilini Fernando",
-    role: "Head of Guest Relations",
-    bio: "Dilini ensures every guest feels like family, coordinating every touchpoint from first inquiry to fond farewell.",
+    name: "Dilini Wickramasinghe",
+    role: "Guest Relations Manager",
+    bio: "Dilini handles first contact. She is the one you email first and the voice on the other end of the phone. She makes sure nothing gets missed.",
   },
   {
-    name: "Ravindu Silva",
-    role: "Adventure Specialist",
-    bio: "A certified naturalist and trek leader, Ravindu designs wildlife safaris and hiking expeditions across the island.",
+    name: "Nimal Silva",
+    role: "Wildlife and Adventure Guide",
+    bio: "Nimal is a trained naturalist who grew up near Yala. He leads safaris and treks across the island and can spot birds you would walk right past.",
   },
 ];
 
@@ -55,7 +55,7 @@ export default function AboutPage() {
       <section className="relative h-[50vh] min-h-[400px] flex items-end overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/Ella Nine Arch.jpeg')" }}
+          style={{ backgroundImage: "url('/images/public-ella-nine-arch.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
@@ -63,11 +63,10 @@ export default function AboutPage() {
             Our Story
           </span>
           <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-6xl text-white mb-4 max-w-3xl">
-            Sri Lanka, Through the Eyes of Those Who Call It Home
+            We Live Here. That is the Difference.
           </h1>
           <p className="text-white/60 max-w-lg">
-            Helanka Vacations was born from a simple belief — the best way to
-            discover a country is through the people who love it most.
+            Helanka Vacations was built by Sri Lankans who got tired of watching visitors miss the real island. We know every road, every guide, and every good spot to eat.
           </p>
         </div>
       </section>
@@ -94,36 +93,24 @@ export default function AboutPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white mb-6">
-                From a Passion for Sri Lanka to a Promise to Travelers
+                How We Started
               </h2>
               <div className="space-y-4 text-white/60 leading-relaxed">
                 <p>
-                  Helanka Vacations started with a single idea: that Sri Lanka
-                  deserves to be experienced, not just visited. Founded by a team
-                  of Sri Lankans who grew up exploring every corner of this
-                  island, we set out to share the places, flavors, and stories
-                  that no guidebook can capture.
+                  Helanka Vacations started because the standard tour felt wrong. Hit five places in five days, take photos, leave. We wanted to show people the Sri Lanka we actually know.
                 </p>
                 <p>
-                  What began as curated tours for a handful of friends quickly
-                  grew into a full-service travel company. Today, we design
-                  bespoke journeys for solo adventurers, couples, families, and
-                  groups — each one shaped by deep local knowledge and a genuine
-                  love for hospitality.
+                  We are a small team based in Rajagiriya, Colombo, operating under MendisOne Pvt Ltd. We work with local guides, homestays, family restaurants, and fishing communities across the island. When you book with us, the money stays in Sri Lanka.
                 </p>
                 <p>
-                  We don&apos;t do cookie-cutter. Whether it&apos;s a sunrise
-                  hike to Adam&apos;s Peak, a private cooking class in a
-                  grandmother&apos;s kitchen, or a luxury train journey through
-                  tea country — every moment is intentional, personal, and
-                  unforgettable.
+                  Over the past eight years, we have sent thousands of travelers through tea estates, into national parks, up mountains, and into home kitchens. Not because we are selling an experience. Because that is how you actually get to know a place.
                 </p>
               </div>
             </div>
             <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
               <div
                 className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: "url('/Down South Beach.jpeg')" }}
+                style={{ backgroundImage: "url('/images/public-down-south-beach.jpg')" }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent" />
             </div>
@@ -136,7 +123,7 @@ export default function AboutPage() {
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
           <div className="text-center mb-16">
             <span className="inline-block bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
-              What We Stand For
+              How We Work
             </span>
             <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white">
               Our Values
@@ -166,7 +153,7 @@ export default function AboutPage() {
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
           <div className="text-center mb-16">
             <span className="inline-block bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
-              The People Behind Your Journey
+              The People You Will Meet
             </span>
             <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white">
               Meet the Team
@@ -201,7 +188,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* MendisOne — Parent Company */}
+      {/* MendisOne - Parent Company */}
       <section className="bg-[#020617] py-20 border-t border-white/5">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -214,21 +201,12 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-white/60 leading-relaxed">
                 <p>
-                  Helanka Vacations is proudly a part of{" "}
+                  Helanka Vacations is part of{" "}
                   <span className="text-white font-medium">MendisOne Pvt Ltd</span>
-                  , a diversified Sri Lankan business group pioneering trust,
-                  innovation, and ethical excellence across shipping, trading,
-                  logistics, and leisure.
+                  , a Sri Lankan business group with operations in shipping, trading, logistics, and leisure.
                 </p>
                 <p>
-                  Under the MendisOne umbrella, we leverage decades of
-                  operational expertise and a deep commitment to service quality.
-                  Our parent company&apos;s philosophy —{" "}
-                  <span className="italic text-white/80">
-                    &ldquo;Bearing, Forward. Heading, Tomorrow.&rdquo;
-                  </span>{" "}
-                  — drives everything we do at Helanka, from the journeys we
-                  design to the relationships we build.
+                  Our parent company has been operating for decades, and their approach to service and reliability runs through everything we do at Helanka. From the trips we plan to the relationships we build with our guests.
                 </p>
               </div>
             </div>
@@ -238,19 +216,19 @@ export default function AboutPage() {
                 {
                   name: "Helanka Vacations",
                   description:
-                    "Gateway to unforgettable experiences — curated travel journeys and MICE tourism across Sri Lanka.",
+                    "Custom travel and MICE tourism across Sri Lanka. Holiday packages, corporate events, and group tours.",
                   active: true,
                 },
                 {
                   name: "Premium Trading & Logistics",
                   description:
-                    "Partner in global trade — customs brokerage, supply chain management, and swift logistics solutions.",
+                    "Global trade, customs brokerage, and supply chain management.",
                   active: false,
                 },
                 {
                   name: "Prudential Shipping",
                   description:
-                    "One of Sri Lanka's fast-growing shipping agencies — maritime operations and port services.",
+                    "One of Sri Lanka's growing shipping agencies with maritime operations and port services.",
                   active: false,
                 },
               ].map((company) => (
@@ -306,11 +284,10 @@ export default function AboutPage() {
       <section className="bg-[#020617] py-20 border-t border-white/5">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 text-center">
           <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white mb-4">
-            Ready to Explore Sri Lanka?
+            Want to See Sri Lanka?
           </h2>
           <p className="text-white/50 max-w-lg mx-auto mb-8">
-            Let our team design a journey that&apos;s uniquely yours. No
-            templates, no compromises — just your dream trip, handled.
+            Let our team put together a trip that fits what you actually want. No templates, no compromises. Just tell us your dates and interests.
           </p>
           <a
             href="/login"

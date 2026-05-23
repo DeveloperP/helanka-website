@@ -20,50 +20,45 @@ const slides: Slide[] = [
     label: "The Ancient Throne",
     region: "CULTURAL TRIANGLE",
     tagline:
-      "Ascend the lion rock and witness the echoes of a kingdom carved into the clouds. A journey through history, luxury, and untamed beauty.",
+      "Climb a 1,200-year-old fortress that rises 200 metres above the plains. Ancient frescoes, royal gardens, and views that reach the horizon.",
     slug: "sigiriya",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA8byS4ur0YLqV8SSm4o61Threszjg0SP-yUsTDvcAY44XGdvHjfYtEmO8xWwdqa3zsomjFqQtUBs_9fbsmGchF1ijExKBw3GDStxTXIWmBvXvbxDv6CANoGNG0bkoO87RTXHyD4ukJA_5T3DRM_YVekWrf7hsdtWPwQcUDQCJMcTQlypRC92CKbLkIXkqjXuz_5A9pFehLUBwX50r4bRM-xaJmnv9KbcgYdGPhVhfT-gJNnbo0aSzlHkBhns9h19oZzn9JNx2vi6g",
+    image: "/images/heroes/hero-sigiriya.jpg",
   },
   {
     destination: "Emerald\nHighlands",
     label: "The Tea Country",
     region: "HILL COUNTRY",
     tagline:
-      "Journey through mist-wrapped mountains and endless tea plantations aboard the world's most scenic train ride.",
+      "Watch the highlands roll past your train window. Tea estates, waterfalls, and the famous Nine Arch Bridge. The pace here is slow and that is the whole point.",
     slug: "ella",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA7yFEXyPuNX9h_GbgmSdd2qwI4JGC1uoPb7ulTfAcuU6WQF6HvDWujaf8QEbi-HXIPSi9Ar_221wIJRyI8Oc7J9YbONA7xBcrMWiP3j9sUxtS_xURw4mrwBaIxZ8YFeFDrWujeqMRLL2Z_yQq2sEuX2EIyjhd_ytbtIFiFgLpuMSox6uLPQ4pCNGmRMXN6AjrjBnRZaTcV7N1c8-P2ncWBgCmmQPApVYrL3GlPUK8xxdDNtop4B4tKepr0tLvqmw1IS4_2n1Kc2ko",
+    image: "/images/heroes/hero-ella.jpg",
   },
   {
     destination: "Shores of\nMirissa",
     label: "The Southern Coast",
     region: "COASTAL",
     tagline:
-      "Where palm-fringed beaches meet the deep Indian Ocean. Surf, sunsets, and the silence of pristine coastline.",
+      "Golden sand, whale watching boats heading out at dawn, and fresh seafood grilled on the beach. The south coast at its simplest.",
     slug: "galle",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBmyTIo8YOpdkZbjNE4Zb0suaLf9bdAU7twbbb6gP99Rnxc612XVWmI3SRy5DGonal9DQDihBwEKQR1sKvRwuQl9xWpSNmBnPHjnZtCU0dtxO3ivqyt4kfTEhJr5ZjH04EqJdKA_2wj6K3lpUdEMEbH7siAiTWks6W-LGz9tZMbKXbt6MK48V3T3oA7-PCIWDmkLqT6ma5Iga--4Y-rNqtL5K-96EGmEPesQ_l_EqrXPd7oJCEL-0z2vnZXeTwjUpjQkrwLobtgqB0",
+    image: "/images/heroes/hero-mirissa.jpg",
   },
   {
     destination: "Wild Heart\nof Yala",
     label: "The Safari",
     region: "WILDLIFE",
     tagline:
-      "Track leopards through savannah and lagoon in Sri Lanka's premier national park. A luxury wildlife odyssey.",
+      "One of the highest leopard densities anywhere on Earth. Safari jeeps leave at sunrise. Crocodiles, painted storks, and spotted cats.",
     slug: "yala",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAvL9qQCZqkuUZZhDFPiuljSOElBzTS-i7kLp90dx9jPIRgvPItqhfxy9613-soZHzobTHli7BjWkH4-Haw9lP45E2wiW9j2dUftl84hUoLQpMhO1LIzUoQRk5nyTAmY78Y-IBlM5Mrog1JBI8zdp86HBVzmlXisZYgFH5lIspaZdstoAxqxQrnPxafv0B8S_p0e8P0tS2KZMFdCj6rUEkqe56zoOq8yXRaQE2XqbrLuXWXGtJVEbnTCZcpKa2KlGrKVElRaZGsohs",
+    image: "/images/heroes/hero-yala.jpg",
   },
   {
     destination: "Fortress\nof Galle",
     label: "The Heritage",
     region: "HERITAGE",
     tagline:
-      "A UNESCO fortress town where Dutch colonial walls embrace artisan boutiques, ocean views, and centuries of living history.",
+      "Walk along 350-year-old ramparts with the ocean below. The old town has bookshops, galleries, and restaurants where the salt air comes right in.",
     slug: "galle",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDiJOIXdRp0l7rGwM8eiDyKXWXVHTHtciFZ-YXdZS3Cd9Uo-jvjFfC09J1WRQpYmbcO1BEtchv6CUXXxjYi0Pj8O9AFnXORA-4OY6xP1sCWn2N6cEUxSy-Eggf1cODQjozh-4b2OecEaGjoTRnYKY5p2xzfvI7ykfVFCQobSh7YxsSpR8Jz3XPqWXMndy5ipi7S_5kAdrq6RJQjUewrywmX-gNn0HENvBLOT0nNjqBDC3yCoO4EmHmuMhnoLYkVsDUktQR6kRPhP2M",
+    image: "/images/heroes/hero-galle.jpg",
   },
 ];
 
@@ -100,6 +95,28 @@ export default function HeroCarousel() {
     const id = setInterval(next, 6000);
     return () => clearInterval(id);
   }, [paused, next]);
+
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = 120;
+      c.height = 20;
+      const ctx = c.getContext("2d");
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, img.width, img.height * 0.12, 0, 0, 120, 20);
+      const { data } = ctx.getImageData(0, 0, 120, 20);
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        sum += 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      }
+      const brightness = sum / (data.length / 4);
+      window.dispatchEvent(
+        new CustomEvent("hero-brightness", { detail: { light: brightness > 140 } })
+      );
+    };
+    img.src = slides[active].image;
+  }, [active]);
 
   const slide = slides[active];
 
@@ -141,14 +158,9 @@ export default function HeroCarousel() {
             <p className="text-lg leading-7 text-white/80 mb-10 max-w-sm drop-shadow-lg">
               {slide.tagline}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-[#ff9d00] text-[#482900] px-10 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95">
-                Explore Package
-              </button>
-              <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-white/20 transition-all">
-                Watch Story
-              </button>
-            </div>
+            <button className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-white/20 transition-all hover:scale-105 active:scale-95">
+              Explore Package
+            </button>
           </div>
 
           {/* Right: Trip builder teaser */}

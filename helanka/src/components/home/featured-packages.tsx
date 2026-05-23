@@ -19,19 +19,19 @@ export default async function FeaturedPackages() {
     <section className="relative py-24 overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/Featured packages background.png')" }}
+        style={{ backgroundImage: "url('/images/bg-featured-packages.jpg')" }}
       />
       <div className="absolute inset-0 bg-[#020617]/70" />
       <div className="relative z-10 px-5 md:px-20 max-w-[1440px] mx-auto">
       <div className="text-center mb-16">
         <span className="font-[family-name:var(--font-manrope)] text-xs font-semibold text-[#ff9d00] tracking-[0.2em] uppercase block mb-3">
-          Curated Journeys
+          Our Most Popular Trips
         </span>
         <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white mb-4">
           Featured Packages
         </h2>
         <p className="text-[#dac2ad] max-w-lg mx-auto">
-          Hand-crafted itineraries designed by our local experts for every kind of traveler.
+          Each trip is designed by someone who knows the island. Flexible dates, experienced guides, and everything included.
         </p>
       </div>
 

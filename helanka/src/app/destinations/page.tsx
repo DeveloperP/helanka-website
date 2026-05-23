@@ -77,7 +77,7 @@ export default function DestinationsPage() {
           </Link>
         </div>
 
-        {/* Numbered destination nav — right side */}
+        {/* Numbered destination nav - right side */}
         <div className="absolute right-8 md:right-16 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end gap-2">
           {destinations.map((d, i) => (
             <button
@@ -189,7 +189,7 @@ export default function DestinationsPage() {
           </h2>
           <p className="text-white/60 max-w-md mb-8 leading-relaxed">
             Sri Lanka packs more diversity into a small island than most continents.
-            Every hour of driving opens a new world — ancient ruins, misty peaks, golden coasts, and untamed jungle.
+            Every hour of driving opens a new world. Ancient ruins, misty peaks, golden coasts, and untamed jungle.
           </p>
           <Link
             href="/login"

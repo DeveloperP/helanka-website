@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4 py-12 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: "url('/Helanka Auth page background.png')" }}
+      style={{ backgroundImage: "url('/images/bg-auth-page.jpg')" }}
     >
       <div className="absolute inset-0 bg-black/10 backdrop-blur-[2px]" />
 

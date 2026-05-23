@@ -334,7 +334,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
     return (
       <div
         className="min-h-screen pt-24 pb-12 bg-cover bg-center bg-fixed relative"
-        style={{ backgroundImage: "url('/Helanka Dashboard BG image.png')" }}
+        style={{ backgroundImage: "url('/images/bg-dashboard.jpg')" }}
       >
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
         <div className="relative z-10 max-w-[800px] mx-auto px-4 md:px-8">
@@ -416,7 +416,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
   return (
     <div
       className="min-h-screen pt-24 pb-12 bg-cover bg-center bg-fixed relative"
-      style={{ backgroundImage: "url('/Helanka Dashboard BG image.png')" }}
+      style={{ backgroundImage: "url('/images/bg-dashboard.jpg')" }}
     >
       <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
       <div className="relative z-10 max-w-[1440px] mx-auto px-4 md:px-8">

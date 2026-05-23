@@ -11,6 +11,7 @@ interface UserMenuProps {
     image?: string | null;
     role: string;
   };
+  darkMode?: boolean;
 }
 
 function getInitials(name?: string | null, email?: string | null): string {
@@ -29,7 +30,7 @@ function getDashboardLink(role: string): { href: string; label: string } {
   return { href: "/dashboard", label: "My Dashboard" };
 }
 
-export function UserMenu({ user }: UserMenuProps) {
+export function UserMenu({ user, darkMode }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -51,7 +52,9 @@ export function UserMenu({ user }: UserMenuProps) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 hover:bg-white/10 transition-colors"
+        className={`flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition-colors ${
+          darkMode ? "hover:bg-black/5" : "hover:bg-white/10"
+        }`}
       >
         <div className="relative">
           {user.image ? (
@@ -65,13 +68,19 @@ export function UserMenu({ user }: UserMenuProps) {
               {initials}
             </div>
           )}
-          <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0a0a0a] rounded-full" />
+          <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 rounded-full ${
+            darkMode ? "border-white" : "border-[#0a0a0a]"
+          }`} />
         </div>
-        <span className="text-sm text-[#dac2ad] hidden lg:block max-w-[120px] truncate">
+        <span className={`text-sm hidden lg:block max-w-[120px] truncate ${
+          darkMode ? "text-slate-600" : "text-[#dac2ad]"
+        }`}>
           {displayName}
         </span>
         <svg
-          className={`w-3.5 h-3.5 text-[#dac2ad]/60 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""} ${
+            darkMode ? "text-slate-400" : "text-[#dac2ad]/60"
+          }`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

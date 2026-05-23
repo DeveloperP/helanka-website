@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Manrope, Hanken_Grotesk } from "next/font/google";
+import { Space_Grotesk, Manrope, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 
-const playfair = Playfair_Display({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  weight: ["900"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-playfair",
 });
 
@@ -25,11 +25,11 @@ const hankenGrotesk = Hanken_Grotesk({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s — Helanka Vacations",
-    default: "Helanka Vacations — Sri Lanka Holiday Tours",
+    template: "%s | Helanka Vacations",
+    default: "Helanka Vacations | Sri Lanka Holiday Tours",
   },
   description:
-    "Plan your perfect Sri Lanka vacation with Helanka Vacations. Explore curated holiday packages, tailor-made itineraries, group experiences, and expert travel advice for unforgettable journeys across the island.",
+    "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services. Talk to our team for a free consultation.",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${playfair.variable} ${manrope.variable} ${hankenGrotesk.variable}`}
+      className={`dark ${spaceGrotesk.variable} ${manrope.variable} ${hankenGrotesk.variable}`}
     >
       <body className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#020617] text-[#e5e2e1] font-[family-name:var(--font-manrope)] antialiased">
         <Header />

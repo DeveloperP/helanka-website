@@ -30,8 +30,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-05-10",
     readTime: "6 min",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA7yFEXyPuNX9h_GbgmSdd2qwI4JGC1uoPb7ulTfAcuU6WQF6HvDWujaf8QEbi-HXIPSi9Ar_221wIJRyI8Oc7J9YbONA7xBcrMWiP3j9sUxtS_xURw4mrwBaIxZ8YFeFDrWujeqMRLL2Z_yQq2sEuX2EIyjhd_ytbtIFiFgLpuMSox6uLPQ4pCNGmRMXN6AjrjBnRZaTcV7N1c8-P2ncWBgCmmQPApVYrL3GlPUK8xxdDNtop4B4tKepr0tLvqmw1IS4_2n1Kc2ko",
+    image: "/images/public-ella-nine-arch.jpg",
     featured: true,
   },
   {
@@ -52,8 +51,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Amara Silva",
     date: "2026-04-28",
     readTime: "5 min",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAvL9qQCZqkuUZZhDFPiuljSOElBzTS-i7kLp90dx9jPIRgvPItqhfxy9613-soZHzobTHli7BjWkH4-Haw9lP45E2wiW9j2dUftl84hUoLQpMhO1LIzUoQRk5nyTAmY78Y-IBlM5Mrog1JBI8zdp86HBVzmlXisZYgFH5lIspaZdstoAxqxQrnPxafv0B8S_p0e8P0tS2KZMFdCj6rUEkqe56zoOq8yXRaQE2XqbrLuXWXGtJVEbnTCZcpKa2KlGrKVElRaZGsohs",
+    image: "/images/destinations/dest-yala.jpg",
     featured: true,
   },
   {
@@ -74,8 +72,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-04-15",
     readTime: "4 min",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDiJOIXdRp0l7rGwM8eiDyKXWXVHTHtciFZ-YXdZS3Cd9Uo-jvjFfC09J1WRQpYmbcO1BEtchv6CUXXxjYi0Pj8O9AFnXORA-4OY6xP1sCWn2N6cEUxSy-Eggf1cODQjozh-4b2OecEaGjoTRnYKY5p2xzfvI7ykfVFCQobSh7YxsSpR8Jz3XPqWXMndy5ipi7S_5kAdrq6RJQjUewrywmX-gNn0HENvBLOT0nNjqBDC3yCoO4EmHmuMhnoLYkVsDUktQR6kRPhP2M",
+    image: "/images/destinations/dest-galle.jpg",
   },
   {
     slug: "best-time-visit-sri-lanka",
@@ -97,8 +94,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Amara Silva",
     date: "2026-03-20",
     readTime: "4 min",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBmyTIo8YOpdkZbjNE4Zb0suaLf9bdAU7twbbb6gP99Rnxc612XVWmI3SRy5DGonal9DQDihBwEKQR1sKvRwuQl9xWpSNmBnPHjnZtCU0dtxO3ivqyt4kfTEhJr5ZjH04EqJdKA_2wj6K3lpUdEMEbH7siAiTWks6W-LGz9tZMbKXbt6MK48V3T3oA7-PCIWDmkLqT6ma5Iga--4Y-rNqtL5K-96EGmEPesQ_l_EqrXPd7oJCEL-0z2vnZXeTwjUpjQkrwLobtgqB0",
+    image: "/images/destinations/dest-mirissa.jpg",
   },
   {
     slug: "sri-lanka-surf-guide-beginners",
@@ -120,8 +116,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-03-05",
     readTime: "5 min",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA8byS4ur0YLqV8SSm4o61Threszjg0SP-yUsTDvcAY44XGdvHjfYtEmO8xWwdqa3zsomjFqQtUBs_9fbsmGchF1ijExKBw3GDStxTXIWmBvXvbxDv6CANoGNG0bkoO87RTXHyD4ukJA_5T3DRM_YVekWrf7hsdtWPwQcUDQCJMcTQlypRC92CKbLkIXkqjXuz_5A9pFehLUBwX50r4bRM-xaJmnv9KbcgYdGPhVhfT-gJNnbo0aSzlHkBhns9h19oZzn9JNx2vi6g",
+    image: "/images/packages/pkg-east-coast-escape.jpg",
   },
 ];
 

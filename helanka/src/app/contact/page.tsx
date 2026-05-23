@@ -27,7 +27,7 @@ export default function ContactPage() {
       <section className="relative h-[50vh] min-h-[400px] flex items-end overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/Sigiriya.jpeg')" }}
+          style={{ backgroundImage: "url('/images/public-sigiriya.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
@@ -35,11 +35,10 @@ export default function ContactPage() {
             Get in Touch
           </span>
           <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-6xl text-white mb-4 max-w-3xl">
-            Plan Your Dream Sri Lanka Journey
+            Let's Plan Your Trip
           </h1>
           <p className="text-white/60 max-w-lg">
-            Whether you have a trip in mind or need inspiration, our travel
-            specialists are here to craft your perfect itinerary.
+            Tell us your dates and interests, or just send a rough idea. We will work out the details together.
           </p>
         </div>
       </section>
@@ -68,21 +67,19 @@ export default function ContactPage() {
                     </svg>
                   </div>
                   <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-white mb-4">
-                    Thank You!
+                    Got It
                   </h2>
                   <p className="text-white/60 max-w-md mx-auto">
-                    We&apos;ve received your inquiry. A Helanka travel specialist
-                    will reach out within 24 hours to start planning your journey.
+                    We have received your inquiry. Someone from the Helanka team will get back to you within 24 hours to start working on your trip.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <h2 className="font-[family-name:var(--font-playfair)] text-2xl text-white mb-2">
-                    Send Us an Inquiry
+                    Tell Us About Your Trip
                   </h2>
                   <p className="text-white/50 text-sm mb-8">
-                    Fill out the form below and we&apos;ll get back to you with a
-                    personalized proposal.
+                    The more detail, the better. But even a rough idea is enough to start.
                   </p>
 
                   <div className="grid md:grid-cols-2 gap-6">
@@ -211,7 +208,7 @@ export default function ContactPage() {
               )}
             </div>
 
-            {/* Sidebar — Contact Details */}
+            {/* Sidebar - Contact Details */}
             <div className="lg:col-span-2 space-y-10">
               <div>
                 <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-4">
@@ -226,8 +223,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-white/50 mb-1">Email</p>
-                      <a href="mailto:hello@helanka.co" className="text-white hover:text-[#ff9d00] transition-colors">
-                        hello@helanka.co
+                      <a href="mailto:tours@helanka.co" className="text-white hover:text-[#ff9d00] transition-colors">
+                        tours@helanka.co
                       </a>
                     </div>
                   </div>
@@ -240,8 +237,8 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm text-white/50 mb-1">Phone / WhatsApp</p>
-                      <a href="tel:+94771234567" className="text-white hover:text-[#ff9d00] transition-colors">
-                        +94 77 123 4567
+                      <a href="tel:+94117400857" className="text-white hover:text-[#ff9d00] transition-colors">
+                        +94 11 7400 857
                       </a>
                     </div>
                   </div>
@@ -256,7 +253,7 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm text-white/50 mb-1">Office</p>
                       <p className="text-white">
-                        Colombo, Sri Lanka
+                        No. 471, Cotta Road, Rajagiriya, Colombo
                       </p>
                     </div>
                   </div>
@@ -271,19 +268,19 @@ export default function ContactPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-green-400" />
                     <p className="text-white/60 text-sm">
-                      Inquiries answered within 24 hours
+                      We reply to inquiries within 24 hours
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-[#ff9d00]" />
                     <p className="text-white/60 text-sm">
-                      Custom itinerary delivered in 48 hours
+                      Custom itinerary ready in 48 hours
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-blue-400" />
                     <p className="text-white/60 text-sm">
-                      No obligation — free consultation
+                      Free consultation, no obligation
                     </p>
                   </div>
                 </div>

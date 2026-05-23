@@ -103,7 +103,7 @@ const TRANSPORT_TIERS: TransportTierOption[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// ALL EXCURSIONS — real curated data across all destinations
+// ALL EXCURSIONS - real curated data across all destinations
 // ---------------------------------------------------------------------------
 
 export const ALL_EXCURSIONS: Excursion[] = [
@@ -112,7 +112,7 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "col-2",  name: "Gangaramaya Temple",                     description: "Explore the eclectic and sacred Gangaramaya Temple, one of Colombo's most important Buddhist shrines, filled with art and antiquities.", durationHours: 1.5, destinationSlug: "colombo" },
   { id: "col-3",  name: "Lotus Tower",                            description: "Ascend South Asia's tallest tower for 360-degree panoramic views of Colombo and the Indian Ocean coastline.", durationHours: 1.5, destinationSlug: "colombo" },
   { id: "col-4",  name: "Independence Square",                    description: "Visit the grand open-air monument celebrating Sri Lanka's 1948 independence, set within beautifully landscaped gardens.", durationHours: 1,   destinationSlug: "colombo" },
-  { id: "col-5",  name: "Pettah Market Experience",               description: "Immerse yourself in the sensory overload of Pettah Bazaar — Sri Lanka's oldest and busiest street market.", durationHours: 2,   destinationSlug: "colombo" },
+  { id: "col-5",  name: "Pettah Market Experience",               description: "Immerse yourself in the sensory overload of Pettah Bazaar, Sri Lanka's oldest and busiest street market.", durationHours: 2,   destinationSlug: "colombo" },
   { id: "col-6",  name: "Dutch Hospital Precinct",                description: "Stroll through the beautifully restored 17th-century Dutch Hospital, now home to upscale restaurants and boutiques.", durationHours: 1.5, destinationSlug: "colombo" },
   { id: "col-7",  name: "Galle Face Green",                       description: "Enjoy a classic Colombo evening on the iconic seafront promenade with street food stalls and ocean breezes.", durationHours: 1.5, destinationSlug: "colombo" },
   { id: "col-8",  name: "Colombo National Museum",                description: "Discover Sri Lanka's finest collection of royal regalia, ancient artefacts, and natural history exhibits in the capital's flagship museum.", durationHours: 2,   destinationSlug: "colombo" },
@@ -136,14 +136,14 @@ export const ALL_EXCURSIONS: Excursion[] = [
 
   // --- Kandy ---
   { id: "kan-1",  name: "Temple of the Sacred Tooth Relic",       description: "Attend the evening puja ceremony at Sri Lanka's most sacred Buddhist shrine, housing the relic of the Buddha's tooth.", durationHours: 2,   destinationSlug: "kandy" },
-  { id: "kan-2",  name: "Kandy City Tour",                        description: "A guided walk through Kandy's historic centre — lake, markets, colonial architecture, and sacred sites.", durationHours: 3,   destinationSlug: "kandy" },
+  { id: "kan-2",  name: "Kandy City Tour",                        description: "A guided walk through Kandy's historic centre, including the lake, markets, colonial architecture, and sacred sites.", durationHours: 3,   destinationSlug: "kandy" },
   { id: "kan-3",  name: "Royal Botanical Gardens – Peradeniya",   description: "Explore 150 acres of tropical orchids, spice groves, and giant Java fig trees at Sri Lanka's premier botanical garden.", durationHours: 3,   destinationSlug: "kandy" },
   { id: "kan-4",  name: "Kandy Cultural Dance Show",              description: "A private performance of traditional Kandyan dance and drumming, including fire-walking and plate-spinning acts.", durationHours: 1.5, destinationSlug: "kandy" },
   { id: "kan-5",  name: "Bahirawakanda Buddha Statue",            description: "Climb to the hilltop white Buddha statue overlooking Kandy for sweeping views of the city and surrounding hills.", durationHours: 1,   destinationSlug: "kandy" },
   { id: "kan-6",  name: "Gem Museum & Lapidary Visit",            description: "Tour a working gem museum and lapidary workshop to discover Sri Lanka's world-famous sapphires, rubies, and cat's-eyes.", durationHours: 1.5, destinationSlug: "kandy" },
   { id: "kan-7",  name: "Tea Factory & Tea Plantation Tour",      description: "Visit a working highland tea estate and factory to trace the journey from leaf to cup with a tasting session.", durationHours: 3,   destinationSlug: "kandy" },
   { id: "kan-8",  name: "Ambuluwawa Tower Excursion",             description: "Drive to the unique helical-staircase tower atop Ambuluwawa Hill, surrounded by bio-diversity reserve forest.", durationHours: 3,   destinationSlug: "kandy" },
-  { id: "kan-9",  name: "Knuckles Mountain Trekking",             description: "A guided trek into the UNESCO Knuckles Mountain Range — a pristine wilderness of cloud forest, streams, and rare wildlife.", durationHours: 6,   destinationSlug: "kandy" },
+  { id: "kan-9",  name: "Knuckles Mountain Trekking",             description: "A guided trek into the UNESCO Knuckles Mountain Range, a pristine wilderness of cloud forest, streams, and rare wildlife.", durationHours: 6,   destinationSlug: "kandy" },
   { id: "kan-10", name: "Riverston Excursion",                    description: "Drive to Riverston's dramatic ridge viewpoints, known as the 'Mini World's End', for staggering highland vistas.", durationHours: 4,   destinationSlug: "kandy" },
   { id: "kan-11", name: "Spice Garden Visit",                     description: "A guided walk through a traditional spice garden to discover cinnamon, cardamom, pepper, and nutmeg growing in their natural habitat.", durationHours: 1.5, destinationSlug: "kandy" },
   { id: "kan-12", name: "Traditional Kandyan Cooking Experience", description: "A hands-on cooking class with a local family learning to prepare rice and curry, pol sambol, and milk hoppers.", durationHours: 3,   destinationSlug: "kandy" },
@@ -155,16 +155,16 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "sig-1",  name: "Sigiriya Rock Fortress Climb",           description: "Climb the iconic 5th-century rock citadel through terraced gardens, frescoes, and the lion's paw gateway to summit palace ruins.", durationHours: 3.5, destinationSlug: "sigiriya" },
   { id: "sig-2",  name: "Pidurangala Rock Hiking",                description: "Hike the neighbouring Pidurangala Rock for the most celebrated aerial view of Sigiriya and the surrounding forest canopy.", durationHours: 2.5, destinationSlug: "sigiriya" },
   { id: "sig-3",  name: "Dambulla Cave Temple",                   description: "Visit the largest and best-preserved cave temple complex in Sri Lanka, adorned with 153 Buddha statues and ancient murals.", durationHours: 2,   destinationSlug: "sigiriya" },
-  { id: "sig-4",  name: "Village Safari Experience",              description: "An immersive bullock-cart and tuk-tuk tour through traditional village life — paddy fields, pottery, and home cooking.", durationHours: 3,   destinationSlug: "sigiriya" },
+  { id: "sig-4",  name: "Village Safari Experience",              description: "An immersive bullock-cart and tuk-tuk tour through traditional village life, paddy fields, pottery, and home cooking.", durationHours: 3,   destinationSlug: "sigiriya" },
   { id: "sig-5",  name: "Bullock Cart Ride",                      description: "A slow, charming ride through the Sigiriya countryside on a traditional ox-drawn cart with a village family.", durationHours: 1.5, destinationSlug: "sigiriya" },
   { id: "sig-6",  name: "Catamaran Ride on Village Lake",         description: "Glide across a calm village reservoir on a wooden catamaran as the sun sets behind Sigiriya Rock.", durationHours: 1.5, destinationSlug: "sigiriya" },
   { id: "sig-7",  name: "Traditional Sri Lankan Village Lunch",   description: "Enjoy a multi-dish home-cooked Sri Lankan rice and curry lunch with a local village family in their traditional homestead.", durationHours: 2,   destinationSlug: "sigiriya" },
-  { id: "sig-8",  name: "Minneriya National Park Safari",         description: "Jeep safari to Minneriya Tank, famous for 'The Gathering' — one of Asia's greatest elephant congregations.", durationHours: 4,   destinationSlug: "sigiriya" },
+  { id: "sig-8",  name: "Minneriya National Park Safari",         description: "Jeep safari to Minneriya Tank, famous for 'The Gathering', one of Asia's greatest elephant congregations.", durationHours: 4,   destinationSlug: "sigiriya" },
   { id: "sig-9",  name: "Kaudulla National Park Safari",          description: "Afternoon game drive at Kaudulla, a quieter alternative to Minneriya for excellent elephant herds and birdlife.", durationHours: 3.5, destinationSlug: "sigiriya" },
   { id: "sig-10", name: "Hurulu Eco Park Safari",                 description: "Explore the UNESCO Hurulu Forest Reserve on a guided jeep safari through dry-zone jungle rich with elephants and deer.", durationHours: 3,   destinationSlug: "sigiriya" },
   { id: "sig-11", name: "Hot Air Ballooning",                     description: "Drift silently above Sigiriya's ancient landscape at sunrise on a private hot-air balloon for unparalleled aerial views.", durationHours: 3,   destinationSlug: "sigiriya" },
   { id: "sig-12", name: "Ritigala Forest Monastery",              description: "Trek through dense forest to discover the atmospheric ruins of the ancient forest hermitage of Ritigala.", durationHours: 3.5, destinationSlug: "sigiriya" },
-  { id: "sig-13", name: "Ayurvedic Village Experiences",          description: "A holistic village Ayurveda session — herbal garden tour, consultation, and traditional treatments in a rural setting.", durationHours: 3,   destinationSlug: "sigiriya" },
+  { id: "sig-13", name: "Ayurvedic Village Experiences",          description: "A holistic village Ayurveda session with herbal garden tour, consultation, and traditional treatments in a rural setting.", durationHours: 3,   destinationSlug: "sigiriya" },
   { id: "sig-14", name: "Cycling Around Sigiriya Countryside",    description: "Pedal through the flat, scenic Sigiriya countryside on a guided cycling tour past lakes, temples, and farmer villages.", durationHours: 3,   destinationSlug: "sigiriya" },
   { id: "sig-15", name: "Sigiriya Museum Visit",                  description: "Explore the modern on-site museum detailing the history, archaeology, and royal legends of the Sigiriya citadel.", durationHours: 1.5, destinationSlug: "sigiriya" },
 
@@ -172,11 +172,11 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "ella-1",  name: "Nine Arch Bridge",                      description: "Visit the iconic nine-arched colonial viaduct at golden hour and watch the blue train roll across the jungle ravine.", durationHours: 2,   destinationSlug: "ella" },
   { id: "ella-2",  name: "Little Adam's Peak Hiking",             description: "A gentle, rewarding hike through tea estates to a summit with sweeping 360-degree views of the Ella Gap.", durationHours: 2.5, destinationSlug: "ella" },
   { id: "ella-3",  name: "Ella Rock Trekking",                    description: "A half-day trek through jungle and tea plantation to the dramatic Ella Rock summit for panoramic highland views.", durationHours: 5,   destinationSlug: "ella" },
-  { id: "ella-4",  name: "Ravana Falls",                          description: "Visit the wide, cascading Ravana Falls — one of Sri Lanka's broadest waterfalls, steeped in Ramayana legend.", durationHours: 1,   destinationSlug: "ella" },
+  { id: "ella-4",  name: "Ravana Falls",                          description: "Visit the wide, cascading Ravana Falls, one of Sri Lanka's broadest waterfalls, steeped in Ramayana legend.", durationHours: 1,   destinationSlug: "ella" },
   { id: "ella-5",  name: "Ravana Cave",                           description: "Explore the legendary cave in the hillside above Ella, mythologically linked to King Ravana of the Ramayana.", durationHours: 1.5, destinationSlug: "ella" },
   { id: "ella-6",  name: "Flying Ravana Zipline",                 description: "Soar over the valley floor on one of Asia's longest ziplines for an adrenaline-charged perspective of the Ella highlands.", durationHours: 2,   destinationSlug: "ella" },
   { id: "ella-7",  name: "Tea Plantation Visits",                 description: "Walk through a working Ella tea estate and meet the pluckers, before a guided factory tour and estate tasting.", durationHours: 2.5, destinationSlug: "ella" },
-  { id: "ella-8",  name: "Demodara Loop",                        description: "Walk across or observe the Demodara railway loop — an engineering marvel where the train passes over its own tunnel.", durationHours: 1.5, destinationSlug: "ella" },
+  { id: "ella-8",  name: "Demodara Loop",                        description: "Walk across or observe the Demodara railway loop, an engineering marvel where the train passes over its own tunnel.", durationHours: 1.5, destinationSlug: "ella" },
   { id: "ella-9",  name: "ATV Adventure Experiences",            description: "Power through jungle trails and tea estate roads on an all-terrain quad bike for a thrilling off-road experience.", durationHours: 2,   destinationSlug: "ella" },
   { id: "ella-10", name: "Scenic Train Journey",                  description: "Board the celebrated Hill Country train for a window-seat journey through tunnels, tea estates, and mountain mist.", durationHours: 3,   destinationSlug: "ella" },
   { id: "ella-11", name: "Sunrise Viewpoints",                    description: "Rise before dawn and hike to Ella's finest ridge-top viewpoint to watch the sun emerge over the Eastern Province plains.", durationHours: 2,   destinationSlug: "ella" },
@@ -190,17 +190,17 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "ne-5",  name: "Strawberry Farm Visits",                 description: "Pick fresh strawberries at a highland farm and enjoy locally made strawberry jam and juice in the cool hill air.", durationHours: 1.5, destinationSlug: "nuwara-eliya" },
   { id: "ne-6",  name: "Horton Plains National Park",            description: "Trek through the cloud-forest plateau of Horton Plains, one of Asia's most important montane ecosystems.", durationHours: 4,   destinationSlug: "nuwara-eliya" },
   { id: "ne-7",  name: "World's End Trek",                       description: "Hike to the sheer 880-metre cliff drop at World's End on the edge of Horton Plains for a view across half of Sri Lanka.", durationHours: 5,   destinationSlug: "nuwara-eliya" },
-  { id: "ne-8",  name: "Colonial City Walk",                     description: "A guided walking tour of Nuwara Eliya's colonial legacy — the Hill Club, Grand Hotel, post office, and English market.", durationHours: 2,   destinationSlug: "nuwara-eliya" },
+  { id: "ne-8",  name: "Colonial City Walk",                     description: "A guided walking tour of Nuwara Eliya's colonial legacy, including the Hill Club, Grand Hotel, post office, and English market.", durationHours: 2,   destinationSlug: "nuwara-eliya" },
   { id: "ne-9",  name: "Horse Riding",                           description: "Ride through scenic highland trails and tea estate paths on horseback with an experienced Nuwara Eliya guide.", durationHours: 2,   destinationSlug: "nuwara-eliya" },
   { id: "ne-10", name: "Waterfall Excursions",                   description: "Visit a curated selection of the hill country's most dramatic waterfalls, including Lovers Leap and Devon Falls.", durationHours: 3,   destinationSlug: "nuwara-eliya" },
   { id: "ne-11", name: "High Tea Experiences",                   description: "Savour traditional high tea with freshly brewed estate tea, scones, and pastries at a grand colonial hill-country property.", durationHours: 2,   destinationSlug: "nuwara-eliya" },
 
   // --- Yala ---
-  { id: "yala-1",  name: "Yala National Park Safari",            description: "Dawn jeep safari through Yala's Block 1 — the highest leopard density on Earth, plus elephants, bears, and 200 bird species.", durationHours: 4,   destinationSlug: "yala" },
+  { id: "yala-1",  name: "Yala National Park Safari",            description: "Dawn jeep safari through Yala's Block 1, the highest leopard density on Earth, plus elephants, bears, and 200 bird species.", durationHours: 4,   destinationSlug: "yala" },
   { id: "yala-2",  name: "Leopard Tracking Experiences",         description: "A specialist-guided leopard tracking safari with an expert naturalist who reads spoor, calls, and territorial behaviour.", durationHours: 5,   destinationSlug: "yala" },
   { id: "yala-3",  name: "Kataragama Temple Visit",              description: "Visit the sacred multi-faith Kataragama complex on the Yala border, revered by Buddhists, Hindus, and Muslims alike.", durationHours: 2,   destinationSlug: "yala" },
   { id: "yala-4",  name: "Sithulpawwa Rock Temple",              description: "Climb to the ancient 2nd-century BC cave monastery on a granite inselberg deep inside the Yala wilderness.", durationHours: 2.5, destinationSlug: "yala" },
-  { id: "yala-5",  name: "Bundala Bird Watching Safari",         description: "A guided birdwatching excursion through Bundala's flamingo flats, lagoons, and coastal dunes — a Ramsar wetland site.", durationHours: 3.5, destinationSlug: "yala" },
+  { id: "yala-5",  name: "Bundala Bird Watching Safari",         description: "A guided birdwatching excursion through Bundala's flamingo flats, lagoons, and coastal dunes. Bundala is a Ramsar wetland site.", durationHours: 3.5, destinationSlug: "yala" },
   { id: "yala-6",  name: "Camping Safari Experiences",           description: "An overnight glamping safari inside the Yala buffer zone, sleeping under stars to the sounds of the wilderness.", durationHours: 18,  destinationSlug: "yala" },
   { id: "yala-7",  name: "Sunrise & Sunset Safari Drives",       description: "Twin golden-hour drives to experience Yala's wildlife during the most active periods of dawn and dusk.", durationHours: 4,   destinationSlug: "yala" },
 
@@ -225,7 +225,7 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "gal-8",  name: "Southern Coast Beach Excursions",       description: "A curated coastal day trip covering Jungle Beach, Unawatuna Bay, and the stilt fishermen of Koggala.", durationHours: 5,   destinationSlug: "galle" },
 
   // --- Mirissa ---
-  { id: "mir-1",  name: "Blue Whale Watching",                   description: "An early morning pelagic boat excursion to spot the world's largest animal — blue whales — off Sri Lanka's southern tip.", durationHours: 4,   destinationSlug: "mirissa" },
+  { id: "mir-1",  name: "Blue Whale Watching",                   description: "An early morning pelagic boat excursion to spot blue whales off Sri Lanka's southern tip.", durationHours: 4,   destinationSlug: "mirissa" },
   { id: "mir-2",  name: "Dolphin Watching Cruise",               description: "Spot large pods of spinner and bottlenose dolphins leaping alongside the boat in the warm Indian Ocean waters.", durationHours: 3,   destinationSlug: "mirissa" },
   { id: "mir-3",  name: "Surfing at Mirissa",                    description: "A surf lesson or guided session at Mirissa's consistent beach break, suitable for beginners and intermediate surfers.", durationHours: 2,   destinationSlug: "mirissa" },
   { id: "mir-4",  name: "Coconut Tree Hill Sunset",              description: "Walk to the famous Instagram viewpoint where coconut palms arch over the bay for the perfect Mirissa sunset shot.", durationHours: 1.5, destinationSlug: "mirissa" },
@@ -250,7 +250,7 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "pekoe-11", name: "Pekoe Trail Stage 11",                description: "Begin the southern arc of the Pekoe Trail, walking from Nuwara Eliya toward the Ambewela highlands with alpine scenery.", durationHours: 5, destinationSlug: "ella" },
   { id: "pekoe-12", name: "Pekoe Trail Stage 12",                description: "Trek through Ambewela's cattle farms and pine forests, with Horton Plains looming on the horizon.", durationHours: 5, destinationSlug: "ella" },
   { id: "pekoe-13", name: "Pekoe Trail Stage 13",                description: "Stage 13 crosses the escarpment edge above Haputale, with vast lowland views stretching to the eastern plains.", durationHours: 6, destinationSlug: "ella" },
-  { id: "pekoe-14", name: "Pekoe Trail Stage 14",                description: "Walk through Haputale's dramatic ridge — the thinnest point on the island — with views from both coasts on a clear day.", durationHours: 5, destinationSlug: "ella" },
+  { id: "pekoe-14", name: "Pekoe Trail Stage 14",                description: "Walk through Haputale's dramatic ridge, the thinnest point on the island, with views from both coasts on a clear day.", durationHours: 5, destinationSlug: "ella" },
   { id: "pekoe-15", name: "Pekoe Trail Stage 15",                description: "Descend from Haputale's spine through Dambatenne tea estate, home to Sir Thomas Lipton's original Ceylon tea factory.", durationHours: 5, destinationSlug: "ella" },
   // Stages 16–22 → ella / nuwara-eliya split
   { id: "pekoe-16", name: "Pekoe Trail Stage 16",                description: "Stage 16 winds through the Bandarawela highlands, a transition zone of cooler estates and lush valley villages.", durationHours: 5, destinationSlug: "ella" },
@@ -259,7 +259,7 @@ export const ALL_EXCURSIONS: Excursion[] = [
   { id: "pekoe-19", name: "Pekoe Trail Stage 19",                description: "A rewarding highland stage through Poonagala and Badulla's outskirts, passing ancient temple ruins and waterfalls.", durationHours: 5, destinationSlug: "nuwara-eliya" },
   { id: "pekoe-20", name: "Pekoe Trail Stage 20",                description: "Stage 20 descends toward Hali Ela through spice-garden villages and rubber forests on the edge of the hill country.", durationHours: 5, destinationSlug: "nuwara-eliya" },
   { id: "pekoe-21", name: "Pekoe Trail Stage 21",                description: "The penultimate Pekoe Trail stage crosses the Badulla basin through paddy lands and river valleys.", durationHours: 5, destinationSlug: "nuwara-eliya" },
-  { id: "pekoe-22", name: "Pekoe Trail Stage 22",                description: "Complete the 300km Pekoe Trail at Nuwara Eliya — a triumphant finale through high-grown estates and mist-wrapped hills.", durationHours: 6, destinationSlug: "nuwara-eliya" },
+  { id: "pekoe-22", name: "Pekoe Trail Stage 22",                description: "Complete the 300km Pekoe Trail at Nuwara Eliya, a triumphant finale through high-grown estates and mist-wrapped hills.", durationHours: 6, destinationSlug: "nuwara-eliya" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -273,7 +273,7 @@ export const packages: Package[] = [
     minGuests: 2,
     maxGuests: 8,
     description:
-      "Wind through misty mountains, colonial tea estates, and sacred cultural sites on this classic Sri Lanka hill country circuit. Travel by scenic train from Nuwara Eliya down to Ella before finishing in the cultural capital Kandy.",
+      "From Kandy's temple ceremonies to Nuwara Eliya's cool highlands and Ella's green peaks. Travel the famous train through tea estates, hike to viewpoints, and move at a pace that lets you actually take things in.",
     durationDays: 6,
     difficulty: "Easy",
     region: "Hill Country",
@@ -285,8 +285,7 @@ export const packages: Package[] = [
       "Temple of the Tooth in Kandy",
       "Little Adam's Peak hike",
     ],
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA7yFEXyPuNX9h_GbgmSdd2qwI4JGC1uoPb7ulTfAcuU6WQF6HvDWujaf8QEbi-HXIPSi9Ar_221wIJRyI8Oc7J9YbONA7xBcrMWiP3j9sUxtS_xURw4mrwBaIxZ8YFeFDrWujeqMRLL2Z_yQq2sEuX2EIyjhd_ytbtIFiFgLpuMSox6uLPQ4pCNGmRMXN6AjrjBnRZaTcV7N1c8-P2ncWBgCmmQPApVYrL3GlPUK8xxdDNtop4B4tKepr0tLvqmw1IS4_2n1Kc2ko",
+    image: "/images/packages/pkg-hill-country-explorer.jpg",
     gallery: [],
     itinerary: [
       { day: 1, title: "Arrive in Kandy", description: "Airport pickup, drive to Kandy. Evening visit to the Temple of the Tooth and a cultural dance performance." },
@@ -317,7 +316,7 @@ export const packages: Package[] = [
     maxGuests: 6,
     name: "Wildlife Adventure",
     description:
-      "Track leopards, elephants, and exotic birds across two of Sri Lanka's premier national parks. Combine dawn game drives in Yala with a twilight excursion to Wilpattu for an unparalleled wildlife experience.",
+      "Track leopards and elephants on dawn game drives across Yala and Wilpattu. Our naturalist guides read the landscape and animal behaviour. You come back each evening with real stories from the wild.",
     durationDays: 4,
     difficulty: "Easy",
     region: "Southern",
@@ -329,11 +328,10 @@ export const packages: Package[] = [
       "Sloth bear spotting",
       "Expert naturalist guide",
     ],
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAvL9qQCZqkuUZZhDFPiuljSOElBzTS-i7kLp90dx9jPIRgvPItqhfxy9613-soZHzobTHli7BjWkH4-Haw9lP45E2wiW9j2dUftl84hUoLQpMhO1LIzUoQRk5nyTAmY78Y-IBlM5Mrog1JBI8zdp86HBVzmlXisZYgFH5lIspaZdstoAxqxQrnPxafv0B8S_p0e8P0tS2KZMFdCj6rUEkqe56zoOq8yXRaQE2XqbrLuXWXGtJVEbnTCZcpKa2KlGrKVElRaZGsohs",
+    image: "/images/packages/pkg-wildlife-adventure.jpg",
     gallery: [],
     itinerary: [
-      { day: 1, title: "Colombo to Yala", description: "Morning drive to Yala. Afternoon game drive with expert tracker — prime leopard territory." },
+      { day: 1, title: "Colombo to Yala", description: "Morning drive to Yala. Afternoon game drive with expert tracker through prime leopard territory." },
       { day: 2, title: "Full Day Yala Safari", description: "Dawn and dusk game drives. Spot elephants, sloth bears, crocodiles, and over 200 bird species." },
       { day: 3, title: "Yala to Wilpattu", description: "Transfer to Wilpattu National Park. Twilight safari along the unique villu (natural lakes)." },
       { day: 4, title: "Wilpattu & Departure", description: "Early morning game drive. Afternoon transfer to Colombo airport." },
@@ -359,7 +357,7 @@ export const packages: Package[] = [
     maxGuests: 10,
     name: "Golden Southern Coast",
     description:
-      "Explore the sun-kissed southern coastline from the UNESCO-listed Galle Fort to the turtle-nesting beaches of Bentota. Enjoy colonial heritage, world-class snorkelling, and relaxing beachside evenings.",
+      "Colonial Galle Fort, whale watching boats, turtle hatcheries, and beaches where you can swim or just watch the fishermen work. Five days along the southern shore where the ocean is warm and the pace feels right.",
     durationDays: 5,
     difficulty: "Easy",
     region: "Southern",
@@ -371,11 +369,10 @@ export const packages: Package[] = [
       "Whale watching (seasonal)",
       "Beachfront sunset dining",
     ],
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDiJOIXdRp0l7rGwM8eiDyKXWXVHTHtciFZ-YXdZS3Cd9Uo-jvjFfC09J1WRQpYmbcO1BEtchv6CUXXxjYi0Pj8O9AFnXORA-4OY6xP1sCWn2N6cEUxSy-Eggf1cODQjozh-4b2OecEaGjoTRnYKY5p2xzfvI7ykfVFCQobSh7YxsSpR8Jz3XPqWXMndy5ipi7S_5kAdrq6RJQjUewrywmX-gNn0HENvBLOT0nNjqBDC3yCoO4EmHmuMhnoLYkVsDUktQR6kRPhP2M",
+    image: "/images/packages/pkg-golden-southern-coast.jpg",
     gallery: [],
     itinerary: [
-      { day: 1, title: "Arrive in Galle", description: "Airport transfer to Galle. Afternoon walking tour of the UNESCO fort — ramparts, boutiques, and cafés." },
+      { day: 1, title: "Arrive in Galle", description: "Airport transfer to Galle. Afternoon walking tour of the UNESCO fort, including ramparts, boutiques, and cafes." },
       { day: 2, title: "Galle to Mirissa", description: "Morning whale watching excursion (seasonal). Afternoon at Mirissa beach." },
       { day: 3, title: "Mirissa to Unawatuna", description: "Snorkelling at Jungle Beach, visit the Japanese Peace Pagoda. Evening beachside dining." },
       { day: 4, title: "Unawatuna to Bentota", description: "Turtle hatchery visit, river safari on the Madu River, water sports in Bentota." },
@@ -402,7 +399,7 @@ export const packages: Package[] = [
     maxGuests: 12,
     name: "Throbbing Adventure",
     description:
-      "An action-packed hill country escape for thrill-seekers. Raft the Grade 3–4 rapids of the Kelani River in Kitulgala, abseil cliff faces through jungle canyons, and summit Ella Rock for sweeping highland panoramas.",
+      "White water rafting on the Kelani River, waterfall jumps in jungle canyons, and Ella Rock at dawn. Three intense days in the hills for people who want to move fast and feel something real.",
     durationDays: 3,
     difficulty: "Challenging",
     region: "Hill Country",
@@ -414,8 +411,7 @@ export const packages: Package[] = [
       "Nine Arch Bridge photography",
       "Adventure-camp accommodation",
     ],
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuA8byS4ur0YLqV8SSm4o61Threszjg0SP-yUsTDvcAY44XGdvHjfYtEmO8xWwdqa3zsomjFqQtUBs_9fbsmGchF1ijExKBw3GDStxTXIWmBvXvbxDv6CANoGNG0bkoO87RTXHyD4ukJA_5T3DRM_YVekWrf7hsdtWPwQcUDQCJMcTQlypRC92CKbLkIXkqjXuz_5A9pFehLUBwX50r4bRM-xaJmnv9KbcgYdGPhVhfT-gJNnbo0aSzlHkBhns9h19oZzn9JNx2vi6g",
+    image: "/images/packages/pkg-throbbing-adventure.jpg",
     gallery: [],
     itinerary: [
       { day: 1, title: "Colombo to Kitulgala", description: "Drive to Kitulgala. Afternoon Grade 3–4 white water rafting on the Kelani River." },
@@ -443,7 +439,7 @@ export const packages: Package[] = [
     maxGuests: 8,
     name: "East Coast Escape",
     description:
-      "Discover the raw, unhurried beauty of Sri Lanka's east coast. Ride consistent surf breaks at Arugam Bay, explore the wildlife-rich Kumana lagoon, and unwind on some of the island's most pristine and uncrowded beaches.",
+      "Surf breaks at Arugam Bay, lagoon safaris at Kumana where flamingos gather, and beaches so quiet you will think you are the only one there. The east coast stays raw because fewer visitors find their way here.",
     durationDays: 5,
     difficulty: "Moderate",
     region: "Eastern Coast",
@@ -455,13 +451,12 @@ export const packages: Package[] = [
       "Local fishing village visit",
       "Stargazing on the beach",
     ],
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBmyTIo8YOpdkZbjNE4Zb0suaLf9bdAU7twbbb6gP99Rnxc612XVWmI3SRy5DGonal9DQDihBwEKQR1sKvRwuQl9xWpSNmBnPHjnZtCU0dtxO3ivqyt4kfTEhJr5ZjH04EqJdKA_2wj6K3lpUdEMEbH7siAiTWks6W-LGz9tZMbKXbt6MK48V3T3oA7-PCIWDmkLqT6ma5Iga--4Y-rNqtL5K-96EGmEPesQ_l_EqrXPd7oJCEL-0z2vnZXeTwjUpjQkrwLobtgqB0",
+    image: "/images/packages/pkg-east-coast-escape.jpg",
     gallery: [],
     itinerary: [
       { day: 1, title: "Colombo to Arugam Bay", description: "Scenic drive through the eastern highlands to Arugam Bay. Evening beach walk." },
       { day: 2, title: "Surf Day", description: "Morning and afternoon surf sessions at Main Point. Lessons available for all levels." },
-      { day: 3, title: "Kumana Safari", description: "Dawn lagoon safari at Kumana National Park — flamingos, painted storks, and crocodiles." },
+      { day: 3, title: "Kumana Safari", description: "Dawn lagoon safari at Kumana National Park. Flamingos, painted storks, and crocodiles." },
       { day: 4, title: "Beach & Village", description: "Visit a local fishing village, explore Pottuvil lagoon, relax on Whiskey Point beach." },
       { day: 5, title: "Departure", description: "Morning stargazing optional. Transfer to Colombo airport." },
     ],
