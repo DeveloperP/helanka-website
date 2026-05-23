@@ -138,6 +138,14 @@ export function SessionDetailClient({
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {(session.status === "QUOTE_REQUESTED" || session.status === "CLOSED") && (
+              <Link
+                href={`/admin/sessions/${initialSession.id}/quote`}
+                className="text-xs font-medium px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-all"
+              >
+                {session.status === "QUOTE_REQUESTED" ? "Create Quote" : "View Quote"}
+              </Link>
+            )}
             {session.idleSince && (
               <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
                 Customer may be stuck

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { packages } from "@/lib/packages";
+import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 
 export const metadata: Metadata = {
   title: "Packages",
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
     "Explore our curated Sri Lanka travel packages — from hill country train journeys to wildlife safaris and coastal escapes.",
 };
 
-export default function PackagesPage() {
+export default async function PackagesPage() {
+  const priceEstimates = await getPackagePriceEstimates();
   return (
     <>
       {/* Hero */}
@@ -86,8 +88,11 @@ export default function PackagesPage() {
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
+                    <span className="text-[10px] text-[#dac2ad] uppercase tracking-widest mr-1">
+                      from
+                    </span>
                     <span className="font-[family-name:var(--font-playfair)] text-2xl text-[#ff9d00]">
-                      ${pkg.price.toLocaleString()}
+                      ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
                     </span>
                     <span className="text-[10px] text-[#dac2ad] uppercase tracking-widest ml-2">
                       per person

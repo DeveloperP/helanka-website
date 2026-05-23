@@ -9,7 +9,7 @@ export default async function AdminLayout({
   const session = await requireAdminOrSpecialist();
 
   return (
-    <div className="fixed inset-0 z-50 overflow-auto bg-slate-50">
+    <div className="fixed inset-0 z-50 overflow-auto bg-white">
       <AdminShell
         role={session.user.role}
         user={{ name: session.user.name ?? null, image: session.user.image ?? null }}

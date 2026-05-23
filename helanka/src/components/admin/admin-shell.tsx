@@ -16,6 +16,7 @@ const navItems = [
   { href: "/admin/sessions", label: "Sessions", icon: "sessions", roles: ["ADMIN", "SPECIALIST"] },
   { href: "/admin/customers", label: "Customers", icon: "customers", roles: ["ADMIN", "SPECIALIST"] },
   { href: "/admin/bookings", label: "Bookings", icon: "bookings", roles: ["ADMIN"] },
+  { href: "/admin/pricing", label: "Pricing", icon: "pricing", roles: ["ADMIN"] },
   { href: "/admin/blog", label: "Blog", icon: "blog", roles: ["ADMIN"] },
   { href: "/admin/reports", label: "Reports", icon: "reports", roles: ["ADMIN"] },
   { href: "/admin/specialists", label: "Team", icon: "team", roles: ["ADMIN"] },
@@ -36,89 +37,109 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
     : "?";
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-200 via-blue-100/60 to-white isolate">
+      {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex flex-col bg-slate-900 text-white transition-all duration-200 ${
-          collapsed ? "w-16" : "w-56"
+        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 ${
+          collapsed ? "w-[72px]" : "w-60"
         }`}
       >
-        <div className="flex items-center gap-2.5 px-4 h-14 border-b border-white/10 shrink-0">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-xs font-bold">
-            H
-          </div>
-          {!collapsed && <span className="text-sm font-bold tracking-tight">Helanka Admin</span>}
-        </div>
-
-        <nav className="flex-1 py-3 space-y-0.5 overflow-y-auto">
-          {filteredNav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                isActive(item.href)
-                  ? "bg-white/10 text-white font-semibold"
-                  : "text-slate-400 hover:text-white hover:bg-white/5"
-              }`}
-              title={collapsed ? item.label : undefined}
-            >
-              <NavIcon name={item.icon} />
-              {!collapsed && item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="border-t border-white/10 p-3 space-y-1">
-          <Link
-            href="/admin/account"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname.startsWith("/admin/account")
-                ? "bg-white/10 text-white"
-                : "text-slate-400 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            {user.image ? (
-              <img src={user.image} alt="" className="w-6 h-6 rounded-full object-cover" />
-            ) : (
-              <div className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">
-                {initials}
+        <div className="flex flex-col h-full m-3 mr-0 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50">
+          {/* Logo */}
+          <div className={`flex items-center gap-3 h-16 shrink-0 ${collapsed ? "justify-center px-2" : "px-5"}`}>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white text-sm font-bold shadow-md shrink-0">
+              H
+            </div>
+            {!collapsed && (
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-slate-800 tracking-tight truncate">Helanka</p>
+                <p className="text-[10px] text-slate-400 font-medium">Operations</p>
               </div>
             )}
-            {!collapsed && <span className="truncate">{user.name ?? "Account"}</span>}
-          </Link>
-          <form action={logoutUser}>
-            <button
-              type="submit"
-              className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-slate-400 hover:text-red-400 hover:bg-white/5 transition-colors ${
-                collapsed ? "justify-center" : ""
+          </div>
+
+          {/* Nav */}
+          <nav className="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto">
+            {filteredNav.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+                    collapsed ? "justify-center px-2 py-3" : "px-3.5 py-2.5"
+                  } ${
+                    active
+                      ? "bg-slate-800 text-white shadow-md shadow-slate-300/50"
+                      : "text-slate-500 hover:text-slate-800 hover:bg-slate-100/80"
+                  }`}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <NavIcon name={item.icon} active={active} />
+                  {!collapsed && item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Bottom */}
+          <div className="px-2 pb-3 space-y-1">
+            <Link
+              href="/admin/account"
+              className={`flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+                collapsed ? "justify-center px-2 py-2.5" : "px-3.5 py-2.5"
+              } ${
+                pathname.startsWith("/admin/account")
+                  ? "bg-slate-100 text-slate-800"
+                  : "text-slate-400 hover:text-slate-700 hover:bg-slate-50"
               }`}
             >
-              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-              </svg>
-              {!collapsed && "Sign Out"}
-            </button>
-          </form>
+              {user.image ? (
+                <img src={user.image} alt="" className="w-7 h-7 rounded-full object-cover ring-2 ring-white" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white shadow-sm shrink-0">
+                  {initials}
+                </div>
+              )}
+              {!collapsed && <span className="truncate">{user.name ?? "Account"}</span>}
+            </Link>
+            <form action={logoutUser}>
+              <button
+                type="submit"
+                className={`flex items-center gap-3 w-full rounded-xl text-[13px] font-medium text-slate-400 hover:text-red-500 hover:bg-red-50/50 transition-all duration-200 ${
+                  collapsed ? "justify-center px-2 py-2.5" : "px-3.5 py-2.5"
+                }`}
+              >
+                <svg className="w-[18px] h-[18px] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                </svg>
+                {!collapsed && "Sign Out"}
+              </button>
+            </form>
+          </div>
         </div>
 
+        {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-16 w-6 h-6 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+          className="absolute -right-1 top-20 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-slate-700 hover:shadow-md transition-all duration-200 z-40"
         >
-          <svg className={`w-3 h-3 transition-transform ${collapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className={`w-3 h-3 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
       </aside>
 
-      <main className={`flex-1 transition-all duration-200 ${collapsed ? "ml-16" : "ml-56"}`}>
+      {/* Main content */}
+      <main className={`flex-1 transition-all duration-300 ${collapsed ? "ml-[72px]" : "ml-60"}`}>
         {children}
       </main>
     </div>
   );
 }
 
-function NavIcon({ name }: { name: string }) {
-  const cls = "w-4.5 h-4.5 shrink-0";
+function NavIcon({ name, active }: { name: string; active?: boolean }) {
+  const cls = `w-[18px] h-[18px] shrink-0 transition-colors ${active ? "text-white" : ""}`;
   switch (name) {
     case "dashboard":
       return (
@@ -156,10 +177,16 @@ function NavIcon({ name }: { name: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
         </svg>
       );
+    case "pricing":
+      return (
+        <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
     case "blog":
       return (
         <svg className={cls} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" />
         </svg>
       );
     default:

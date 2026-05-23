@@ -50,6 +50,12 @@ async function main() {
   console.log(`  ${specialists.length} specialists upserted.`);
 
   // ─── Destinations ─────────────────────────────────────────────────────────
+  const distancesFromColombo: Record<string, number> = {
+    colombo: 0, bentota: 64, galle: 126, ella: 200, "nuwara-eliya": 180,
+    kandy: 116, sigiriya: 170, anuradhapura: 200, yala: 305,
+    "arugam-bay": 320, kitulgala: 87, wilpattu: 180,
+  };
+
   const destinationData = [
     {
       name: "Ella",
@@ -249,8 +255,8 @@ async function main() {
   for (const d of destinationData) {
     const dest = await prisma.destination.upsert({
       where: { slug: d.slug },
-      update: {},
-      create: d,
+      update: { distanceFromColomboKm: distancesFromColombo[d.slug] ?? null },
+      create: { ...d, distanceFromColomboKm: distancesFromColombo[d.slug] ?? null },
     });
     destinations[d.slug] = dest.id;
   }
@@ -532,11 +538,11 @@ async function main() {
       }))
     );
 
-    // Transport (per vehicle per day, USD)
+    // Transport: daily vehicle charge (driver wages, vehicle wear) + per-km rate
     const transportTiers = [
-      { tier: "standard",  peak: [60, 90],   shoulder: [50, 75],  "off-peak": [40, 60] },
-      { tier: "premium",   peak: [100, 150],  shoulder: [85, 125], "off-peak": [70, 100] },
-      { tier: "luxury",    peak: [170, 280],  shoulder: [140, 230], "off-peak": [110, 180] },
+      { tier: "standard",  peak: [60, 90],   shoulder: [50, 75],  "off-peak": [40, 60],  perKm: { peak: 0.45, shoulder: 0.38, "off-peak": 0.30 } },
+      { tier: "premium",   peak: [100, 150],  shoulder: [85, 125], "off-peak": [70, 100], perKm: { peak: 0.75, shoulder: 0.63, "off-peak": 0.50 } },
+      { tier: "luxury",    peak: [170, 280],  shoulder: [140, 230], "off-peak": [110, 180], perKm: { peak: 1.20, shoulder: 1.00, "off-peak": 0.80 } },
     ];
 
     const transportCards = transportTiers.flatMap((t) =>
@@ -547,6 +553,7 @@ async function main() {
         season,
         minPrice: t[season][0],
         maxPrice: t[season][1],
+        perKmRate: t.perKm[season],
         currency: "USD",
       }))
     );
@@ -578,6 +585,98 @@ async function main() {
     console.log(`  ${allRateCards.length} rate cards created.`);
   } else {
     console.log(`  Rate cards already exist (${existingRateCards} found), skipping.`);
+  }
+
+  // ─── Destination Distances (pairwise matrix) ─────────────────────────────
+  const existingDistances = await prisma.destinationDistance.count();
+  if (existingDistances === 0) {
+    const distancePairs: [string, string, number][] = [
+      ["colombo", "kandy", 116], ["colombo", "sigiriya", 170],
+      ["colombo", "anuradhapura", 200], ["colombo", "galle", 126],
+      ["colombo", "bentota", 64], ["colombo", "ella", 200],
+      ["colombo", "nuwara-eliya", 180], ["colombo", "yala", 305],
+      ["colombo", "arugam-bay", 320], ["colombo", "kitulgala", 87],
+      ["colombo", "wilpattu", 180],
+      ["kandy", "sigiriya", 90], ["kandy", "ella", 140],
+      ["kandy", "nuwara-eliya", 80], ["kandy", "anuradhapura", 140],
+      ["kandy", "kitulgala", 75],
+      ["sigiriya", "anuradhapura", 65], ["sigiriya", "kandy", 90],
+      ["nuwara-eliya", "ella", 58],
+      ["ella", "yala", 140], ["ella", "arugam-bay", 170],
+      ["galle", "yala", 190], ["galle", "bentota", 65],
+      ["galle", "ella", 180],
+      ["yala", "arugam-bay", 130],
+      ["bentota", "galle", 65],
+      ["wilpattu", "anuradhapura", 60], ["wilpattu", "sigiriya", 120],
+      ["kitulgala", "nuwara-eliya", 110], ["kitulgala", "ella", 150],
+    ];
+
+    const distanceData = distancePairs.flatMap(([from, to, km]) => {
+      const fromId = destinations[from];
+      const toId = destinations[to];
+      if (!fromId || !toId) return [];
+      return [
+        { fromId, toId, distanceKm: km },
+        { fromId: toId, toId: fromId, distanceKm: km },
+      ];
+    });
+
+    const seen = new Set<string>();
+    const deduped = distanceData.filter((d) => {
+      const key = `${d.fromId}-${d.toId}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    await prisma.destinationDistance.createMany({ data: deduped });
+    console.log(`  ${deduped.length} destination distances seeded.`);
+  } else {
+    console.log(`  Destination distances already exist (${existingDistances}), skipping.`);
+  }
+
+  // ─── Excursions ───────────────────────────────────────────────────────────
+  const existingExcursions = await prisma.excursion.count();
+  if (existingExcursions === 0) {
+    const excursionData = [
+      { name: "Yala Safari Drive", slug: "yala-safari-drive", dest: "yala", type: "safari", km: 80, desc: "Full-day jeep safari through Yala National Park Block 1" },
+      { name: "Kataragama Temple Visit", slug: "kataragama-temple", dest: "yala", type: "cultural", km: 40, desc: "Visit to the sacred Kataragama Devalaya and surrounds" },
+      { name: "Sigiriya Rock Fortress", slug: "sigiriya-rock-fortress", dest: "sigiriya", type: "cultural", km: 10, desc: "Climb the ancient rock fortress with guide" },
+      { name: "Minneriya Safari", slug: "minneriya-safari", dest: "sigiriya", type: "safari", km: 30, desc: "Elephant gathering safari at Minneriya National Park" },
+      { name: "Pidurangala Rock", slug: "pidurangala-rock", dest: "sigiriya", type: "nature", km: 8, desc: "Sunrise hike up Pidurangala for panoramic views of Sigiriya" },
+      { name: "Temple of the Tooth", slug: "temple-of-tooth", dest: "kandy", type: "cultural", km: 5, desc: "Guided tour of Sri Dalada Maligawa" },
+      { name: "Peradeniya Botanical Gardens", slug: "peradeniya-gardens", dest: "kandy", type: "nature", km: 8, desc: "Royal Botanical Gardens and spice garden visit" },
+      { name: "Pinnawala Elephant Orphanage", slug: "pinnawala-elephants", dest: "kandy", type: "safari", km: 40, desc: "Visit to the elephant orphanage and river bathing" },
+      { name: "Nine Arch Bridge Walk", slug: "nine-arch-bridge", dest: "ella", type: "nature", km: 10, desc: "Walk to the iconic Nine Arch Bridge at sunrise" },
+      { name: "Little Adam's Peak Hike", slug: "little-adams-peak", dest: "ella", type: "nature", km: 5, desc: "Sunrise hike to Little Adam's Peak viewpoint" },
+      { name: "Ella Rock Trek", slug: "ella-rock-trek", dest: "ella", type: "adventure", km: 12, desc: "Half-day guided trek to Ella Rock summit" },
+      { name: "Horton Plains & World's End", slug: "horton-plains", dest: "nuwara-eliya", type: "nature", km: 35, desc: "Trek through Horton Plains to World's End precipice" },
+      { name: "Tea Factory Tour", slug: "tea-factory-tour", dest: "nuwara-eliya", type: "cultural", km: 15, desc: "Visit a working tea factory and estate walk" },
+      { name: "Galle Fort Walking Tour", slug: "galle-fort-tour", dest: "galle", type: "cultural", km: 5, desc: "Guided walking tour of the UNESCO-listed Galle Fort" },
+      { name: "Unawatuna Beach Trip", slug: "unawatuna-beach", dest: "galle", type: "water-sport", km: 12, desc: "Beach day with snorkelling at Unawatuna" },
+      { name: "Bentota River Safari", slug: "bentota-river-safari", dest: "bentota", type: "safari", km: 20, desc: "Boat safari on the Bentota River and mangroves" },
+      { name: "Water Sports Package", slug: "bentota-water-sports", dest: "bentota", type: "water-sport", km: 5, desc: "Jet skiing, banana boat, and windsurfing at Bentota Beach" },
+      { name: "White Water Rafting", slug: "kitulgala-rafting", dest: "kitulgala", type: "adventure", km: 15, desc: "Grade 3-4 rapids on the Kelani River" },
+      { name: "Jungle Canyoning", slug: "kitulgala-canyoning", dest: "kitulgala", type: "adventure", km: 10, desc: "Canyoning and abseiling through jungle gorges" },
+      { name: "Wilpattu Safari Drive", slug: "wilpattu-safari", dest: "wilpattu", type: "safari", km: 70, desc: "Full-day jeep safari through Wilpattu's villu lakes" },
+      { name: "Arugam Bay Surf Lesson", slug: "arugam-bay-surf", dest: "arugam-bay", type: "water-sport", km: 5, desc: "Surf lesson at Main Point with instructor" },
+      { name: "Kumana Lagoon Safari", slug: "kumana-lagoon-safari", dest: "arugam-bay", type: "safari", km: 45, desc: "Bird watching and wildlife safari at Kumana" },
+    ];
+
+    await prisma.excursion.createMany({
+      data: excursionData.map((e) => ({
+        name: e.name,
+        slug: e.slug,
+        destinationId: destinations[e.dest],
+        type: e.type,
+        distanceKm: e.km,
+        description: e.desc,
+        isActive: true,
+      })),
+    });
+    console.log(`  ${excursionData.length} excursions seeded.`);
+  } else {
+    console.log(`  Excursions already exist (${existingExcursions}), skipping.`);
   }
 
   // ─── Blog Posts ──────────────────────────────────────────────────────────

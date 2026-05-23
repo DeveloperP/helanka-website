@@ -14,6 +14,17 @@ import { SuggestionCard } from "@/components/chat/suggestion-card";
 
 interface DashboardClientProps {
   user: { name: string; email: string; image: string | null };
+  bookings: Array<{
+    id: string;
+    status: string;
+    arrivalDate: string | null;
+    departureDate: string | null;
+    numTravelers: number;
+    latestQuoteTotal: number | null;
+    latestQuoteStatus: string | null;
+    totalPaid: number;
+    createdAt: string;
+  }>;
 }
 
 // --- Trip Type & Tab types from Zustand store ---
@@ -104,7 +115,7 @@ allPackages.forEach((pkg) =>
 
 const DEFAULT_PACKAGE_SLUG = "hill-country-explorer";
 
-export default function DashboardClient({ user }: DashboardClientProps) {
+export default function DashboardClient({ user, bookings }: DashboardClientProps) {
   const store = useTripSessionStore();
   useSessionSync();
   useSSE(store.sessionId);
@@ -1006,6 +1017,72 @@ export default function DashboardClient({ user }: DashboardClientProps) {
                     </button>
                   </div>
                 </div>
+
+                {/* My Bookings */}
+                {bookings.length > 0 && (
+                  <div className="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 className="text-sm font-bold text-slate-900 mb-4">My Bookings</h3>
+                    <div className="space-y-3">
+                      {bookings.map((b) => {
+                        const statusColors: Record<string, string> = {
+                          QUOTE_SENT: "bg-amber-50 text-amber-700 border-amber-200",
+                          CONFIRMED: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                          REVISION_REQUESTED: "bg-blue-50 text-blue-700 border-blue-200",
+                          BALANCE_DUE: "bg-orange-50 text-orange-700 border-orange-200",
+                          COMPLETED: "bg-slate-100 text-slate-600 border-slate-200",
+                        };
+                        const statusLabels: Record<string, string> = {
+                          DRAFT: "Draft",
+                          QUOTE_REQUESTED: "Quote Requested",
+                          PRICING_IN_PROGRESS: "Preparing Quote",
+                          QUOTE_SENT: "Quote Ready",
+                          REVISION_REQUESTED: "Revision Requested",
+                          CONFIRMED: "Confirmed",
+                          BALANCE_DUE: "Balance Due",
+                          COMPLETED: "Completed",
+                          EXPIRED: "Expired",
+                        };
+                        const colorClass = statusColors[b.status] ?? "bg-slate-50 text-slate-600 border-slate-200";
+                        const dates = b.arrivalDate && b.departureDate
+                          ? `${new Date(b.arrivalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(b.departureDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                          : "Dates TBD";
+
+                        return (
+                          <Link
+                            key={b.id}
+                            href={b.status === "QUOTE_SENT" || b.status === "CONFIRMED" ? `/dashboard/quotes/${b.id}` : "#"}
+                            className={`block rounded-xl border p-4 transition-all ${
+                              b.status === "QUOTE_SENT" ? "border-amber-200 bg-amber-50/30 hover:border-amber-300" : "border-slate-100 hover:border-slate-200"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+                                    {statusLabels[b.status] ?? b.status}
+                                  </span>
+                                  <span className="text-xs text-slate-400">{b.numTravelers} traveler{b.numTravelers !== 1 ? "s" : ""}</span>
+                                </div>
+                                <p className="text-sm text-slate-600">{dates}</p>
+                              </div>
+                              <div className="text-right shrink-0">
+                                {b.latestQuoteTotal != null && (
+                                  <p className="text-sm font-bold text-slate-900">${b.latestQuoteTotal.toLocaleString()}</p>
+                                )}
+                                {b.totalPaid > 0 && (
+                                  <p className="text-[10px] text-emerald-600 font-medium">${b.totalPaid.toLocaleString()} paid</p>
+                                )}
+                              </div>
+                            </div>
+                            {b.status === "QUOTE_SENT" && (
+                              <p className="text-xs text-amber-600 font-medium mt-2">Review your quote →</p>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </>
             )}
 

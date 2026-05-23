@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { destinations, getDestinationBySlug } from "@/lib/destinations";
 import { packages, getExcursionsForDestination } from "@/lib/packages";
+import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -31,6 +32,8 @@ export default async function DestinationDetailPage({ params }: Props) {
     (p) => p.excursions.some((exc) => exc.destinationSlug === dest.slug) ||
       p.region.toLowerCase().includes(dest.region.toLowerCase().split(" ")[0])
   );
+
+  const priceEstimates = await getPackagePriceEstimates();
 
   return (
     <>
@@ -175,7 +178,7 @@ export default async function DestinationDetailPage({ params }: Props) {
                   <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-1 group-hover:text-[#ff9d00] transition-colors">
                     {pkg.name}
                   </h3>
-                  <p className="text-sm text-[#dac2ad]">{pkg.durationDays} Days · ${pkg.price.toLocaleString()}/person</p>
+                  <p className="text-sm text-[#dac2ad]">{pkg.durationDays} Days · from ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}/person</p>
                 </div>
               </Link>
             ))}

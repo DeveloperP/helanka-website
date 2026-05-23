@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { updateBookingStatus } from "@/actions/booking-actions";
+import { recordPayment } from "@/actions/quote-actions";
 
 interface BookingItem {
   id: string;
@@ -68,6 +69,8 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
   const [booking, setBooking] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "bank_transfer", currency: "USD", webxpayRef: "" });
 
   const nextStatuses = VALID_TRANSITIONS[booking.status] ?? [];
   const totalPaid = booking.payments
@@ -86,6 +89,47 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
       }
     });
   }
+
+  function handleRecordPayment(e: React.FormEvent) {
+    e.preventDefault();
+    const amount = parseFloat(paymentForm.amount);
+    if (!amount || amount <= 0) return;
+    startTransition(async () => {
+      const result = await recordPayment({
+        bookingId: booking.id,
+        amount,
+        currency: paymentForm.currency,
+        method: paymentForm.method,
+        webxpayRef: paymentForm.webxpayRef || undefined,
+      });
+      if (result.success) {
+        setBooking((prev) => ({
+          ...prev,
+          payments: [
+            {
+              id: crypto.randomUUID(),
+              amount,
+              currency: paymentForm.currency,
+              method: paymentForm.method,
+              status: "SUCCESS",
+              webxpayRef: paymentForm.webxpayRef || null,
+              paidAt: new Date().toISOString(),
+              createdAt: new Date().toISOString(),
+            },
+            ...prev.payments,
+          ],
+        }));
+        setShowPaymentModal(false);
+        setPaymentForm({ amount: "", method: "bank_transfer", currency: "USD", webxpayRef: "" });
+        setMessage({ type: "success", text: "Payment recorded." });
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Failed to record payment." });
+      }
+    });
+  }
+
+  const depositRequired = booking.latestQuote?.deposit ?? 0;
+  const balanceRequired = (booking.latestQuote?.totalPrice ?? 0) - totalPaid;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
@@ -192,7 +236,24 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
         </div>
 
         <div className="space-y-6">
-          <Section title={`Payments (${totalPaid > 0 ? `$${totalPaid.toLocaleString()} paid` : "none"})`}>
+          <div className="bg-white rounded-xl border border-slate-200 p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-slate-900">
+                Payments {totalPaid > 0 && <span className="text-emerald-600 font-normal ml-1">(${totalPaid.toLocaleString()} paid)</span>}
+              </h2>
+              <button
+                onClick={() => setShowPaymentModal(true)}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-all"
+              >
+                Record Payment
+              </button>
+            </div>
+            {booking.latestQuote && (
+              <div className="flex gap-4 mb-3 text-xs">
+                <span className="text-slate-400">Deposit: <span className="text-slate-700 font-medium">${depositRequired.toLocaleString()}</span></span>
+                <span className="text-slate-400">Balance: <span className={`font-medium ${balanceRequired <= 0 ? "text-emerald-600" : "text-slate-700"}`}>${Math.max(0, balanceRequired).toLocaleString()}</span></span>
+              </div>
+            )}
             {booking.payments.length === 0 ? (
               <p className="text-sm text-slate-400">No payments recorded.</p>
             ) : (
@@ -203,6 +264,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                       <p className="text-sm text-slate-900">${p.amount.toLocaleString()} {p.currency}</p>
                       <p className="text-xs text-slate-400">
                         {p.method ?? "—"} · {p.paidAt ? new Date(p.paidAt).toLocaleDateString() : "Pending"}
+                        {p.webxpayRef && ` · Ref: ${p.webxpayRef}`}
                       </p>
                     </div>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -217,7 +279,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                 ))}
               </div>
             )}
-          </Section>
+          </div>
 
           {booking.tripSessions.length > 0 && (
             <Section title="Linked Sessions">
@@ -236,6 +298,68 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
           )}
         </div>
       </div>
+
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 p-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Record Payment</h3>
+            <form onSubmit={handleRecordPayment} className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">Amount (USD)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={paymentForm.amount}
+                  onChange={(e) => setPaymentForm((f) => ({ ...f, amount: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">Method</label>
+                <select
+                  value={paymentForm.method}
+                  onChange={(e) => setPaymentForm((f) => ({ ...f, method: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                >
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="cash">Cash</option>
+                  <option value="card">Card</option>
+                  <option value="webxpay">WebXPay</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1 block">Reference (optional)</label>
+                <input
+                  type="text"
+                  value={paymentForm.webxpayRef}
+                  onChange={(e) => setPaymentForm((f) => ({ ...f, webxpayRef: e.target.value }))}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                  placeholder="Transaction reference"
+                />
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentModal(false)}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition-all"
+                >
+                  {isPending ? "Saving..." : "Record Payment"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

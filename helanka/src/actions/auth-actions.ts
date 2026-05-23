@@ -68,7 +68,7 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
 
   // Sign in immediately using the credentials provider
   try {
-    await signIn("credentials", { email, password, redirect: false });
+    await signIn("credentials", { email, password, redirectTo: "/dashboard" });
   } catch (err) {
     if (err instanceof AuthError) {
       return { success: false, error: "Account created but sign-in failed. Please log in." };
@@ -76,7 +76,7 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
     throw err;
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -86,7 +86,7 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
 /**
  * Validates credentials and signs the user in via the credentials provider.
  */
-export async function loginUser(formData: FormData): Promise<ActionResult> {
+export async function loginUser(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
   const raw = {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -104,21 +104,34 @@ export async function loginUser(formData: FormData): Promise<ActionResult> {
 
   const { email, password } = parsed.data;
 
+  // Verify credentials manually before calling signIn, because Auth.js v5
+  // beta throws CredentialsSignin in server actions even on success.
+  const user = await db.user.findUnique({ where: { email } });
+  if (!user || !user.passwordHash) {
+    return { success: false, error: "Invalid email or password." };
+  }
+
+  const valid = await bcrypt.compare(password, user.passwordHash);
+  if (!valid) {
+    return { success: false, error: "Invalid email or password." };
+  }
+
+  const redirectTo =
+    user.role === "ADMIN" || user.role === "SPECIALIST"
+      ? "/admin/sessions"
+      : "/dashboard";
+
   try {
-    await signIn("credentials", { email, password, redirect: false });
+    await signIn("credentials", { email, password, redirectTo });
   } catch (err) {
     if (err instanceof AuthError) {
-      return { success: false, error: "Invalid email or password." };
+      return { success: false, error: "Sign-in failed. Please try again." };
     }
+    // NEXT_REDIRECT throws an error that must be re-thrown for Next.js to handle
     throw err;
   }
 
-  const session = await auth();
-  const role = session?.user?.role;
-  if (role === "ADMIN" || role === "SPECIALIST") {
-    redirect("/admin/sessions");
-  }
-  redirect("/dashboard");
+  return { success: true };
 }
 
 // ---------------------------------------------------------------------------

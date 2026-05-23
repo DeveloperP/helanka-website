@@ -91,6 +91,61 @@ export const quoteResponseSchema = z.object({
 export type QuoteResponseInput = z.infer<typeof quoteResponseSchema>;
 
 // ---------------------------------------------------------------------------
+// Rate card schemas
+// ---------------------------------------------------------------------------
+
+export const rateCardCreateSchema = z.object({
+  itemType: z.enum(["ACCOMMODATION", "ACTIVITY", "TRANSPORT", "ADDON"]),
+  tier: z.string().min(1),
+  season: z.string().min(1),
+  destinationId: z.string().optional(),
+  minPrice: z.number().nonnegative(),
+  maxPrice: z.number().nonnegative(),
+  perKmRate: z.number().nonnegative().optional(),
+  currency: z.string().default("USD"),
+});
+
+export type RateCardCreateInput = z.infer<typeof rateCardCreateSchema>;
+
+export const rateCardUpdateSchema = z.object({
+  minPrice: z.number().nonnegative(),
+  maxPrice: z.number().nonnegative(),
+  perKmRate: z.number().nonnegative().optional(),
+});
+
+export type RateCardUpdateInput = z.infer<typeof rateCardUpdateSchema>;
+
+export const rateCardImportRowSchema = z.object({
+  itemType: z.enum(["ACCOMMODATION", "ACTIVITY", "TRANSPORT", "ADDON"]),
+  tier: z.string(),
+  season: z.string(),
+  destination: z.string(),
+  minPrice: z.number().nonnegative(),
+  maxPrice: z.number().nonnegative(),
+  perKmRate: z.number().nonnegative().optional(),
+  currency: z.string().default("USD"),
+});
+
+export type RateCardImportRow = z.infer<typeof rateCardImportRowSchema>;
+
+export const excursionCreateSchema = z.object({
+  name: z.string().min(1),
+  slug: z.string().min(1),
+  destinationId: z.string(),
+  type: z.string().min(1),
+  distanceKm: z.number().nonnegative(),
+  description: z.string().optional(),
+});
+
+export type ExcursionCreateInput = z.infer<typeof excursionCreateSchema>;
+
+export const distanceUpdateSchema = z.object({
+  distanceKm: z.number().positive(),
+});
+
+export type DistanceUpdateInput = z.infer<typeof distanceUpdateSchema>;
+
+// ---------------------------------------------------------------------------
 // Trip session schemas
 // ---------------------------------------------------------------------------
 

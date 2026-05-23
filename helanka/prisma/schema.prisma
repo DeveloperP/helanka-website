@@ -132,22 +132,54 @@ model VerificationToken {
 }
 
 model Destination {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  region      String
-  description String
-  highlights  String[]
-  photos      String[]
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  name                String
+  slug                String   @unique
+  region              String
+  description         String
+  highlights          String[]
+  photos              String[]
+  distanceFromColomboKm Float?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  packageItems PackageItem[]
-  bookingItems BookingItem[]
-  rateCards    RateCard[]
+  packageItems  PackageItem[]
+  bookingItems  BookingItem[]
+  rateCards     RateCard[]
+  excursions    Excursion[]
+  distancesFrom DestinationDistance[] @relation("DistanceFrom")
+  distancesTo   DestinationDistance[] @relation("DistanceTo")
 
   @@map("destinations")
+}
+
+model DestinationDistance {
+  id         String @id @default(cuid())
+  fromId     String
+  toId       String
+  distanceKm Float
+
+  from Destination @relation("DistanceFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Destination @relation("DistanceTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+  @@map("destination_distances")
+}
+
+model Excursion {
+  id            String  @id @default(cuid())
+  name          String
+  slug          String  @unique
+  destinationId String
+  type          String
+  distanceKm    Float
+  description   String?
+  isActive      Boolean @default(true)
+
+  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@map("excursions")
 }
 
 model Package {
@@ -190,6 +222,7 @@ model RateCard {
   season        String
   minPrice      Float
   maxPrice      Float
+  perKmRate     Float?
   currency      String   @default("USD")
   updatedAt     DateTime @updatedAt
 
