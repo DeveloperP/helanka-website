@@ -148,10 +148,28 @@ model Destination {
   bookingItems  BookingItem[]
   rateCards     RateCard[]
   excursions    Excursion[]
+  hotels        Hotel[]
   distancesFrom DestinationDistance[] @relation("DistanceFrom")
   distancesTo   DestinationDistance[] @relation("DistanceTo")
 
   @@map("destinations")
+}
+
+model Hotel {
+  id            String       @id @default(cuid())
+  name          String
+  destinationId String?
+  tier          String
+  doubleRate    Float
+  validUntil    DateTime
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  destination            Destination?          @relation(fields: [destinationId], references: [id])
+  accommodationDetails   AccommodationDetail[]
+
+  @@map("hotels")
 }
 
 model DestinationDistance {
@@ -311,6 +329,7 @@ model Quote {
 model AccommodationDetail {
   id               String @id @default(cuid())
   bookingItemId    String @unique
+  hotelId          String?
   hotelName        String
   starRating       String?
   roomType         String?
@@ -335,6 +354,7 @@ model AccommodationDetail {
   remarks          String?
 
   bookingItem BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+  hotel       Hotel?      @relation(fields: [hotelId], references: [id])
 
   @@map("accommodation_details")
 }

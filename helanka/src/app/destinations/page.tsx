@@ -7,11 +7,13 @@ import { destinations, regionFilters } from "@/lib/destinations";
 import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
 
 const categoryTabs = ["Heritage", "Adventure", "Wildlife", "Coastal", "Cultural"];
+const heroSlugs = ["sigiriya", "ella", "yala", "mirissa", "kandy"];
+const heroDestinations = heroSlugs.map((s) => destinations.find((d) => d.slug === s)!);
 
 export default function DestinationsPage() {
   const [active, setActive] = useState(0);
   const [filter, setFilter] = useState("All");
-  const dest = destinations[active];
+  const dest = heroDestinations[active];
 
   const filtered = filter === "All"
     ? destinations
@@ -25,7 +27,7 @@ export default function DestinationsPage() {
     <>
       {/* Full-screen hero with destination switcher */}
       <section className="relative h-screen min-h-[700px] flex flex-col overflow-hidden">
-        {destinations.map((d, i) => (
+        {heroDestinations.map((d, i) => (
           <div
             key={d.slug}
             className={cn(
@@ -85,7 +87,7 @@ export default function DestinationsPage() {
 
         {/* Numbered destination nav */}
         <div className="absolute right-8 md:right-16 top-1/2 -translate-y-1/2 z-20 flex flex-col items-end gap-2">
-          {destinations.map((d, i) => (
+          {heroDestinations.map((d, i) => (
             <button
               key={d.slug}
               onClick={() => setActive(i)}

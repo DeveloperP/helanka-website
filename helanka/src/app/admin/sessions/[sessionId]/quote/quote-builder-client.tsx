@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useTransition, useCallback, useRef } from "react";
+import { useState, useTransition, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   priceBookingItems,
   sendQuote,
   getSessionForQuoting,
+  addBookingItem,
+  removeBookingItem,
 } from "@/actions/quote-actions";
 import type {
   QuotingSessionData,
@@ -120,9 +122,12 @@ const selectCls = "w-full rounded-lg border border-slate-200 bg-white/80 px-2.5 
 // ─── Detail state types ─────────────────────────────────────────────────────
 
 interface AccomState {
+  hotelId: string | null;
   hotelName: string;
   starRating: string;
   mealPlan: string;
+  roomType: string;
+  overrideRate: boolean;
   sglRooms: string; sglRate: string;
   dblRooms: string; dblRate: string;
   twnRooms: string; twnRate: string;
@@ -187,9 +192,12 @@ interface DetailStates {
 function initAccom(item: QuotingItemData, numTravelers: number): AccomState {
   const d = item.accommodationDetail;
   return {
+    hotelId: d?.hotelId ?? null,
     hotelName: d?.hotelName ?? item.description,
     starRating: d?.starRating ?? "",
     mealPlan: d?.mealPlan ?? "BB",
+    roomType: d ? (p(String(d.sglRooms)) > 0 ? "sgl" : p(String(d.twnRooms)) > 0 ? "twn" : p(String(d.tplRooms)) > 0 ? "tpl" : "dbl") : "dbl",
+    overrideRate: false,
     sglRooms: String(d?.sglRooms ?? 0),
     sglRate: String(d?.sglRate ?? 0),
     dblRooms: String(d?.dblRooms ?? Math.ceil(numTravelers / 2)),
@@ -222,7 +230,7 @@ function initExcursion(item: QuotingItemData, numTravelers: number): ExcursionSt
   };
 }
 
-function initTransport(item: QuotingItemData, breakdown: TransportBreakdown | null): TransportState {
+function initTransport(item: QuotingItemData, breakdown: TransportBreakdown | null, dailyBufferRate?: number): TransportState {
   const d = item.transportDetail;
   return {
     vehicleType: d?.vehicleType ?? item.tier ?? "car",
@@ -233,7 +241,7 @@ function initTransport(item: QuotingItemData, breakdown: TransportBreakdown | nu
     dropoffLocation: d?.dropoffLocation ?? "",
     isGroupTransfer: d?.isGroupTransfer ?? false,
     driverGuideType: d?.driverGuideType ?? "chauffeur",
-    driverRatePerDay: String(d?.driverRatePerDay ?? breakdown?.dailyRate ?? 0),
+    driverRatePerDay: String(d?.driverRatePerDay ?? breakdown?.dailyRate ?? dailyBufferRate ?? 0),
     driverAccommodation: d?.driverAccommodation ?? false,
     driverFee: String(d?.driverFee ?? 0),
     remarks: d?.remarks ?? "",
@@ -285,7 +293,7 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
   const [data, setData] = useState<QuotingSessionData>(initialData);
   const [isPending, startTransition] = useTransition();
 
-  const { booking, session, items, transportBreakdown, existingQuotes } = data;
+  const { booking, session, items, transportBreakdown, existingQuotes, hotelsByDestination, excursionsByDestination, transportRateCards, dailyBufferRate } = data;
   const accommodations = items.filter((i) => i.type === "ACCOMMODATION");
   const excursions = items.filter((i) => i.type === "ACTIVITY");
   const transports = items.filter((i) => i.type === "TRANSPORT");
@@ -302,7 +310,7 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
     const exc: Record<string, ExcursionState> = {};
     for (const item of excursions) exc[item.id] = initExcursion(item, booking.numTravelers);
     const trn: Record<string, TransportState> = {};
-    for (const item of transports) trn[item.id] = initTransport(item, transportBreakdown);
+    for (const item of transports) trn[item.id] = initTransport(item, transportBreakdown, dailyBufferRate);
     const oth: Record<string, OtherChargeState> = {};
     for (const item of addons) oth[item.id] = initOtherCharge(item);
     return { accommodations: acc, excursions: exc, transports: trn, otherCharges: oth };
@@ -316,12 +324,36 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
     discountAmt: "0",
   });
 
+  useEffect(() => {
+    setDetails((prev) => {
+      const acc = { ...prev.accommodations };
+      const exc = { ...prev.excursions };
+      const trn = { ...prev.transports };
+      const oth = { ...prev.otherCharges };
+      let changed = false;
+      for (const item of items.filter((i) => i.type === "ACCOMMODATION")) {
+        if (!acc[item.id]) { acc[item.id] = initAccom(item, booking.numTravelers); changed = true; }
+      }
+      for (const item of items.filter((i) => i.type === "ACTIVITY")) {
+        if (!exc[item.id]) { exc[item.id] = initExcursion(item, booking.numTravelers); changed = true; }
+      }
+      for (const item of items.filter((i) => i.type === "TRANSPORT")) {
+        if (!trn[item.id]) { trn[item.id] = initTransport(item, transportBreakdown, dailyBufferRate); changed = true; }
+      }
+      for (const item of items.filter((i) => i.type === "ADDON")) {
+        if (!oth[item.id]) { oth[item.id] = initOtherCharge(item); changed = true; }
+      }
+      return changed ? { accommodations: acc, excursions: exc, transports: trn, otherCharges: oth } : prev;
+    });
+  }, [items, booking.numTravelers, transportBreakdown, dailyBufferRate]);
+
   const [deposit, setDeposit] = useState<string>("0");
   const [validUntil, setValidUntil] = useState<string>(defaultValidUntil);
   const [adminNotes, setAdminNotes] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [quoteSent, setQuoteSent] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     accommodation: true,
     excursions: true,
@@ -335,6 +367,27 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
     setDetails((prev) => ({
       ...prev,
       accommodations: { ...prev.accommodations, [id]: { ...prev.accommodations[id], [field]: value } },
+    }));
+  }
+  function updateAccomFromHotel(id: string, hotelId: string, destinationId: string | null) {
+    const hotels = destinationId ? (hotelsByDestination[destinationId] ?? []) : [];
+    const hotel = hotels.find((h) => h.id === hotelId);
+    if (!hotel) return;
+    setDetails((prev) => ({
+      ...prev,
+      accommodations: {
+        ...prev.accommodations,
+        [id]: {
+          ...prev.accommodations[id],
+          hotelId: hotel.id,
+          hotelName: hotel.name,
+          starRating: hotel.tier,
+          dblRate: String(hotel.doubleRate),
+          sglRate: String(hotel.singleRate),
+          tplRate: String(hotel.tripleRate),
+          twnRate: String(hotel.doubleRate),
+        },
+      },
     }));
   }
   function updateExcursion(id: string, field: keyof ExcursionState, value: string) {
@@ -401,6 +454,7 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
           ...base,
           actualPrice: t.selling,
           accommodationDetail: s ? {
+            hotelId: s.hotelId ?? null,
             hotelName: s.hotelName,
             starRating: s.starRating || null,
             roomType: null,
@@ -537,6 +591,26 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
     setDeposit(String(Math.round(grandTotal * 0.3 * 100) / 100));
   }
 
+  function handleRemoveItem(itemId: string) {
+    startTransition(async () => {
+      const result = await removeBookingItem(itemId);
+      if ("success" in result) {
+        const refreshed = await getSessionForQuoting(data.session.id);
+        if (refreshed) setData(refreshed);
+      }
+    });
+  }
+
+  function handleAddItem(type: "ACCOMMODATION" | "ACTIVITY" | "TRANSPORT" | "ADDON", description: string, destId: string | null, nights?: number) {
+    startTransition(async () => {
+      const result = await addBookingItem(booking.id, type, destId, description, nights);
+      if ("id" in result) {
+        const refreshed = await getSessionForQuoting(data.session.id);
+        if (refreshed) setData(refreshed);
+      }
+    });
+  }
+
   const sessionId = data.session.id;
 
   // ─── Render ─────────────────────────────────────────────────────────────
@@ -653,30 +727,76 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                     const s = details.accommodations[item.id];
                     if (!s) return null;
                     const t = accomTotal(s, item.nights ?? 1);
+                    const stayIndex = accommodations.indexOf(item) + 1;
+                    const destinationHotels = item.destinationId ? (hotelsByDestination[item.destinationId] ?? []) : [];
+                    const tierOrder = ["4-star", "5-star", "boutique", "luxury-boutique"];
+                    const hotelsByTier = tierOrder.reduce<Record<string, typeof destinationHotels>>((acc, tier) => {
+                      const group = destinationHotels.filter((h) => h.tier === tier);
+                      if (group.length > 0) acc[tier] = group;
+                      return acc;
+                    }, {});
+                    const ungroupedHotels = destinationHotels.filter((h) => !tierOrder.includes(h.tier));
                     return (
                       <div key={item.id} className="px-6 py-5 space-y-4">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold text-blue-600">{item.destinationName ?? "Destination"}</span>
-                          {item.nights != null && <span className="text-[11px] text-slate-400">· {item.nights} night{item.nights !== 1 ? "s" : ""}</span>}
+                        {/* Day grouping header */}
+                        <div className="flex items-center justify-between gap-2 -mx-6 px-6 py-2.5 bg-blue-50/60 border-b border-blue-100">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                            <span className="text-xs font-semibold text-blue-700">
+                              Stay {stayIndex}: {item.destinationName ?? "Destination"}
+                              {item.nights != null && <span className="font-normal text-blue-500 ml-1">— {item.nights} night{item.nights !== 1 ? "s" : ""}</span>}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="text-[10px] font-medium text-red-400 hover:text-red-600 transition-colors"
+                          >
+                            Remove
+                          </button>
                         </div>
 
-                        {/* Hotel info row */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="col-span-2 flex flex-col gap-1">
-                            <label className={labelCls}>Hotel name</label>
-                            <input className={inputCls} value={s.hotelName} onChange={(e) => updateAccom(item.id, "hotelName", e.target.value)} placeholder="Hotel name" />
-                          </div>
+                        {/* Hotel dropdown */}
+                        {destinationHotels.length > 0 && (
                           <div className="flex flex-col gap-1">
-                            <label className={labelCls}>Star rating</label>
-                            <select className={selectCls} value={s.starRating} onChange={(e) => updateAccom(item.id, "starRating", e.target.value)}>
-                              <option value="">—</option>
-                              <option value="2">2 Star</option>
-                              <option value="3">3 Star</option>
-                              <option value="4">4 Star</option>
-                              <option value="5">5 Star</option>
-                              <option value="boutique">Boutique</option>
+                            <label className={labelCls}>Select hotel</label>
+                            <select
+                              className={selectCls}
+                              value={s.hotelId ?? ""}
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  updateAccomFromHotel(item.id, e.target.value, item.destinationId ?? null);
+                                } else {
+                                  updateAccom(item.id, "hotelId" as keyof AccomState, "");
+                                }
+                              }}
+                            >
+                              <option value="">— Select a hotel —</option>
+                              {Object.entries(hotelsByTier).map(([tier, hotels]) => (
+                                <optgroup key={tier} label={tier.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}>
+                                  {hotels.map((hotel) => (
+                                    <option key={hotel.id} value={hotel.id}>
+                                      {hotel.name} — ${hotel.doubleRate}/night ({hotel.tier})
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              ))}
+                              {ungroupedHotels.length > 0 && (
+                                <optgroup label="Other">
+                                  {ungroupedHotels.map((hotel) => (
+                                    <option key={hotel.id} value={hotel.id}>
+                                      {hotel.name} — ${hotel.doubleRate}/night ({hotel.tier})
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              )}
                             </select>
                           </div>
+                        )}
+
+                        {/* Meal plan */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Meal plan</label>
                             <select className={selectCls} value={s.mealPlan} onChange={(e) => updateAccom(item.id, "mealPlan", e.target.value)}>
@@ -689,29 +809,83 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                           </div>
                         </div>
 
-                        {/* Room types */}
+                        {/* Room type selector */}
                         <div>
-                          <p className={`${labelCls} mb-2`}>Room types (per night)</p>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                            {(["sgl", "dbl", "twn", "tpl"] as const).map((rt) => {
+                          <div className="flex items-center justify-between mb-2">
+                            <p className={labelCls}>Room configuration (per night)</p>
+                            <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                              <input
+                                type="checkbox"
+                                checked={s.overrideRate}
+                                onChange={(e) => setDetails((d) => ({
+                                  ...d,
+                                  accommodations: { ...d.accommodations, [item.id]: { ...d.accommodations[item.id], overrideRate: e.target.checked } },
+                                }))}
+                                className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                              />
+                              <span className="text-[10px] font-medium text-slate-500">Override rate</span>
+                            </label>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                            <div className="flex flex-col gap-1">
+                              <label className={labelCls}>Room type</label>
+                              <select
+                                className={selectCls}
+                                value={s.roomType}
+                                onChange={(e) => {
+                                  const rt = e.target.value;
+                                  const prev = s.roomType;
+                                  const prevRoomsKey = `${prev}Rooms` as keyof AccomState;
+                                  const prevRooms = s[prevRoomsKey] as string;
+                                  const newRoomsKey = `${rt}Rooms` as keyof AccomState;
+                                  const newRateKey = `${rt}Rate` as keyof AccomState;
+                                  setDetails((d) => ({
+                                    ...d,
+                                    accommodations: {
+                                      ...d.accommodations,
+                                      [item.id]: {
+                                        ...d.accommodations[item.id],
+                                        roomType: rt,
+                                        [prevRoomsKey]: "0",
+                                        [newRoomsKey]: prevRooms !== "0" ? prevRooms : String(Math.ceil(booking.numTravelers / (rt === "tpl" ? 3 : rt === "sgl" ? 1 : 2))),
+                                        [newRateKey]: d.accommodations[item.id][newRateKey] || "0",
+                                      },
+                                    },
+                                  }));
+                                }}
+                              >
+                                <option value="sgl">Single (90% of double rate)</option>
+                                <option value="dbl">Double</option>
+                                <option value="twn">Twin (same as double rate)</option>
+                                <option value="tpl">Triple (130% of double rate)</option>
+                              </select>
+                            </div>
+                            {(() => {
+                              const rt = s.roomType || "dbl";
                               const roomsKey = `${rt}Rooms` as keyof AccomState;
                               const rateKey = `${rt}Rate` as keyof AccomState;
+                              const rateLabel = rt === "sgl" ? "Single rate $" : rt === "tpl" ? "Triple rate $" : rt === "twn" ? "Twin rate $" : "Double rate $";
                               return (
-                                <div key={rt} className="rounded-lg border border-slate-150 bg-slate-50/50 p-2.5">
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase mb-1.5">{rt.toUpperCase()}</p>
-                                  <div className="flex gap-1.5">
-                                    <div className="flex-1">
-                                      <p className="text-[9px] text-slate-400 mb-0.5">Rooms</p>
-                                      <input type="number" min="0" className={`${inputCls} text-center !px-1.5`} value={s[roomsKey]} onChange={(e) => updateAccom(item.id, roomsKey, e.target.value)} />
-                                    </div>
-                                    <div className="flex-1">
-                                      <p className="text-[9px] text-slate-400 mb-0.5">Rate $</p>
-                                      <input type="number" min="0" step="0.01" className={`${inputCls} text-center !px-1.5`} value={s[rateKey]} onChange={(e) => updateAccom(item.id, rateKey, e.target.value)} />
-                                    </div>
+                                <>
+                                  <div className="flex flex-col gap-1">
+                                    <label className={labelCls}>No. of rooms</label>
+                                    <input type="number" min="0" className={inputCls} value={String(s[roomsKey] ?? "")} onChange={(e) => updateAccom(item.id, roomsKey, e.target.value)} />
                                   </div>
-                                </div>
+                                  <div className="flex flex-col gap-1">
+                                    <label className={labelCls}>{rateLabel}{!s.overrideRate && " (locked)"}</label>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      className={`${inputCls} ${!s.overrideRate ? "bg-slate-50 text-slate-500 cursor-not-allowed" : ""}`}
+                                      value={String(s[rateKey] ?? "")}
+                                      readOnly={!s.overrideRate}
+                                      onChange={s.overrideRate ? (e) => updateAccom(item.id, rateKey, e.target.value) : undefined}
+                                    />
+                                  </div>
+                                </>
                               );
-                            })}
+                            })()}
                           </div>
                         </div>
 
@@ -741,19 +915,25 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                           </div>
                         </div>
 
-                        {/* Margin + subtotal */}
+                        {/* Margin + remarks */}
                         <div className="flex flex-wrap items-end gap-3">
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Margin type</label>
-                            <select className={`${selectCls} w-28`} value={s.marginType} onChange={(e) => updateAccom(item.id, "marginType", e.target.value)}>
-                              <option value="fixed">Fixed $</option>
-                              <option value="percentage">Percentage %</option>
+                            <select className={`${selectCls} w-36`} value={s.marginType} onChange={(e) => updateAccom(item.id, "marginType", e.target.value)}>
+                              <option value="fixed">Fixed amount ($)</option>
+                              <option value="percentage">Percentage (%)</option>
                             </select>
                           </div>
                           <div className="flex flex-col gap-1">
-                            <label className={labelCls}>Margin value</label>
-                            <input type="number" min="0" step="0.01" className={`${inputCls} w-28`} value={s.marginValue} onChange={(e) => updateAccom(item.id, "marginValue", e.target.value)} />
+                            <label className={labelCls}>{s.marginType === "percentage" ? "Margin %" : "Margin $"}</label>
+                            <input type="number" min="0" step={s.marginType === "percentage" ? "1" : "0.01"} className={`${inputCls} w-28`} value={s.marginValue} onChange={(e) => updateAccom(item.id, "marginValue", e.target.value)} placeholder={s.marginType === "percentage" ? "e.g. 15" : "e.g. 100"} />
                           </div>
+                          {s.marginType === "percentage" && p(s.marginValue) > 0 && (
+                            <div className="flex flex-col gap-1">
+                              <label className={labelCls}>Calculated margin</label>
+                              <div className={`${inputCls} w-28 bg-slate-50 text-slate-600 flex items-center`}>{fmt(t.margin)}</div>
+                            </div>
+                          )}
                           <div className="flex flex-col gap-1 flex-1 min-w-[120px]">
                             <label className={labelCls}>Remarks</label>
                             <input className={inputCls} value={s.remarks} onChange={(e) => updateAccom(item.id, "remarks", e.target.value)} placeholder="Optional..." />
@@ -764,26 +944,47 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                         <div className="rounded-lg bg-blue-50/50 border border-blue-100 px-3 py-2 flex items-center justify-between text-sm">
                           <div className="space-x-3 text-xs text-slate-500">
                             <span>Buying: <strong className="text-slate-700">{fmt(t.buying)}</strong></span>
-                            <span>Margin: <strong className="text-slate-700">{fmt(t.margin)}</strong></span>
+                            <span>Margin{s.marginType === "percentage" && p(s.marginValue) > 0 ? ` (${p(s.marginValue)}%)` : ""}: <strong className="text-slate-700">{fmt(t.margin)}</strong></span>
                           </div>
                           <span className="font-semibold text-blue-800">Selling: {fmt(t.selling)}</span>
                         </div>
                       </div>
                     );
                   })}
+
+                  {/* Add accommodation button */}
+                  <div className="px-6 py-4 border-t border-slate-100">
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleAddItem("ACCOMMODATION", "Additional accommodation", accommodations[0]?.destinationId ?? null, 1)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-slate-200 text-sm font-medium text-slate-500 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50/30 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                      Add Accommodation
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {/* ─── EXCURSIONS ─── */}
-          {excursions.length > 0 && (
-            <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
+          {(() => {
+            const totalNights = accommodations.reduce((sum, a) => sum + (a.nights ?? 0), 0);
+            const excursionLimit = Math.max(totalNights, 1);
+            const isOverLimit = excursions.length > excursionLimit;
+            const itineraryDestIds = new Set(accommodations.map((a) => a.destinationId).filter(Boolean));
+            const filteredExcursions = Object.fromEntries(
+              Object.entries(excursionsByDestination).filter(([destId]) => itineraryDestIds.has(destId))
+            );
+            return (
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden" data-excursion-limit={excursionLimit}>
               <button type="button" onClick={() => toggleSection("excursions")} className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-6 rounded-full bg-green-500" />
                   <h2 className="text-sm font-semibold text-slate-800">Excursions</h2>
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-700">{excursions.length}</span>
+                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${isOverLimit ? "bg-amber-50 text-amber-700" : "bg-green-50 text-green-700"}`}>{excursions.length} / {excursionLimit}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-slate-700">{fmt(excursionSubtotal)}</span>
@@ -792,17 +993,51 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
               </button>
               {openSections.excursions && (
                 <div className="divide-y divide-slate-100">
+                  {isOverLimit && (
+                    <div className="mx-6 mt-4 mb-2 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-amber-800 text-xs">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                      <span>This trip has <strong>{totalNights} nights</strong> across {accommodations.length} destination{accommodations.length !== 1 ? "s" : ""}. You have <strong>{excursions.length} excursions</strong> which exceeds the recommended 1 per night. Additional excursions may affect pricing and scheduling.</span>
+                    </div>
+                  )}
                   {excursions.map((item) => {
                     const s = details.excursions[item.id];
                     if (!s) return null;
                     const t = excursionTotal(s);
                     return (
                       <div key={item.id} className="px-6 py-4 space-y-3">
-                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                          <div className="col-span-2 sm:col-span-1 flex flex-col gap-1">
-                            <label className={labelCls}>Excursion</label>
-                            <input className={inputCls} value={s.excursionName} onChange={(e) => updateExcursion(item.id, "excursionName", e.target.value)} />
-                          </div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold text-green-700">{item.destinationName ?? item.description}</span>
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="text-[10px] font-medium text-red-400 hover:text-red-600 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                        {/* Excursion dropdown - filtered to itinerary destinations */}
+                        <div className="flex flex-col gap-1">
+                          <label className={labelCls}>Select excursion</label>
+                          <select
+                            className={selectCls}
+                            value={s.excursionName}
+                            onChange={(e) => updateExcursion(item.id, "excursionName", e.target.value)}
+                          >
+                            <option value="">— Select an excursion —</option>
+                            {Object.entries(filteredExcursions).map(([destId, excs]) => {
+                              const destName = accommodations.find((a) => a.destinationId === destId)?.destinationName || destId;
+                              return (
+                                <optgroup key={destId} label={destName}>
+                                  {excs.map((exc) => (
+                                    <option key={exc.id} value={exc.name}>{exc.name}</option>
+                                  ))}
+                                </optgroup>
+                              );
+                            })}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Cost/person $</label>
                             <input type="number" min="0" step="0.01" className={inputCls} value={s.costPerPerson} onChange={(e) => updateExcursion(item.id, "costPerPerson", e.target.value)} />
@@ -827,14 +1062,27 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                       </div>
                     );
                   })}
+
+                  {/* Add excursion button */}
+                  <div className="px-6 py-4 border-t border-slate-100">
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleAddItem("ACTIVITY", "Additional excursion", accommodations[0]?.destinationId ?? null)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-slate-200 text-sm font-medium text-slate-500 hover:border-green-300 hover:text-green-600 hover:bg-green-50/30 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                      Add Excursion
+                    </button>
+                  </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
+            );
+          })()}
 
           {/* ─── TRANSPORT ─── */}
-          {transports.length > 0 && (
-            <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
               <button type="button" onClick={() => toggleSection("transport")} className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-6 rounded-full bg-amber-500" />
@@ -858,13 +1106,30 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Vehicle type</label>
-                            <select className={selectCls} value={s.vehicleType} onChange={(e) => updateTransport(item.id, "vehicleType", e.target.value)}>
-                              <option value="car">Car</option>
-                              <option value="van">Van (6-8 pax)</option>
-                              <option value="minibus">Minibus (12-15 pax)</option>
-                              <option value="bus">Bus (30+ pax)</option>
-                              <option value="suv">SUV / Jeep</option>
-                            </select>
+                            {transportRateCards.length > 0 ? (
+                              <select
+                                className={selectCls}
+                                value={s.vehicleType}
+                                onChange={(e) => {
+                                  const selected = transportRateCards.find((rc) => rc.tier === e.target.value);
+                                  updateTransport(item.id, "vehicleType", e.target.value);
+                                  if (selected) updateTransport(item.id, "ratePerKm", String(selected.perKmRate));
+                                }}
+                              >
+                                <option value="">— Select vehicle —</option>
+                                {transportRateCards.map((rc) => (
+                                  <option key={rc.tier} value={rc.tier}>{rc.label}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <select className={selectCls} value={s.vehicleType} onChange={(e) => updateTransport(item.id, "vehicleType", e.target.value)}>
+                                <option value="car">Car</option>
+                                <option value="van">Van (6-8 pax)</option>
+                                <option value="minibus">Minibus (12-15 pax)</option>
+                                <option value="bus">Bus (30+ pax)</option>
+                                <option value="suv">SUV / Jeep</option>
+                              </select>
+                            )}
                           </div>
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Rate / km ($)</label>
@@ -950,12 +1215,23 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                   })}
                 </div>
               )}
-            </div>
-          )}
+              {transports.length === 0 && openSections.transport && (
+                <div className="px-6 py-4">
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => handleAddItem("TRANSPORT", "Transport", null)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-slate-200 text-sm font-medium text-slate-500 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50/30 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    Add Transport
+                  </button>
+                </div>
+              )}
+          </div>
 
           {/* ─── OTHER CHARGES ─── */}
-          {addons.length > 0 && (
-            <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
               <button type="button" onClick={() => toggleSection("other")} className="w-full flex items-center justify-between px-6 py-4 border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-1 h-6 rounded-full bg-purple-500" />
@@ -975,6 +1251,17 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                     const t = otherChargeTotal(s);
                     return (
                       <div key={item.id} className="px-6 py-4 space-y-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold text-purple-700">{s.costItem || "Charge"}</span>
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="text-[10px] font-medium text-red-400 hover:text-red-600 transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                           <div className="flex flex-col gap-1">
                             <label className={labelCls}>Cost item</label>
@@ -1000,10 +1287,22 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                       </div>
                     );
                   })}
+
+                  {/* Add other charge button */}
+                  <div className="px-6 py-4 border-t border-slate-100">
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={() => handleAddItem("ADDON", "Additional charge", null)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-slate-200 text-sm font-medium text-slate-500 hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50/30 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                      Add Charge
+                    </button>
+                  </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
 
           {/* ─── PRICE SUMMARY ─── */}
           <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
@@ -1122,8 +1421,8 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                     </button>
                   </div>
                 ) : (
-                  <button type="button" onClick={handleSendQuote} disabled={isPending || grandTotal <= 0} className="bg-slate-800 text-white hover:bg-slate-700 rounded-xl text-sm font-medium px-4 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                    {isPending ? "Sending..." : "Send Quote"}
+                  <button type="button" onClick={() => setShowReviewModal(true)} disabled={isPending || grandTotal <= 0} className="bg-slate-800 text-white hover:bg-slate-700 rounded-xl text-sm font-medium px-4 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    Review & Send Quote
                   </button>
                 )}
               </div>
@@ -1131,6 +1430,189 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
           </div>
         </div>
       </div>
+
+      {/* ─── REVIEW MODAL ─── */}
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setShowReviewModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <h2 className="text-lg font-bold text-slate-800">Review Quote</h2>
+              <button type="button" onClick={() => setShowReviewModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 text-sm">
+              {/* Customer info */}
+              <div className="space-y-1">
+                <p className="font-semibold text-slate-800">{session.customer.name ?? "Unknown"}</p>
+                <p className="text-xs text-slate-500">{fmtDate(booking.arrivalDate)} → {fmtDate(booking.departureDate)} ({tripDays} day{tripDays !== 1 ? "s" : ""}) · {booking.numTravelers} traveler{booking.numTravelers !== 1 ? "s" : ""}</p>
+              </div>
+
+              {/* Accommodation */}
+              {accommodations.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold text-blue-700 uppercase tracking-wide">Accommodation</p>
+                    <span className="text-xs font-semibold text-slate-700">{fmt(accomSubtotal)}</span>
+                  </div>
+                  <div className="space-y-2">
+                    {accommodations.map((item, i) => {
+                      const s = details.accommodations[item.id];
+                      if (!s) return null;
+                      const t = accomTotal(s, item.nights ?? 1);
+                      const rt = s.roomType || "dbl";
+                      const roomsKey = `${rt}Rooms` as keyof AccomState;
+                      const rateKey = `${rt}Rate` as keyof AccomState;
+                      const rtLabels: Record<string, string> = { sgl: "Single", dbl: "Double", twn: "Twin", tpl: "Triple" };
+                      return (
+                        <div key={item.id} className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2.5">
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium text-slate-700">Stay {i + 1}: {item.destinationName ?? "Destination"} ({item.nights ?? 1} night{(item.nights ?? 1) !== 1 ? "s" : ""})</p>
+                            <span className="font-semibold text-slate-800">{fmt(t.selling)}</span>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            {s.hotelName || "No hotel selected"} — {p(String(s[roomsKey]))}× {rtLabels[rt]} @ {fmt(p(String(s[rateKey])))}/night
+                            {s.mealPlan && <span> · {s.mealPlan}</span>}
+                          </p>
+                          {t.margin > 0 && (
+                            <p className="text-xs text-slate-400 mt-0.5">
+                              Margin: {s.marginType === "percentage" ? `${p(s.marginValue)}%` : fmt(p(s.marginValue))} ({fmt(t.margin)})
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Excursions */}
+              {excursions.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold text-green-700 uppercase tracking-wide">Excursions</p>
+                    <span className="text-xs font-semibold text-slate-700">{fmt(excursionSubtotal)}</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {excursions.map((item) => {
+                      const s = details.excursions[item.id];
+                      if (!s) return null;
+                      const t = excursionTotal(s);
+                      return (
+                        <div key={item.id} className="flex items-center justify-between rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                          <div>
+                            <p className="font-medium text-slate-700">{s.excursionName || "Unnamed excursion"}</p>
+                            <p className="text-xs text-slate-500">
+                              {p(s.adultCount) > 0 && <span>{p(s.adultCount)} adult{p(s.adultCount) !== 1 ? "s" : ""} @ {fmt(p(s.costPerPerson))}</span>}
+                              {p(s.childCount) > 0 && <span> · {p(s.childCount)} child{p(s.childCount) !== 1 ? "ren" : ""} @ {fmt(p(s.childRate))}</span>}
+                            </p>
+                          </div>
+                          <span className="font-semibold text-slate-800 shrink-0 ml-3">{fmt(t)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Transport */}
+              {transports.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold text-amber-700 uppercase tracking-wide">Transport</p>
+                    <span className="text-xs font-semibold text-slate-700">{fmt(transportSubtotal)}</span>
+                  </div>
+                  {transports.map((item) => {
+                    const s = details.transports[item.id];
+                    if (!s) return null;
+                    const t = transportTotal(s, tripDays);
+                    return (
+                      <div key={item.id} className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2.5">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-slate-700">{s.vehicleType || "Vehicle"}</p>
+                          <span className="font-semibold text-slate-800">{fmt(t)}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {p(s.distanceKm) > 0 && <span>{p(s.distanceKm)} km @ {fmt(p(s.ratePerKm))}/km</span>}
+                          {p(s.driverRatePerDay) > 0 && <span> · Driver {fmt(p(s.driverRatePerDay))}/day × {tripDays} days</span>}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Other charges */}
+              {addons.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold text-purple-700 uppercase tracking-wide">Other Charges</p>
+                    <span className="text-xs font-semibold text-slate-700">{fmt(otherSubtotal)}</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {addons.map((item) => {
+                      const s = details.otherCharges[item.id];
+                      if (!s) return null;
+                      const t = otherChargeTotal(s);
+                      return (
+                        <div key={item.id} className="flex items-center justify-between rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                          <div>
+                            <p className="font-medium text-slate-700">{s.costItem || "Charge"}</p>
+                            <p className="text-xs text-slate-500">{p(s.units)} × {fmt(p(s.costPerUnit))}</p>
+                          </div>
+                          <span className="font-semibold text-slate-800 shrink-0 ml-3">{fmt(t)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Totals */}
+              <div className="border-t border-slate-200 pt-4 space-y-1.5">
+                <div className="flex justify-between text-slate-600"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
+                {handlingFee > 0 && <div className="flex justify-between text-slate-600"><span>Handling fee</span><span>{fmt(handlingFee)}</span></div>}
+                {tax > 0 && <div className="flex justify-between text-slate-600"><span>Tax ({p(summary.taxRate)}%)</span><span>{fmt(tax)}</span></div>}
+                {discount > 0 && <div className="flex justify-between text-slate-600"><span>Discount</span><span className="text-red-600">-{fmt(discount)}</span></div>}
+                <div className="flex justify-between text-lg font-bold text-slate-900 pt-2 border-t border-slate-200">
+                  <span>Grand Total</span><span>{fmt(grandTotal)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Deposit</span>
+                  <span>{fmt(p(deposit))}{p(deposit) > 0 && grandTotal > 0 && ` (${((p(deposit) / grandTotal) * 100).toFixed(0)}%)`}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Valid until</span><span>{validUntil || "Not set"}</span>
+                </div>
+                {adminNotes && (
+                  <div className="mt-2 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
+                    <p className="text-[10px] font-semibold text-slate-400 uppercase mb-0.5">Notes to customer</p>
+                    <p className="text-xs text-slate-600">{adminNotes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer buttons */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-200">
+              <button type="button" onClick={() => setShowReviewModal(false)} className="border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-sm font-medium px-5 py-2.5 transition-colors">
+                Go Back
+              </button>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => { setShowReviewModal(false); handleSendQuote(); }}
+                className="bg-slate-800 text-white hover:bg-slate-700 rounded-xl text-sm font-medium px-5 py-2.5 transition-colors disabled:opacity-50"
+              >
+                {isPending ? "Sending..." : "Confirm & Send Quote"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

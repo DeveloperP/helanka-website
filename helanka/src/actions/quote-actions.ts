@@ -7,10 +7,13 @@ import { createBookingFromSession } from "@/lib/session-to-booking";
 import { calculateTransportDistance, calculateTransportCost, determineSeason } from "@/lib/pricing-engine";
 import { sendQuoteSchema, quoteResponseSchema } from "@/lib/validations";
 import type { SendQuoteInput, QuoteResponseInput } from "@/lib/validations";
+import { getHotelsGroupedByDestination, getTransportRateCards, getDailyBufferRate, getAllExcursionsGrouped } from "@/actions/hotel-actions";
+import type { HotelOption, ExcursionOption } from "@/actions/hotel-actions";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface AccommodationDetailData {
+  hotelId: string | null;
   hotelName: string;
   starRating: string | null;
   roomType: string | null;
@@ -116,6 +119,10 @@ export interface QuotingSessionData {
   };
   items: QuotingItemData[];
   transportBreakdown: TransportBreakdown | null;
+  hotelsByDestination: Record<string, HotelOption[]>;
+  excursionsByDestination: Record<string, ExcursionOption[]>;
+  transportRateCards: { tier: string; perKmRate: number; label: string }[];
+  dailyBufferRate: number;
   existingQuotes: Array<{
     id: string;
     version: number;
@@ -289,6 +296,19 @@ export async function getSessionForQuoting(sessionId: string): Promise<QuotingSe
     };
   }
 
+  // Fetch hotels grouped by destination for accommodation dropdowns
+  const accomDestIds = booking.items
+    .filter((i) => i.type === "ACCOMMODATION" && i.destinationId)
+    .map((i) => i.destinationId!);
+  const hotelsByDestination = accomDestIds.length > 0
+    ? await getHotelsGroupedByDestination(accomDestIds)
+    : {};
+
+  // Fetch excursions, transport rate cards and daily buffer
+  const excursionsByDestination = await getAllExcursionsGrouped();
+  const transportRateCards = await getTransportRateCards();
+  const dailyBufferRate = await getDailyBufferRate();
+
   return {
     session: {
       id: tripSession.id,
@@ -306,6 +326,10 @@ export async function getSessionForQuoting(sessionId: string): Promise<QuotingSe
     },
     items,
     transportBreakdown,
+    hotelsByDestination,
+    excursionsByDestination,
+    transportRateCards,
+    dailyBufferRate,
     existingQuotes: booking.quotes.map((q) => ({
       id: q.id,
       version: q.version,
@@ -361,6 +385,47 @@ export async function priceBookingItems(
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : "Failed to save pricing" };
   }
+}
+
+// ─── Admin: Add booking item ────────────────────────────────────────────────
+
+export async function addBookingItem(
+  bookingId: string,
+  type: "ACCOMMODATION" | "ACTIVITY" | "TRANSPORT" | "ADDON",
+  destinationId: string | null,
+  description: string,
+  nights?: number,
+): Promise<{ id: string } | { error: string }> {
+  await requireAdminOrSpecialist();
+  if (!db) return { error: "Database not available" };
+
+  const maxSort = await db.bookingItem.aggregate({
+    where: { bookingId },
+    _max: { sortOrder: true },
+  });
+
+  const item = await db.bookingItem.create({
+    data: {
+      bookingId,
+      type,
+      destinationId,
+      description,
+      nights: nights ?? null,
+      sortOrder: (maxSort._max.sortOrder ?? 0) + 1,
+    },
+  });
+
+  return { id: item.id };
+}
+
+export async function removeBookingItem(
+  bookingItemId: string,
+): Promise<{ success: true } | { error: string }> {
+  await requireAdminOrSpecialist();
+  if (!db) return { error: "Database not available" };
+
+  await db.bookingItem.delete({ where: { id: bookingItemId } });
+  return { success: true };
 }
 
 // ─── Helper: upsert detail records ──────────────────────────────────────────
