@@ -64,22 +64,22 @@ export function UserMenu({ user, darkMode }: UserMenuProps) {
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-on-primary text-xs font-bold">
               {initials}
             </div>
           )}
           <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 rounded-full ${
-            darkMode ? "border-white" : "border-[#0a0a0a]"
+            darkMode ? "border-white" : "border-slate-950"
           }`} />
         </div>
         <span className={`text-sm hidden lg:block max-w-[120px] truncate ${
-          darkMode ? "text-slate-600" : "text-[#dac2ad]"
+          darkMode ? "text-slate-600" : "text-on-surface-muted"
         }`}>
           {displayName}
         </span>
         <svg
           className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""} ${
-            darkMode ? "text-slate-400" : "text-[#dac2ad]/60"
+            darkMode ? "text-slate-400" : "text-on-surface-muted/60"
           }`}
           fill="none"
           viewBox="0 0 24 24"

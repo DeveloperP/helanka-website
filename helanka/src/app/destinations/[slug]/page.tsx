@@ -43,22 +43,22 @@ export default async function DestinationDetailPage({ params }: Props) {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${dest.image}')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pt-32">
           <Link
             href="/destinations"
-            className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-on-surface-muted hover:text-on-surface transition-colors mb-6"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             All Destinations
           </Link>
-          <span className="font-[family-name:var(--font-manrope)] text-xs font-semibold text-[#ff9d00] tracking-[0.2em] uppercase block mb-3">
+          <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
             {dest.region}
           </span>
-          <h1 className="font-[family-name:var(--font-playfair)] text-6xl md:text-8xl text-white uppercase tracking-tight">
+          <h1 className="font-[family-name:var(--font-display)] text-6xl md:text-8xl text-on-surface uppercase tracking-tight">
             {dest.name}
           </h1>
         </div>
@@ -66,9 +66,9 @@ export default async function DestinationDetailPage({ params }: Props) {
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
           <div className="flex flex-wrap gap-4">
             {dest.facts.map((f) => (
-              <div key={f.label} className="liquid-glass rounded-xl px-5 py-4">
-                <span className="text-[10px] text-[#dac2ad] uppercase tracking-widest block">{f.label}</span>
-                <span className="text-white font-[family-name:var(--font-playfair)] text-lg">{f.value}</span>
+              <div key={f.label} className="glass-panel rounded-xl px-5 py-4">
+                <span className="text-[10px] text-on-surface-muted uppercase tracking-widest block">{f.label}</span>
+                <span className="text-on-surface font-[family-name:var(--font-display)] text-lg">{f.value}</span>
               </div>
             ))}
           </div>
@@ -79,26 +79,26 @@ export default async function DestinationDetailPage({ params }: Props) {
       <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-white mb-6">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-6">
               {dest.tagline}
             </h2>
-            <p className="text-[#dac2ad] leading-relaxed text-lg">
+            <p className="text-on-surface-muted leading-relaxed text-lg">
               {dest.description}
             </p>
           </div>
           <div>
-            <h3 className="font-[family-name:var(--font-manrope)] text-xs font-bold text-[#ff9d00] tracking-[0.2em] uppercase mb-6">
+            <h3 className="text-xs font-bold text-primary tracking-[0.2em] uppercase mb-6">
               Highlights
             </h3>
             <ul className="space-y-4">
               {dest.highlights.map((h) => (
                 <li key={h} className="flex items-start gap-3">
-                  <span className="text-[#ff9d00] mt-1 shrink-0">
+                  <span className="text-primary mt-1 shrink-0">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </span>
-                  <span className="text-[#e5e2e1]">{h}</span>
+                  <span className="text-on-surface">{h}</span>
                 </li>
               ))}
             </ul>
@@ -112,38 +112,38 @@ export default async function DestinationDetailPage({ params }: Props) {
         if (excursions.length === 0) return null;
         return (
           <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-white mb-3">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-3">
               Excursions in {dest.name}
             </h2>
-            <p className="text-[#dac2ad] mb-10 max-w-2xl">
-              {excursions.length} activities available — include them in a curated package or build a custom tour.
+            <p className="text-on-surface-muted mb-10 max-w-2xl">
+              {excursions.length} activities available: include them in a curated package or build a custom tour.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {excursions.map((exc) => (
                 <div
                   key={exc.id}
-                  className="liquid-glass rounded-2xl p-6 flex flex-col gap-3"
+                  className="surface-card rounded-2xl p-6 flex flex-col gap-3"
                 >
                   <div className="flex items-center justify-between">
-                    <h3 className="font-[family-name:var(--font-playfair)] text-lg text-white">
+                    <h3 className="font-[family-name:var(--font-display)] text-lg text-on-surface">
                       {exc.name}
                     </h3>
-                    <span className="text-xs text-white/40 uppercase tracking-wider flex-shrink-0 ml-4">
+                    <span className="text-xs text-on-surface-subtle uppercase tracking-wider flex-shrink-0 ml-4">
                       {exc.durationHours}h
                     </span>
                   </div>
-                  <p className="text-[#dac2ad] text-sm leading-relaxed">
+                  <p className="text-on-surface-muted text-sm leading-relaxed">
                     {exc.description}
                   </p>
                   {exc.packageSlug ? (
                     <Link
                       href={`/packages/${exc.packageSlug}`}
-                      className="text-[#ff9d00] text-xs font-semibold tracking-wider uppercase hover:text-[#e68d00] transition-colors self-start"
+                      className="text-primary text-xs font-semibold tracking-wider uppercase hover:text-primary-light transition-colors self-start"
                     >
-                      Part of {exc.packageName} →
+                      Part of {exc.packageName} &rarr;
                     </Link>
                   ) : (
-                    <span className="text-white/30 text-xs font-semibold tracking-wider uppercase self-start">
+                    <span className="text-on-surface-subtle text-xs font-semibold tracking-wider uppercase self-start">
                       Available in custom tours
                     </span>
                   )}
@@ -157,7 +157,7 @@ export default async function DestinationDetailPage({ params }: Props) {
       {/* Related packages */}
       {relatedPackages.length > 0 && (
         <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-white mb-10">
+          <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-10">
             Packages featuring {dest.name}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -165,20 +165,20 @@ export default async function DestinationDetailPage({ params }: Props) {
               <Link
                 key={pkg.slug}
                 href={`/packages/${pkg.slug}`}
-                className="group liquid-glass rounded-2xl overflow-hidden hover:border-white/20 transition-all"
+                className="group surface-card rounded-2xl overflow-hidden hover:border-outline-hover transition-all"
               >
                 <div className="relative h-48 overflow-hidden">
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                    style={{ backgroundImage: `url('${pkg.image}')` }}
+                    style={{ backgroundImage: `url('${pkg.image}')`, transitionTimingFunction: "var(--ease-out)" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-1 group-hover:text-[#ff9d00] transition-colors">
+                  <h3 className="font-[family-name:var(--font-display)] text-xl text-on-surface mb-1 group-hover:text-primary transition-colors">
                     {pkg.name}
                   </h3>
-                  <p className="text-sm text-[#dac2ad]">{pkg.durationDays} Days · from ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}/person</p>
+                  <p className="text-sm text-on-surface-muted">{pkg.durationDays} Days &middot; from ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}/person</p>
                 </div>
               </Link>
             ))}
@@ -188,16 +188,16 @@ export default async function DestinationDetailPage({ params }: Props) {
 
       {/* CTA */}
       <section className="py-16 px-8 md:px-24 lg:px-32">
-        <div className="max-w-[1440px] mx-auto liquid-glass rounded-3xl p-12 md:p-16 text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl text-white mb-4">
+        <div className="max-w-[1440px] mx-auto surface-card rounded-3xl p-12 md:p-16 text-center">
+          <h2 className="font-[family-name:var(--font-display)] text-4xl text-on-surface mb-4">
             Want to visit {dest.name}?
           </h2>
-          <p className="text-[#dac2ad] max-w-lg mx-auto mb-8">
-            Let us build a custom itinerary around this destination — tailored to your dates, pace, and interests.
+          <p className="text-on-surface-muted max-w-lg mx-auto mb-8">
+            Let us build a custom itinerary around this destination, tailored to your dates, pace, and interests.
           </p>
           <Link
             href={`/build?destination=${dest.slug}`}
-            className="inline-block bg-[#ff9d00] text-[#482900] px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
+            className="pressable inline-block bg-primary text-on-primary px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:brightness-110 transition-all"
           >
             Build Your Trip
           </Link>

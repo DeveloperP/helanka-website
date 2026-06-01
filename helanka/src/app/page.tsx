@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import HeroCarousel from "@/components/home/hero-carousel";
 import DestinationHighlights from "@/components/home/destination-highlights";
-import FeaturedPackages from "@/components/home/featured-packages";
+import FeaturedPackagesServer from "@/components/home/featured-packages-server";
 import CtaSection from "@/components/home/cta-section";
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default function HomePage() {
     <>
       <HeroCarousel />
       <DestinationHighlights />
-      <FeaturedPackages />
+      <FeaturedPackagesServer />
       <CtaSection />
     </>
   );

@@ -112,7 +112,7 @@ function TabNavigation({ tabs, activeTab, onNavigate }: { tabs: SidebarTab[]; ac
         </button>
       ) : <span />}
       {next ? (
-        <button onClick={() => onNavigate(next.id)} className="flex items-center gap-2 text-sm font-semibold text-[#ff9d00] hover:text-[#e68d00] transition-colors group">
+        <button onClick={() => onNavigate(next.id)} className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-light transition-colors group">
           {next.label}
           <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </button>
@@ -339,7 +339,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
         <div className="relative z-10 max-w-[800px] mx-auto px-4 md:px-8">
           <div className="text-center mb-10">
-            <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-slate-900 mb-3">
+            <h1 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-slate-900 mb-3">
               Welcome, {firstName}
             </h1>
             <p className="text-slate-500 text-lg">How would you like to explore Sri Lanka?</p>
@@ -387,10 +387,10 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
               <button
                 key={card.type}
                 onClick={() => chooseTripType(card.type)}
-                className="text-left bg-white rounded-2xl p-6 md:p-8 shadow-sm border-2 border-transparent hover:border-[#ff9d00] transition-all group"
+                className="text-left bg-white rounded-2xl p-6 md:p-8 shadow-sm border-2 border-transparent hover:border-primary transition-colors group pressable"
               >
                 <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-[#ff9d00]/10 flex items-center justify-center text-[#ff9d00] flex-shrink-0 group-hover:bg-[#ff9d00] group-hover:text-white transition-colors">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
                     {card.icon}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -398,10 +398,10 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <h2 className="text-xl font-bold text-slate-900">{card.title}</h2>
                       <span className="px-2.5 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-semibold rounded-full uppercase tracking-wider">{card.badge}</span>
                     </div>
-                    <p className="text-sm font-medium text-[#ff9d00] mb-2">{card.subtitle}</p>
+                    <p className="text-sm font-medium text-primary mb-2">{card.subtitle}</p>
                     <p className="text-sm text-slate-500 leading-relaxed">{card.desc}</p>
                   </div>
-                  <svg className="w-5 h-5 text-slate-300 group-hover:text-[#ff9d00] group-hover:translate-x-1 transition-all flex-shrink-0 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-5 h-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-[color,transform] flex-shrink-0 mt-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                   </svg>
                 </div>
@@ -430,9 +430,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all group ${
+                  className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-[background-color,color,box-shadow] group ${
                     isActive
-                      ? "bg-[#0a0a0a] text-white shadow-md"
+                      ? "bg-background text-white shadow-md"
                       : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
                   }`}
                   title={tab.label}
@@ -442,7 +442,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full" />
                   )}
                   {tab.id === "review" && !isActive && (
-                    <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#ff9d00] border-2 border-white rounded-full" />
+                    <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-primary border-2 border-white rounded-full" />
                   )}
                   <span className="absolute left-full ml-3 px-2.5 py-1 bg-slate-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
                     {tab.label}
@@ -474,13 +474,13 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
           </div>
 
           {/* Mobile Tab Bar */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-100 px-2 py-2 flex justify-around">
+          <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-slate-100 px-2 py-2 flex justify-around">
             {sidebarTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors ${
-                  activeTab === tab.id ? "text-[#0a0a0a]" : "text-slate-400"
+                  activeTab === tab.id ? "text-slate-900" : "text-slate-400"
                 }`}
               >
                 {tab.icon}
@@ -501,7 +501,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                 </h1>
                 <p className="text-sm text-slate-500 mt-0.5">
                   {activeTab === "overview" && (
-                    <>{tripType === "package" ? "Your trip at a glance" : tripType === "custom" ? "Build your perfect Sri Lankan adventure" : "Your corporate event brief"} — <button onClick={() => setTripType(null)} className="text-[#ff9d00] hover:underline">change trip type</button></>
+                    <>{tripType === "package" ? "Your trip at a glance" : tripType === "custom" ? "Build your perfect Sri Lankan adventure" : "Your corporate event brief"} — <button onClick={() => setTripType(null)} className="text-primary hover:underline">change trip type</button></>
                   )}
                   {activeTab === "itinerary" && "Your day-by-day plan — review stops and timing"}
                   {activeTab === "destinations" && "Select the places you want to visit"}
@@ -532,7 +532,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     <span className="text-[10px] text-slate-400">Custom quote</span>
                   </div>
                 )}
-                <div className="w-10 h-10 rounded-full bg-[#ff9d00] flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
                   {user.name.split(" ").map((n) => n[0]).join("").toUpperCase()}
                 </div>
               </div>
@@ -555,7 +555,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         <span className="text-xs text-slate-400">&middot;</span>
                         <span className="text-xs text-slate-400">{configuredCount}/{totalSections} configured</span>
                       </div>
-                      <h2 className="font-[family-name:var(--font-playfair)] text-3xl lg:text-4xl text-slate-900 mb-2">
+                      <h2 className="font-[family-name:var(--font-display)] text-3xl lg:text-4xl text-slate-900 mb-2">
                         {tripInfo.name}
                       </h2>
                       <p className="text-slate-500 mb-6">{tripInfo.tagline}</p>
@@ -569,7 +569,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <div className="flex gap-3">
                         <button
                           onClick={() => setActiveTab("review")}
-                          className="bg-[#0a0a0a] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors"
+                          className="bg-background text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors"
                         >
                           Review &amp; Get Quote
                         </button>
@@ -596,7 +596,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
 
                 {/* Package Picker */}
                 {showPackagePicker && (
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#ff9d00]/20">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-primary/20">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-semibold text-slate-900">Choose a Different Package</h3>
                       <button onClick={() => setShowPackagePicker(false)} className="text-xs text-slate-400 hover:text-slate-600">Cancel</button>
@@ -608,16 +608,16 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <button
                             key={pkg.slug}
                             onClick={() => switchPackage(pkg.slug)}
-                            className={`text-left rounded-xl p-4 transition-all border-2 ${
+                            className={`text-left rounded-xl p-4 transition-[border-color,background-color] border-2 ${
                               isCurrent
-                                ? "border-[#ff9d00] bg-[#ff9d00]/5"
+                                ? "border-primary bg-primary/5"
                                 : "border-slate-100 hover:border-slate-200 bg-slate-50"
                             }`}
                           >
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <h4 className="text-sm font-semibold text-slate-900 leading-tight">{pkg.name}</h4>
                               {isCurrent && (
-                                <span className="px-2 py-0.5 bg-[#ff9d00] text-white text-[9px] font-bold rounded-full flex-shrink-0">Current</span>
+                                <span className="px-2 py-0.5 bg-primary text-white text-[9px] font-bold rounded-full flex-shrink-0">Current</span>
                               )}
                             </div>
                             <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -653,7 +653,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" /></svg>
                       </button>
-                      <span className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900 w-8 text-center">{guests}</span>
+                      <span className="font-[family-name:var(--font-display)] text-3xl text-slate-900 w-8 text-center">{guests}</span>
                       <button
                         onClick={() => setGuests(Math.min(tripInfo.maxGuests, guests + 1))}
                         className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors disabled:opacity-30"
@@ -669,9 +669,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-slate-900">Itinerary</h3>
-                      <button onClick={() => setActiveTab("itinerary")} className="text-xs text-[#ff9d00] font-semibold hover:underline">View</button>
+                      <button onClick={() => setActiveTab("itinerary")} className="text-xs text-primary font-semibold hover:underline">View</button>
                     </div>
-                    <p className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900">{tripInfo.days}</p>
+                    <p className="font-[family-name:var(--font-display)] text-3xl text-slate-900">{tripInfo.days}</p>
                     <p className="text-xs text-slate-400 mt-1">days &middot; {tripInfo.destinations.length} destinations</p>
                     <div className="mt-3 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -683,9 +683,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-slate-900">Excursions</h3>
-                      <button onClick={() => setActiveTab("excursions")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                      <button onClick={() => setActiveTab("excursions")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                     </div>
-                    <p className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900">
+                    <p className="font-[family-name:var(--font-display)] text-3xl text-slate-900">
                       {selectedExcursionIds.length}<span className="text-lg text-slate-400">/{EXCURSION_CAP}</span>
                     </p>
                     <p className="text-xs text-slate-400 mt-1">selected &middot; ${excursionTotal}</p>
@@ -702,7 +702,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-slate-900">Transport</h3>
-                      <button onClick={() => setActiveTab("transport")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                      <button onClick={() => setActiveTab("transport")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                     </div>
                     <p className="text-sm font-semibold text-slate-900">
                       {transport === "super-luxury" ? "Super Luxury" : "Standard"}
@@ -712,7 +712,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </p>
                     <div className="mt-3">
                       {transport === "super-luxury" ? (
-                        <span className="inline-block px-2 py-0.5 bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-semibold rounded-full">+$400</span>
+                        <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-semibold rounded-full">+$400</span>
                       ) : (
                         <span className="inline-block px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-semibold rounded-full">Included</span>
                       )}
@@ -723,7 +723,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold text-slate-900">Dining</h3>
-                      <button onClick={() => setActiveTab("dining")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                      <button onClick={() => setActiveTab("dining")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                     </div>
                     <p className="text-sm font-semibold text-slate-900">{mealPlan}</p>
                     <p className="text-xs text-slate-400 mt-1">
@@ -744,7 +744,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <>
                         <div className="flex items-center gap-6">
                           <div className="text-center">
-                            <p className="font-[family-name:var(--font-playfair)] text-5xl text-slate-900">{fmtDay(arrDate)}</p>
+                            <p className="font-[family-name:var(--font-display)] text-5xl text-slate-900">{fmtDay(arrDate)}</p>
                             <p className="text-sm text-slate-400">{fmtMonth(arrDate)}</p>
                           </div>
                           <div className="flex flex-col items-center gap-1">
@@ -753,7 +753,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                             <div className="w-8 h-px bg-slate-200" />
                           </div>
                           <div className="text-center">
-                            <p className="font-[family-name:var(--font-playfair)] text-5xl text-slate-900">{fmtDay(depDate)}</p>
+                            <p className="font-[family-name:var(--font-display)] text-5xl text-slate-900">{fmtDay(depDate)}</p>
                             <p className="text-sm text-slate-400">{fmtMonth(depDate)}</p>
                           </div>
                         </div>
@@ -799,8 +799,8 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   <div className="bg-white rounded-2xl p-6 shadow-sm">
                     <h3 className="text-sm font-semibold text-slate-900 mb-5">Destination</h3>
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#ff9d00]/10 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-6 h-6 text-[#ff9d00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                         </svg>
@@ -849,12 +849,12 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <span className="px-3 py-1 bg-purple-50 text-purple-600 text-xs font-semibold rounded-full">Custom Tour</span>
                       <span className="text-xs text-slate-400">{selectedDestinationSlugs.length} destination{selectedDestinationSlugs.length !== 1 ? "s" : ""} selected</span>
                     </div>
-                    <h2 className="font-[family-name:var(--font-playfair)] text-3xl lg:text-4xl text-slate-900 mb-2">
+                    <h2 className="font-[family-name:var(--font-display)] text-3xl lg:text-4xl text-slate-900 mb-2">
                       Your Bespoke Journey
                     </h2>
                     <p className="text-slate-500 mb-6">Pick destinations, choose excursions at each stop, and we&apos;ll craft a personalised itinerary.</p>
                     <div className="flex gap-3">
-                      <button onClick={() => setActiveTab("destinations")} className="bg-[#0a0a0a] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
+                      <button onClick={() => setActiveTab("destinations")} className="bg-background text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
                         {selectedDestinationSlugs.length > 0 ? "Edit Destinations" : "Choose Destinations"}
                       </button>
                       {selectedDestinationSlugs.length > 0 && (
@@ -919,7 +919,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                               <p className="text-xs text-slate-400 mt-0.5">{dest.region}</p>
                               <div className="flex items-center justify-between mt-3">
                                 <span className="text-xs text-slate-500">{selectedHere}/{excCount} excursions</span>
-                                <button onClick={() => setActiveTab("excursions")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Pick</button>
+                                <button onClick={() => setActiveTab("excursions")} className="text-xs text-primary font-semibold hover:underline">Pick</button>
                               </div>
                             </div>
                           </div>
@@ -933,14 +933,14 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-semibold text-slate-900">Transport</h3>
-                        <button onClick={() => setActiveTab("transport")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                        <button onClick={() => setActiveTab("transport")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                       </div>
                       <p className="text-sm font-semibold text-slate-900">{transport === "super-luxury" ? "Super Luxury" : "Standard"}</p>
                     </div>
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-semibold text-slate-900">Dining</h3>
-                        <button onClick={() => setActiveTab("dining")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Edit</button>
+                        <button onClick={() => setActiveTab("dining")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                       </div>
                       <p className="text-sm font-semibold text-slate-900">{mealPlan}</p>
                     </div>
@@ -950,7 +950,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         <button onClick={() => setGuests(Math.max(1, guests - 1))} className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors" disabled={guests <= 1}>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 12H4" /></svg>
                         </button>
-                        <span className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900 w-8 text-center">{guests}</span>
+                        <span className="font-[family-name:var(--font-display)] text-3xl text-slate-900 w-8 text-center">{guests}</span>
                         <button onClick={() => setGuests(Math.min(20, guests + 1))} className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors" disabled={guests >= 20}>
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                         </button>
@@ -966,12 +966,12 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <span className="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-semibold rounded-full">MICE &amp; Group</span>
                       <span className="text-xs text-slate-400">{configuredCount}/{totalSections} configured</span>
                     </div>
-                    <h2 className="font-[family-name:var(--font-playfair)] text-3xl lg:text-4xl text-slate-900 mb-2">
+                    <h2 className="font-[family-name:var(--font-display)] text-3xl lg:text-4xl text-slate-900 mb-2">
                       Corporate Event Brief
                     </h2>
                     <p className="text-slate-500 mb-6">Tell us about your event and we&apos;ll prepare a comprehensive proposal with venue options, logistics, and pricing.</p>
                     <div className="flex gap-3">
-                      <button onClick={() => setActiveTab("event-details")} className="bg-[#0a0a0a] text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
+                      <button onClick={() => setActiveTab("event-details")} className="bg-background text-white px-6 py-3 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-colors">
                         {miceEventType ? "Edit Event Details" : "Start Event Brief"}
                       </button>
                       {configuredCount === totalSections && (
@@ -987,22 +987,22 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <h3 className="text-sm font-semibold text-slate-900 mb-2">Event Type</h3>
                       <p className="text-sm text-slate-600">{miceEventType || "Not set"}</p>
-                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-[#ff9d00] font-semibold hover:underline mt-2">Edit</button>
+                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-primary font-semibold hover:underline mt-2">Edit</button>
                     </div>
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <h3 className="text-sm font-semibold text-slate-900 mb-2">Group Size</h3>
-                      <p className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900">{miceGroupSize}</p>
-                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-[#ff9d00] font-semibold hover:underline mt-2">Edit</button>
+                      <p className="font-[family-name:var(--font-display)] text-3xl text-slate-900">{miceGroupSize}</p>
+                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-primary font-semibold hover:underline mt-2">Edit</button>
                     </div>
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <h3 className="text-sm font-semibold text-slate-900 mb-2">Venues</h3>
                       <p className="text-sm text-slate-600">{miceVenuePrefs.length > 0 ? miceVenuePrefs.join(", ") : "Not set"}</p>
-                      <button onClick={() => setActiveTab("venues")} className="text-xs text-[#ff9d00] font-semibold hover:underline mt-2">Edit</button>
+                      <button onClick={() => setActiveTab("venues")} className="text-xs text-primary font-semibold hover:underline mt-2">Edit</button>
                     </div>
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <h3 className="text-sm font-semibold text-slate-900 mb-2">Budget</h3>
                       <p className="text-sm text-slate-600">{miceBudgetRange}</p>
-                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-[#ff9d00] font-semibold hover:underline mt-2">Edit</button>
+                      <button onClick={() => setActiveTab("event-details")} className="text-xs text-primary font-semibold hover:underline mt-2">Edit</button>
                     </div>
                   </div>
                 </>)}
@@ -1011,7 +1011,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                 <div className="bg-white rounded-2xl p-6 shadow-sm flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-white font-bold text-lg">{specialist.initials}</div>
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white font-bold text-lg">{specialist.initials}</div>
                       <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 border-2 border-white rounded-full" />
                     </div>
                     <div>
@@ -1021,18 +1021,18 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <a href={`mailto:${specialist.email}`} className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-[#ff9d00]/10 hover:text-[#ff9d00] transition-all">
+                    <a href={`mailto:${specialist.email}`} className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                       </svg>
                     </a>
-                    <a href={`https://wa.me/${specialist.whatsapp}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition-all">
+                    <a href={`https://wa.me/${specialist.whatsapp}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-50 hover:text-emerald-500 transition-colors">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                         <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.75.75 0 00.917.918l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.34 0-4.498-.794-6.218-2.128l-.435-.338-3.266 1.095 1.095-3.266-.338-.435A9.956 9.956 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z" />
                       </svg>
                     </a>
-                    <button onClick={() => setChatOpen(true)} className="w-10 h-10 rounded-xl bg-[#ff9d00] flex items-center justify-center text-white hover:bg-[#e68d00] transition-all">
+                    <button onClick={() => setChatOpen(true)} className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white hover:brightness-110 transition-[filter]">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                       </svg>
@@ -1073,7 +1073,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <Link
                             key={b.id}
                             href={b.status === "QUOTE_SENT" || b.status === "CONFIRMED" ? `/dashboard/quotes/${b.id}` : "#"}
-                            className={`block rounded-xl border p-4 transition-all ${
+                            className={`block rounded-xl border p-4 transition-[border-color,background-color] ${
                               b.status === "QUOTE_SENT" ? "border-amber-200 bg-amber-50/30 hover:border-amber-300" : "border-slate-100 hover:border-slate-200"
                             }`}
                           >
@@ -1172,7 +1172,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                   )}
                   {selectedExcursionIds.length >= EXCURSION_CAP && (
-                    <div className="mt-3 px-4 py-4 bg-[#ff9d00]/5 rounded-xl border border-[#ff9d00]/20">
+                    <div className="mt-3 px-4 py-4 bg-primary/5 rounded-xl border border-primary/20">
                       <p className="text-sm font-medium text-slate-800">Your {effectiveDays}-day stay limits you to {EXCURSION_CAP} excursions</p>
                       <p className="text-xs text-slate-500 mt-1">Extend your departure to unlock more.</p>
                       <div className="flex items-center gap-3 mt-3">
@@ -1182,7 +1182,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           value={departureDate}
                           min={arrivalDate}
                           onChange={(e) => setDepartureDate(e.target.value)}
-                          className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-[#ff9d00] transition-colors"
+                          className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-primary transition-colors"
                         />
                         {datesValid && (() => {
                           const previewNights = Math.round((new Date(departureDate + "T00:00:00").getTime() - new Date(arrivalDate + "T00:00:00").getTime()) / 86400000);
@@ -1209,7 +1209,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       return (
                         <div key={slug}>
                           <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#ff9d00]" />
+                            <span className="w-2 h-2 rounded-full bg-primary" />
                             {dest?.name ?? slug}
                             <span className="text-xs text-slate-400 font-normal">({destExcursions.length} available)</span>
                           </h3>
@@ -1222,9 +1222,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                                   key={exc.id}
                                   onClick={() => toggleExcursion(exc.id)}
                                   disabled={atCap}
-                                  className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-all border-2 ${
+                                  className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
                                     picked
-                                      ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
+                                      ? "border-primary ring-1 ring-primary/20"
                                       : atCap
                                       ? "border-transparent opacity-40 cursor-not-allowed"
                                       : "border-transparent hover:border-slate-200"
@@ -1239,7 +1239,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                                         <span className="text-sm font-semibold text-slate-900">${exc.price}</span>
                                       </div>
                                     </div>
-                                    <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-[#ff9d00] border-[#ff9d00]" : "border-slate-200"}`}>
+                                    <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-primary border-primary" : "border-slate-200"}`}>
                                       {picked && (
                                         <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -1265,9 +1265,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           key={exc.id}
                           onClick={() => toggleExcursion(exc.id)}
                           disabled={atCap}
-                          className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-all border-2 ${
+                          className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
                             picked
-                              ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
+                              ? "border-primary ring-1 ring-primary/20"
                               : atCap
                               ? "border-transparent opacity-40 cursor-not-allowed"
                               : "border-transparent hover:border-slate-200"
@@ -1282,7 +1282,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                                 <span className="text-sm font-semibold text-slate-900">${exc.price}</span>
                               </div>
                             </div>
-                            <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-[#ff9d00] border-[#ff9d00]" : "border-slate-200"}`}>
+                            <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-primary border-primary" : "border-slate-200"}`}>
                               {picked && (
                                 <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -1340,16 +1340,16 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       label: "Super Luxury",
                       vehicle: "Mercedes V-Class",
                       price: "+$400",
-                      priceClass: "text-[#ff9d00] bg-[#ff9d00]/10",
+                      priceClass: "text-primary bg-primary/10",
                       features: ["Leather reclining seats", "On-board Wi-Fi", "Mini fridge with refreshments", "Noise-cancelling cabin", "Premium sound system", "Tinted privacy glass"],
                     },
                   ]).map((t) => (
                     <button
                       key={t.tier}
                       onClick={() => setTransport(t.tier)}
-                      className={`text-left bg-white rounded-2xl p-6 shadow-sm transition-all border-2 ${
+                      className={`text-left bg-white rounded-2xl p-6 shadow-sm transition-[border-color,background-color] border-2 ${
                         transport === t.tier
-                          ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
+                          ? "border-primary ring-1 ring-primary/20"
                           : "border-transparent hover:border-slate-200"
                       }`}
                     >
@@ -1384,9 +1384,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <button
                         key={tier.id}
                         onClick={() => setAccommodation(tier.id)}
-                        className={`text-left rounded-2xl p-5 shadow-sm transition-all border-2 ${
+                        className={`text-left rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
                           accommodation === tier.id
-                            ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20 bg-white"
+                            ? "border-primary ring-1 ring-primary/20 bg-white"
                             : "border-transparent hover:border-slate-200 bg-white"
                         }`}
                       >
@@ -1395,7 +1395,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <span className={`px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 ${
                             tier.priceModifier === 0
                               ? "text-emerald-600 bg-emerald-50"
-                              : "text-[#ff9d00] bg-[#ff9d00]/10"
+                              : "text-primary bg-primary/10"
                           }`}>
                             {tier.priceModifier === 0 ? "Included" : `+$${tier.priceModifier}/night`}
                           </span>
@@ -1439,15 +1439,15 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <button
                         key={mp.id}
                         onClick={() => setMealPlan(mp.id)}
-                        className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-all border-2 ${
+                        className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
                           mealPlan === mp.id
-                            ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
+                            ? "border-primary ring-1 ring-primary/20"
                             : "border-transparent hover:border-slate-200"
                         }`}
                       >
                         <div className="flex items-center gap-3 mb-2">
-                          <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${mealPlan === mp.id ? "border-[#ff9d00]" : "border-slate-200"}`}>
-                            {mealPlan === mp.id && <span className="w-2 h-2 rounded-full bg-[#ff9d00]" />}
+                          <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${mealPlan === mp.id ? "border-primary" : "border-slate-200"}`}>
+                            {mealPlan === mp.id && <span className="w-2 h-2 rounded-full bg-primary" />}
                           </span>
                           <span className="text-sm font-semibold text-slate-900">{mp.id}</span>
                         </div>
@@ -1510,7 +1510,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                   )}
                   {selectedDestinationSlugs.length >= DESTINATION_CAP && (
-                    <div className="mt-3 px-4 py-4 bg-[#ff9d00]/5 rounded-xl border border-[#ff9d00]/20">
+                    <div className="mt-3 px-4 py-4 bg-primary/5 rounded-xl border border-primary/20">
                       <p className="text-sm font-medium text-slate-800">Your {effectiveDays}-day stay limits you to {DESTINATION_CAP} destinations</p>
                       <p className="text-xs text-slate-500 mt-1">Extend your departure to visit more places.</p>
                       <div className="flex items-center gap-3 mt-3">
@@ -1520,7 +1520,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           value={departureDate}
                           min={arrivalDate}
                           onChange={(e) => setDepartureDate(e.target.value)}
-                          className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-[#ff9d00] transition-colors"
+                          className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-primary transition-colors"
                         />
                         {datesValid && (() => {
                           const newCap = Math.max(1, Math.floor((effectiveDays + 1) / 2));
@@ -1543,14 +1543,14 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           picked ? selectedDestinationSlugs.filter((s) => s !== dest.slug) : atCap ? selectedDestinationSlugs : [...selectedDestinationSlugs, dest.slug]
                         )}
                         disabled={atCap}
-                        className={`text-left rounded-2xl overflow-hidden shadow-sm transition-all border-2 ${
-                          picked ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20" : atCap ? "border-transparent opacity-40 cursor-not-allowed" : "border-transparent hover:border-slate-200"
+                        className={`text-left rounded-2xl overflow-hidden shadow-sm transition-[border-color,background-color] border-2 ${
+                          picked ? "border-primary ring-1 ring-primary/20" : atCap ? "border-transparent opacity-40 cursor-not-allowed" : "border-transparent hover:border-slate-200"
                         }`}
                       >
                         <div className="relative h-36 bg-cover bg-center" style={{ backgroundImage: `url('${dest.image}')` }}>
                           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                           {picked && (
-                            <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#ff9d00] flex items-center justify-center">
+                            <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                               <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                               </svg>
@@ -1591,9 +1591,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <button
                         key={et}
                         onClick={() => setMiceEventType(et)}
-                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border-2 ${
+                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-[border-color,background-color] border-2 ${
                           miceEventType === et
-                            ? "border-[#ff9d00] bg-[#ff9d00]/5 text-slate-900"
+                            ? "border-primary bg-primary/5 text-slate-900"
                             : "border-slate-100 text-slate-600 hover:border-slate-200"
                         }`}
                       >
@@ -1630,9 +1630,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         <button
                           key={b}
                           onClick={() => setMiceBudgetRange(b)}
-                          className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${
+                          className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-[border-color,background-color] border-2 ${
                             miceBudgetRange === b
-                              ? "border-[#ff9d00] bg-[#ff9d00]/5 text-slate-900"
+                              ? "border-primary bg-primary/5 text-slate-900"
                               : "border-slate-100 text-slate-600 hover:border-slate-200"
                           }`}
                         >
@@ -1684,8 +1684,8 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         onClick={() => setMiceVenuePrefs(
                           picked ? miceVenuePrefs.filter((x) => x !== v.id) : [...miceVenuePrefs, v.id]
                         )}
-                        className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-all border-2 ${
-                          picked ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20" : "border-transparent hover:border-slate-200"
+                        className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
+                          picked ? "border-primary ring-1 ring-primary/20" : "border-transparent hover:border-slate-200"
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
@@ -1694,7 +1694,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                             <p className="text-xs text-slate-500 mt-1">{v.desc}</p>
                             <p className="text-xs text-slate-400 mt-2">Capacity: {v.capacity}</p>
                           </div>
-                          <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-[#ff9d00] border-[#ff9d00]" : "border-slate-200"}`}>
+                          <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-primary border-primary" : "border-slate-200"}`}>
                             {picked && (
                               <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -1725,7 +1725,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                             on ? miceRequirements.replace(svc, "").replace(/,\s*,/g, ",").replace(/^,\s*|,\s*$/g, "") : miceRequirements ? `${miceRequirements}, ${svc}` : svc
                           )}
                           className={`px-3.5 py-1.5 rounded-full text-sm border transition-colors ${
-                            on ? "bg-[#ff9d00]/10 border-[#ff9d00]/30 text-[#ff9d00] font-medium" : "bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200"
+                            on ? "bg-primary/10 border-primary/30 text-primary font-medium" : "bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200"
                           }`}
                         >
                           {svc}
@@ -1760,7 +1760,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-slate-900 mb-3">Quote Requested</h2>
+                    <h2 className="font-[family-name:var(--font-display)] text-3xl text-slate-900 mb-3">Quote Requested</h2>
                     <p className="text-slate-500 max-w-md mx-auto mb-6">
                       {specialist.name.split(" ")[0]} will review your selections and send a detailed quote within 24 hours. You&apos;ll get an email at {user.email}.
                     </p>
@@ -1891,7 +1891,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <div className="bg-white rounded-2xl p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-xs text-slate-400 uppercase tracking-wider">Your Package</h4>
-                          <button onClick={() => setShowPackagePicker(true)} className="text-xs text-[#ff9d00] font-semibold hover:underline">Change</button>
+                          <button onClick={() => setShowPackagePicker(true)} className="text-xs text-primary font-semibold hover:underline">Change</button>
                         </div>
                         <h3 className="text-lg font-semibold text-slate-900 mb-1">{activePackage.name}</h3>
                         <p className="text-sm text-slate-500 mb-3">{activePackage.durationDays} days &middot; {activePackage.itinerary.length} stops</p>
@@ -1906,7 +1906,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <div className="bg-white rounded-2xl p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-xs text-slate-400 uppercase tracking-wider">Your Destinations</h4>
-                          <button onClick={() => setActiveTab("destinations")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Change</button>
+                          <button onClick={() => setActiveTab("destinations")} className="text-xs text-primary font-semibold hover:underline">Change</button>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {selectedDestinationSlugs.map((slug) => {
@@ -1927,7 +1927,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <div className="bg-white rounded-2xl p-5 shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                               <h4 className="text-xs text-slate-400 uppercase tracking-wider">Excursions ({selectedExcursionIds.length})</h4>
-                              <button onClick={() => setActiveTab("excursions")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Change</button>
+                              <button onClick={() => setActiveTab("excursions")} className="text-xs text-primary font-semibold hover:underline">Change</button>
                             </div>
                             {selectedExcursionIds.length > 0 ? (
                               <div className="space-y-2">
@@ -1949,7 +1949,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <div className="bg-white rounded-2xl p-5 shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                               <h4 className="text-xs text-slate-400 uppercase tracking-wider">Dining &amp; Dietary</h4>
-                              <button onClick={() => setActiveTab("dining")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Change</button>
+                              <button onClick={() => setActiveTab("dining")} className="text-xs text-primary font-semibold hover:underline">Change</button>
                             </div>
                             <p className="text-sm text-slate-700 font-medium">{mealPlan}</p>
                             {allergies.length > 0 && (
@@ -1967,7 +1967,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           <div className="bg-white rounded-2xl p-5 shadow-sm">
                             <div className="flex items-center justify-between mb-3">
                               <h4 className="text-xs text-slate-400 uppercase tracking-wider">Transport &amp; Stay</h4>
-                              <button onClick={() => setActiveTab("transport")} className="text-xs text-[#ff9d00] font-semibold hover:underline">Change</button>
+                              <button onClick={() => setActiveTab("transport")} className="text-xs text-primary font-semibold hover:underline">Change</button>
                             </div>
                             <div className="space-y-2">
                               <div className="flex items-center justify-between">
@@ -2014,7 +2014,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
 
                     {/* CTA */}
                     <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
-                      <h3 className="font-[family-name:var(--font-playfair)] text-2xl text-slate-900 mb-2">
+                      <h3 className="font-[family-name:var(--font-display)] text-2xl text-slate-900 mb-2">
                         {tripType === "mice" ? "Ready to submit?" : "Ready to go?"}
                       </h3>
                       <p className="text-sm text-slate-500 mb-6 max-w-md mx-auto">
@@ -2025,7 +2025,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <button
                         onClick={() => setQuoteRequested(true)}
                         disabled={tripType === "mice" ? !miceEventType || !datesValid : !guestsValid || !datesValid || selectedExcursionIds.length > EXCURSION_CAP}
-                        className="bg-[#ff9d00] text-white px-10 py-4 rounded-xl text-base font-bold hover:bg-[#e68d00] transition-colors shadow-lg shadow-[#ff9d00]/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#ff9d00]"
+                        className="bg-primary text-on-primary px-10 py-4 rounded-xl text-base font-bold hover:brightness-110 transition-colors shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed pressable"
                       >
                         {tripType === "mice" ? "Submit Event Inquiry" : "Request My Quote"}
                       </button>
@@ -2044,18 +2044,18 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
       {/* Chat Widget */}
       {chatOpen && (
         <div className="fixed bottom-6 right-6 w-[380px] z-50 flex flex-col bg-white rounded-2xl shadow-2xl shadow-black/15 border border-slate-200 overflow-hidden">
-          <div className="bg-[#0a0a0a] px-5 py-4 flex items-center justify-between">
+          <div className="bg-background px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-white font-bold text-xs">{specialist.initials}</div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-[#0a0a0a] rounded-full" />
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white font-bold text-xs">{specialist.initials}</div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-background rounded-full" />
               </div>
               <div>
                 <p className="text-white text-sm font-semibold">{specialist.name.split(" ")[0]}</p>
                 <p className="text-white/50 text-xs">{specialist.title}</p>
               </div>
             </div>
-            <button onClick={() => setChatOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all">
+            <button onClick={() => setChatOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -2083,7 +2083,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
               }
               return (
                 <div key={msg.id ?? i} className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.from === "user" ? "bg-[#ff9d00] text-[#482900] rounded-br-md" : "bg-slate-100 text-slate-700 rounded-bl-md"}`}>
+                  <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${msg.from === "user" ? "bg-primary text-on-primary rounded-br-md" : "bg-slate-100 text-slate-700 rounded-bl-md"}`}>
                     {msg.text}
                   </div>
                 </div>
@@ -2111,9 +2111,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all"
+                className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow"
               />
-              <button type="submit" className="w-10 h-10 rounded-xl bg-[#ff9d00] flex items-center justify-center text-white hover:bg-[#e68d00] transition-all flex-shrink-0">
+              <button type="submit" className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary hover:brightness-110 transition-colors flex-shrink-0 pressable">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                 </svg>
@@ -2127,7 +2127,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#ff9d00] text-white shadow-lg shadow-[#ff9d00]/30 flex items-center justify-center hover:bg-[#e68d00] hover:scale-105 transition-all"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:brightness-110 hover:scale-105 transition-[transform,filter] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] pressable"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />

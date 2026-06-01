@@ -104,7 +104,7 @@ export function SessionListClient({
                 <Link
                   key={s.id}
                   href={`/admin/sessions/${s.id}`}
-                  className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+                  className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">

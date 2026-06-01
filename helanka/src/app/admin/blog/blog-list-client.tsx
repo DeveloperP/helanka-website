@@ -58,14 +58,14 @@ export function BlogListClient({ posts }: { posts: BlogPostListItem[] }) {
           placeholder="Search posts..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 max-w-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all"
+          className="flex-1 max-w-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow"
         />
         <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
           {(["all", "published", "draft"] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`text-xs font-medium px-3 py-2 rounded-lg transition-all capitalize ${
+              className={`text-xs font-medium px-3 py-2 rounded-lg transition-[background-color,color,box-shadow] capitalize ${
                 filter === f ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
               }`}
             >
@@ -84,11 +84,11 @@ export function BlogListClient({ posts }: { posts: BlogPostListItem[] }) {
           {filtered.map((post) => (
             <div
               key={post.id}
-              className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+              className="bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
             >
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <Link href={`/admin/blog/${post.id}`} className="hover:text-[#ff9d00] transition-colors">
+                  <Link href={`/admin/blog/${post.id}`} className="hover:text-primary transition-colors">
                     <p className="text-sm font-semibold text-slate-900 truncate">{post.title}</p>
                   </Link>
                   <div className="flex items-center gap-2 mt-1">

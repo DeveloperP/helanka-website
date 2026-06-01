@@ -62,12 +62,77 @@ export const submitQuoteRequestSchema = z.object({
 
 export type SubmitQuoteRequestInput = z.infer<typeof submitQuoteRequestSchema>;
 
+export const accommodationDetailSchema = z.object({
+  hotelName: z.string().min(1),
+  starRating: z.string().nullable().optional(),
+  roomType: z.string().nullable().optional(),
+  mealPlan: z.string().nullable().optional(),
+  sglRooms: z.number().int().nonnegative().default(0),
+  sglRate: z.number().nonnegative().default(0),
+  dblRooms: z.number().int().nonnegative().default(0),
+  dblRate: z.number().nonnegative().default(0),
+  twnRooms: z.number().int().nonnegative().default(0),
+  twnRate: z.number().nonnegative().default(0),
+  tplRooms: z.number().int().nonnegative().default(0),
+  tplRate: z.number().nonnegative().default(0),
+  extraAdultQty: z.number().int().nonnegative().default(0),
+  extraAdultRate: z.number().nonnegative().default(0),
+  childSharingQty: z.number().int().nonnegative().default(0),
+  childSharingRate: z.number().nonnegative().default(0),
+  childWithBedQty: z.number().int().nonnegative().default(0),
+  childWithBedRate: z.number().nonnegative().default(0),
+  marginType: z.string().default("fixed"),
+  marginValue: z.number().nonnegative().default(0),
+  rateCode: z.string().nullable().optional(),
+  remarks: z.string().nullable().optional(),
+});
+
+export const transportDetailSchema = z.object({
+  vehicleType: z.string().min(1),
+  ratePerKm: z.number().nonnegative().default(0),
+  vehicleUnits: z.number().int().positive().default(1),
+  distanceKm: z.number().nonnegative().default(0),
+  isGroupTransfer: z.boolean().default(false),
+  pickupLocation: z.string().nullable().optional(),
+  dropoffLocation: z.string().nullable().optional(),
+  overridePrice: z.boolean().default(false),
+  driverGuideType: z.string().nullable().optional(),
+  driverRatePerDay: z.number().nonnegative().default(0),
+  driverAccommodation: z.boolean().default(false),
+  driverFee: z.number().nonnegative().default(0),
+  remarks: z.string().nullable().optional(),
+});
+
+export const excursionDetailSchema = z.object({
+  excursionName: z.string().min(1),
+  sequence: z.number().int().nonnegative().default(0),
+  costPerPerson: z.number().nonnegative().default(0),
+  adultCount: z.number().int().nonnegative().default(0),
+  childRate: z.number().nonnegative().default(0),
+  childCount: z.number().int().nonnegative().default(0),
+  overridePrice: z.boolean().default(false),
+  remarks: z.string().nullable().optional(),
+});
+
+export const otherChargeDetailSchema = z.object({
+  costItem: z.string().min(1),
+  description: z.string().nullable().optional(),
+  costPerUnit: z.number().nonnegative().default(0),
+  units: z.number().int().nonnegative().default(0),
+  overridePrice: z.boolean().default(false),
+  remarks: z.string().nullable().optional(),
+});
+
 export const priceLineItemSchema = z.object({
   bookingItemId: z.string(),
   estimateMin: z.number().nonnegative(),
   estimateMax: z.number().nonnegative(),
   actualPrice: z.number().nonnegative().optional(),
   notes: z.string().optional(),
+  accommodationDetail: accommodationDetailSchema.optional(),
+  transportDetail: transportDetailSchema.optional(),
+  excursionDetail: excursionDetailSchema.optional(),
+  otherChargeDetail: otherChargeDetailSchema.optional(),
 });
 
 export type PriceLineItemInput = z.infer<typeof priceLineItemSchema>;

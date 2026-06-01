@@ -24,7 +24,7 @@ export default function RegisterPage() {
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-14 h-14 bg-white rounded-2xl shadow-md flex items-center justify-center">
-              <span className="font-[family-name:var(--font-playfair)] text-2xl font-black text-[#0a0a0a]">
+              <span className="font-[family-name:var(--font-display)] text-2xl font-black text-slate-950">
                 H
               </span>
             </div>

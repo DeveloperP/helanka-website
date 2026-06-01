@@ -85,7 +85,7 @@ export function CustomerDetailClient({
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-all ${
+            className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-[background-color,color,box-shadow] ${
               activeTab === tab
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -162,7 +162,7 @@ function SessionsTab({ sessions }: { sessions: Session[] }) {
         <Link
           key={s.id}
           href={`/admin/sessions/${s.id}`}
-          className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+          className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -197,7 +197,7 @@ function BookingsTab({ bookings }: { bookings: Booking[] }) {
         <Link
           key={b.id}
           href={`/admin/bookings/${b.id}`}
-          className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+          className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
         >
           <div className="flex items-center justify-between">
             <div>

@@ -50,7 +50,7 @@ export function AccountClient({ user, trips }: { user: UserData; trips: TripSumm
     <div className="min-h-screen bg-slate-50 pt-28 pb-16">
       <div className="max-w-3xl mx-auto px-6">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-white text-xl font-bold">
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-on-primary text-xl font-bold">
             {getInitials(user.name, user.email)}
           </div>
           <div>
@@ -139,7 +139,7 @@ function TripsTab({ trips }: { trips: TripSummary[] }) {
         <p className="text-slate-400">No trips yet.</p>
         <Link
           href="/build"
-          className="inline-block mt-3 text-sm font-semibold text-[#ff9d00] hover:text-[#e68d00] transition-colors"
+          className="inline-block mt-3 text-sm font-semibold text-primary hover:text-primary-light transition-colors"
         >
           Start planning your first trip →
         </Link>

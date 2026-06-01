@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const linkColumns = [
   {
@@ -28,12 +31,14 @@ const linkColumns = [
 ];
 
 export default function Footer() {
+  const ref = useScrollReveal<HTMLElement>();
+
   return (
-    <footer className="bg-[#ff9d00] text-[#0a0a0a] overflow-hidden">
-      <div className="relative w-full px-5 md:px-12 pt-16 pb-6">
+    <footer ref={ref} className="reveal bg-primary text-on-primary overflow-hidden">
+      <div className="relative w-full px-6 md:px-12 pt-16 pb-6">
         <div className="flex items-end md:items-center justify-between gap-8">
           <h2
-            className="font-[family-name:var(--font-playfair)] font-black text-[#0a0a0a] text-[13.5vw] leading-[0.85] tracking-tight select-none whitespace-nowrap shrink-0"
+            className="font-[family-name:var(--font-display)] text-[13.5vw] leading-[0.85] tracking-tight select-none whitespace-nowrap shrink-0"
           >
             Helanka
           </h2>
@@ -45,7 +50,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-[#0a0a0a]/60 hover:text-[#0a0a0a] transition-colors whitespace-nowrap"
+                      className="text-sm text-on-primary/50 hover:text-on-primary transition-colors duration-200 whitespace-nowrap"
                     >
                       {link.label}
                     </Link>
@@ -56,22 +61,36 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex justify-end items-center gap-0 pt-4">
-          <Link href="https://instagram.com/helankavacations" className="text-sm text-[#0a0a0a]/60 hover:text-[#0a0a0a] transition-colors px-4">
-            Instagram
-          </Link>
-          <span className="w-px h-4 bg-[#0a0a0a]/25" />
-          <Link href="https://facebook.com/helankavacations" className="text-sm text-[#0a0a0a]/60 hover:text-[#0a0a0a] transition-colors px-4">
-            Facebook
-          </Link>
-          <span className="w-px h-4 bg-[#0a0a0a]/25" />
-          <Link href="https://youtube.com/@helankavacations" className="text-sm text-[#0a0a0a]/60 hover:text-[#0a0a0a] transition-colors px-4">
-            YouTube
-          </Link>
-          <span className="w-px h-4 bg-[#0a0a0a]/25" />
-          <Link href="https://tripadvisor.com" className="text-sm text-[#0a0a0a]/60 hover:text-[#0a0a0a] transition-colors pl-4">
-            TripAdvisor
-          </Link>
+        {/* Mobile links */}
+        <div className="md:hidden grid grid-cols-2 gap-x-8 gap-y-1.5 mt-8">
+          {linkColumns.flatMap((col) => col.links).map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-sm text-on-primary/50 hover:text-on-primary transition-colors duration-200 py-1"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="flex justify-end items-center gap-0 pt-6 mt-6 border-t border-on-primary/15">
+          {[
+            { label: "Instagram", href: "https://instagram.com/helankavacations" },
+            { label: "Facebook", href: "https://facebook.com/helankavacations" },
+            { label: "YouTube", href: "https://youtube.com/@helankavacations" },
+            { label: "TripAdvisor", href: "https://tripadvisor.com" },
+          ].map((social, i) => (
+            <span key={social.label} className="contents">
+              {i > 0 && <span className="w-px h-4 bg-on-primary/20" />}
+              <Link
+                href={social.href}
+                className="text-sm text-on-primary/50 hover:text-on-primary transition-colors duration-200 px-4"
+              >
+                {social.label}
+              </Link>
+            </span>
+          ))}
         </div>
       </div>
     </footer>

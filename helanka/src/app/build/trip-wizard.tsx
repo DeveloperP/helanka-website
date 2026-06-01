@@ -230,7 +230,7 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
   })();
 
   return (
-    <div className="min-h-screen bg-[#020617] pt-32 pb-20 font-[family-name:var(--font-manrope)]">
+    <div className="min-h-screen bg-background pt-32 pb-20 font-[family-name:var(--font-body)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <ProgressBar currentStep={step} />
 
@@ -353,9 +353,9 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 transition-colors ${
                   isCompleted
-                    ? "bg-[#ff9d00] text-[#482900]"
+                    ? "bg-primary text-on-primary"
                     : isCurrent
-                    ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
+                    ? "bg-primary/20 border border-primary text-primary"
                     : "bg-white/10 text-white/40"
                 }`}
               >
@@ -370,7 +370,7 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
               </span>
             </div>
             {i < STEP_LABELS.length - 1 && (
-              <div className={`flex-1 h-px mx-1 transition-colors ${isCompleted ? "bg-[#ff9d00]/40" : "bg-white/10"}`} />
+              <div className={`flex-1 h-px mx-1 transition-colors ${isCompleted ? "bg-primary/40" : "bg-white/10"}`} />
             )}
           </div>
         );
@@ -382,7 +382,7 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
 function StepHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="mb-8">
-      <h1 className="font-[family-name:var(--font-playfair)] text-3xl sm:text-4xl text-white">{title}</h1>
+      <h1 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl text-white">{title}</h1>
       {subtitle && <p className="mt-2 text-white/60 text-base">{subtitle}</p>}
     </div>
   );
@@ -402,7 +402,7 @@ function StepNav({ onBack, onContinue, continueLabel = "Continue", continueDisab
       <button
         onClick={onContinue}
         disabled={continueDisabled}
-        className="bg-[#ff9d00] text-[#482900] px-7 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#ffb340] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        className="bg-primary text-on-primary px-7 py-2.5 rounded-lg text-sm font-semibold hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {continueLabel}
       </button>
@@ -425,12 +425,12 @@ function Step1TripType({ onSelect }: { onSelect: (type: TripType) => void }) {
           <button
             key={type}
             onClick={() => onSelect(type)}
-            className="liquid-glass p-7 rounded-2xl text-left group hover:border-[#ff9d00] border border-white/10 transition-all hover:ring-1 hover:ring-[#ff9d00]/20"
+            className="surface-card p-7 rounded-2xl text-left group hover:border-primary border border-white/10 transition-all hover:ring-1 hover:ring-primary/20"
           >
-            <div className="text-[#ff9d00] mb-4 group-hover:scale-110 transition-transform">
+            <div className="text-primary mb-4 group-hover:scale-110 transition-transform">
               <SvgIcon d={icon} />
             </div>
-            <h3 className="font-[family-name:var(--font-playfair)] text-lg text-white mb-1">{title}</h3>
+            <h3 className="font-[family-name:var(--font-display)] text-lg text-white mb-1">{title}</h3>
             <p className="text-white/60 text-sm leading-relaxed">{description}</p>
           </button>
         ))}
@@ -458,9 +458,9 @@ function Step2Packages({
             <button
               key={pkg.slug}
               onClick={() => onSelect(pkg.slug)}
-              className={`liquid-glass rounded-2xl overflow-hidden text-left transition-all ${
+              className={`surface-card rounded-2xl overflow-hidden text-left transition-all ${
                 isSelected
-                  ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20 border"
+                  ? "border-primary ring-1 ring-primary/20 border"
                   : "border border-white/10 hover:border-white/25"
               }`}
             >
@@ -469,11 +469,11 @@ function Step2Packages({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
                   <span className="text-white font-semibold text-sm">{pkg.durationDays} days</span>
-                  <span className="text-[#ff9d00] font-semibold text-sm">from ${pkg.price.toLocaleString()}</span>
+                  <span className="text-primary font-semibold text-sm">from ${pkg.price.toLocaleString()}</span>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-[family-name:var(--font-playfair)] text-white text-base mb-1">{pkg.name}</h3>
+                <h3 className="font-[family-name:var(--font-display)] text-white text-base mb-1">{pkg.name}</h3>
                 <p className="text-white/60 text-xs leading-relaxed line-clamp-2 mb-3">{pkg.description}</p>
                 <div className="flex flex-wrap gap-1">
                   {pkg.excursions.slice(0, 3).map((exc) => (
@@ -523,11 +523,11 @@ function Step2Destinations({
               key={dest.slug}
               onClick={() => !isDisabled && onToggle(dest.slug)}
               disabled={isDisabled}
-              className={`liquid-glass rounded-2xl overflow-hidden text-left transition-all ${
+              className={`surface-card rounded-2xl overflow-hidden text-left transition-all ${
                 isDisabled ? "opacity-40 cursor-not-allowed" : ""
               } ${
                 isSelected
-                  ? "border-[#ff9d00] ring-1 ring-[#ff9d00]/20 border"
+                  ? "border-primary ring-1 ring-primary/20 border"
                   : "border border-white/10 hover:border-white/25"
               }`}
             >
@@ -535,8 +535,8 @@ function Step2Destinations({
                 <img src={dest.image} alt={dest.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 {isSelected && (
-                  <div className="absolute top-2 right-2 bg-[#ff9d00] rounded-full w-5 h-5 flex items-center justify-center">
-                    <CheckIcon className="w-3 h-3 text-[#482900]" />
+                  <div className="absolute top-2 right-2 bg-primary rounded-full w-5 h-5 flex items-center justify-center">
+                    <CheckIcon className="w-3 h-3 text-on-primary" />
                   </div>
                 )}
               </div>
@@ -582,8 +582,8 @@ function Step2Mice({
                 onClick={() => onEventType(type)}
                 className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   eventType === type
-                    ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
-                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                    ? "bg-primary/20 border border-primary text-primary"
+                    : "surface-card border border-white/10 text-white/70 hover:border-white/25"
                 }`}
               >
                 {type}
@@ -646,13 +646,13 @@ function ExcursionSection({
                 isDisabled ? "opacity-40 cursor-not-allowed" : ""
               } ${
                 isSelected
-                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/10"
-                  : "liquid-glass border border-white/10 hover:border-white/25"
+                  ? "bg-primary/10 border border-primary ring-1 ring-primary/10"
+                  : "surface-card border border-white/10 hover:border-white/25"
               }`}
             >
               <div className="flex items-start gap-2">
-                <div className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border flex items-center justify-center ${isSelected ? "bg-[#ff9d00] border-[#ff9d00]" : "border-white/30"}`}>
-                  {isSelected && <CheckIcon className="w-2.5 h-2.5 text-[#482900]" />}
+                <div className={`mt-0.5 w-4 h-4 rounded flex-shrink-0 border flex items-center justify-center ${isSelected ? "bg-primary border-primary" : "border-white/30"}`}>
+                  {isSelected && <CheckIcon className="w-2.5 h-2.5 text-on-primary" />}
                 </div>
                 <div className="min-w-0">
                   <p className="text-white text-sm font-medium leading-tight">{exc.name}</p>
@@ -699,15 +699,15 @@ function TransportAndDining({
               onClick={() => onTransport(tier)}
               className={`rounded-xl p-4 text-left transition-all ${
                 transport === tier
-                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/10"
-                  : "liquid-glass border border-white/10 hover:border-white/25"
+                  ? "bg-primary/10 border border-primary ring-1 ring-primary/10"
+                  : "surface-card border border-white/10 hover:border-white/25"
               }`}
             >
               <p className="text-white text-sm font-semibold">{tier === "standard" ? "Standard" : "Super Luxury"}</p>
               <p className="text-white/50 text-xs mt-1">
                 {tier === "standard" ? "Toyota KDH Van — A/C, water, charging" : "Mercedes V-Class — Wi-Fi, leather, fridge"}
               </p>
-              {tier === "super-luxury" && <p className="text-[#ff9d00] text-xs mt-1">+$400 per trip</p>}
+              {tier === "super-luxury" && <p className="text-primary text-xs mt-1">+$400 per trip</p>}
             </button>
           ))}
         </div>
@@ -722,13 +722,13 @@ function TransportAndDining({
               onClick={() => onAccommodation(tier.id)}
               className={`rounded-xl p-4 text-left transition-all ${
                 accommodation === tier.id
-                  ? "bg-[#ff9d00]/10 border border-[#ff9d00] ring-1 ring-[#ff9d00]/20"
-                  : "liquid-glass border border-white/10 hover:border-white/25"
+                  ? "bg-primary/10 border border-primary ring-1 ring-primary/20"
+                  : "surface-card border border-white/10 hover:border-white/25"
               }`}
             >
               <p className="text-white text-sm font-semibold">{tier.name}</p>
               <p className="text-white/50 text-xs mt-1 leading-relaxed">{tier.description}</p>
-              <p className={`text-xs mt-2 font-medium ${tier.priceModifier === 0 ? "text-white/40" : "text-[#ff9d00]"}`}>
+              <p className={`text-xs mt-2 font-medium ${tier.priceModifier === 0 ? "text-white/40" : "text-primary"}`}>
                 {tier.priceModifier === 0 ? "Included" : `+$${tier.priceModifier}/night`}
               </p>
             </button>
@@ -742,10 +742,10 @@ function TransportAndDining({
         <select
           value={guideLanguage}
           onChange={(e) => onGuideLanguage(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-[#e5e2e1] focus:outline-none focus:border-[#ff9d00]/50"
+          className="w-full bg-white/5 border border-white/10 rounded-lg py-4 px-4 text-on-surface focus:outline-none focus:border-primary/50"
         >
           {GUIDE_LANGUAGES.map((lang) => (
-            <option key={lang.id} value={lang.id} className="bg-[#020617] text-[#e5e2e1]">
+            <option key={lang.id} value={lang.id} className="bg-background text-on-surface">
               {lang.label}
             </option>
           ))}
@@ -761,8 +761,8 @@ function TransportAndDining({
               onClick={() => onMealPlan(plan.id)}
               className={`rounded-xl p-3 text-left transition-all ${
                 mealPlan === plan.id
-                  ? "bg-[#ff9d00]/10 border border-[#ff9d00]"
-                  : "liquid-glass border border-white/10 hover:border-white/25"
+                  ? "bg-primary/10 border border-primary"
+                  : "surface-card border border-white/10 hover:border-white/25"
               }`}
             >
               <p className="text-white text-sm font-medium">{plan.label}</p>
@@ -781,7 +781,7 @@ function TransportAndDining({
               onClick={() => onToggleAllergy(allergy)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 allergies.includes(allergy)
-                  ? "bg-[#ff9d00]/20 border border-[#ff9d00] text-[#ff9d00]"
+                  ? "bg-primary/20 border border-primary text-primary"
                   : "bg-white/10 border border-white/20 text-white/60 hover:border-white/35"
               }`}
             >
@@ -794,7 +794,7 @@ function TransportAndDining({
           onChange={(e) => onDietaryNotes(e.target.value)}
           placeholder="Any other dietary notes..."
           rows={2}
-          className="mt-3 w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 resize-none"
+          className="mt-3 w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-primary/50 resize-none"
         />
       </div>
     </div>
@@ -908,8 +908,8 @@ function Step3Mice({
                 onClick={() => onToggleVenue(venue)}
                 className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
                   venuePrefs.includes(venue)
-                    ? "bg-[#ff9d00]/10 border border-[#ff9d00] text-[#ff9d00]"
-                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                    ? "bg-primary/10 border border-primary text-primary"
+                    : "surface-card border border-white/10 text-white/70 hover:border-white/25"
                 }`}
               >
                 {venue}
@@ -927,8 +927,8 @@ function Step3Mice({
                 onClick={() => onBudgetRange(range)}
                 className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
                   budgetRange === range
-                    ? "bg-[#ff9d00]/10 border border-[#ff9d00] text-[#ff9d00]"
-                    : "liquid-glass border border-white/10 text-white/70 hover:border-white/25"
+                    ? "bg-primary/10 border border-primary text-primary"
+                    : "surface-card border border-white/10 text-white/70 hover:border-white/25"
                 }`}
               >
                 {range}
@@ -944,7 +944,7 @@ function Step3Mice({
             onChange={(e) => onRequirements(e.target.value)}
             placeholder="AV equipment, accessibility needs, themed décor, catering preferences..."
             rows={4}
-            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-[#ff9d00]/50 resize-none"
+            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-primary/50 resize-none"
           />
         </div>
       </div>
@@ -990,9 +990,9 @@ function Step4Review({
     <div>
       <StepHeading title="Review your trip" subtitle="Everything looks right? Sign in to receive your quote." />
 
-      <div className="liquid-glass border border-white/10 rounded-2xl p-6 space-y-5">
+      <div className="surface-card border border-white/10 rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-3">
-          <span className="bg-[#ff9d00]/20 text-[#ff9d00] text-xs font-semibold px-3 py-1 rounded-full">
+          <span className="bg-primary/20 text-primary text-xs font-semibold px-3 py-1 rounded-full">
             {tripTypeBadge[state.tripType ?? "package"]}
           </span>
         </div>
@@ -1025,7 +1025,7 @@ function Step4Review({
               <span className="text-white">
                 {accommodationTier?.name ?? state.accommodation}
                 {accommodationTier && accommodationTier.priceModifier > 0 && (
-                  <span className="text-[#ff9d00] ml-2 text-xs">+${accommodationTier.priceModifier}/night</span>
+                  <span className="text-primary ml-2 text-xs">+${accommodationTier.priceModifier}/night</span>
                 )}
               </span>
             </ReviewRow>
@@ -1075,7 +1075,7 @@ function Step4Review({
         <div className="pt-4 border-t border-white/10 flex items-center justify-between">
           <span className="text-white/60 text-sm">Estimated Price</span>
           {estimatedPrice !== null ? (
-            <span className="font-[family-name:var(--font-playfair)] text-2xl text-[#ff9d00]">
+            <span className="font-[family-name:var(--font-display)] text-2xl text-primary">
               ${estimatedPrice.toLocaleString()}
             </span>
           ) : (
@@ -1090,7 +1090,7 @@ function Step4Review({
         </button>
         <button
           onClick={onConfirm}
-          className="bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-sm font-bold hover:bg-[#ffb340] transition-colors"
+          className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-bold hover:brightness-110 transition-colors"
         >
           Get My Quote — Sign In to Continue
         </button>

@@ -35,19 +35,18 @@ export default async function PackageDetailPage({ params }: Props) {
 
   return (
     <>
-      {/* ── Hero ── */}
+      {/* Hero */}
       <section className="relative h-screen min-h-[700px] flex flex-col justify-between overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${pkg.image}')` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
-        {/* Top: back link + title */}
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pt-32">
           <Link
             href="/packages"
-            className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors mb-6"
+            className="inline-flex items-center gap-2 text-sm text-on-surface-muted hover:text-on-surface transition-colors mb-6"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -55,30 +54,29 @@ export default async function PackageDetailPage({ params }: Props) {
             All Packages
           </Link>
 
-          <h1 className="font-[family-name:var(--font-playfair)] text-6xl md:text-8xl lg:text-9xl text-white uppercase tracking-tight">
+          <h1 className="font-[family-name:var(--font-display)] text-6xl md:text-8xl lg:text-9xl text-on-surface uppercase tracking-tight">
             {pkg.name}
           </h1>
         </div>
 
-        {/* Bottom: stat cards */}
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
           <div className="flex flex-wrap gap-4">
             {stats.map((s) => (
               <div
                 key={s.label}
-                className="liquid-glass rounded-xl px-5 py-4 min-w-[140px]"
+                className="glass-panel rounded-xl px-5 py-4 min-w-[140px]"
               >
-                <span className="block text-white font-[family-name:var(--font-playfair)] text-lg">
+                <span className="block text-on-surface font-[family-name:var(--font-display)] text-lg">
                   {s.value}
                 </span>
-                <span className="text-[11px] text-[#dac2ad] uppercase tracking-widest">
+                <span className="text-[11px] text-on-surface-muted uppercase tracking-widest">
                   {s.label}
                 </span>
               </div>
             ))}
             <Link
               href="/build"
-              className="bg-[#ff9d00] text-[#482900] rounded-xl px-8 py-4 flex items-center text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
+              className="pressable bg-primary text-on-primary rounded-xl px-8 py-4 flex items-center text-xs font-bold tracking-[0.1em] uppercase hover:brightness-110 transition-all"
             >
               Book Now
             </Link>
@@ -86,49 +84,46 @@ export default async function PackageDetailPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── About the Tour ── */}
+      {/* About the Tour */}
       <section className="py-24 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="flex items-center gap-6 mb-16">
-          <div className="h-px flex-1 bg-white/10" />
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white uppercase tracking-wide shrink-0">
+          <div className="h-px flex-1 bg-outline" />
+          <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface uppercase tracking-wide shrink-0">
             About the Tour
           </h2>
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-outline" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Left: description */}
           <div>
-            <p className="text-lg text-[#dac2ad] leading-relaxed mb-8">
+            <p className="text-lg text-on-surface-muted leading-relaxed mb-8">
               {pkg.description}
             </p>
-            <p className="text-base text-white/50 leading-relaxed">
-              No need to worry about routes, schedules, or finding places — everything is already
+            <p className="text-base text-on-surface-subtle leading-relaxed">
+              No need to worry about routes, schedules, or finding places: everything is already
               organized. We&apos;ll show you where to go, what to see, and where to eat, so you can
-              simply <span className="text-white underline underline-offset-4">enjoy the journey</span>.
+              simply <span className="text-on-surface underline underline-offset-4">enjoy the journey</span>.
             </p>
           </div>
 
-          {/* Right: vertical timeline */}
           <div className="relative pl-8">
-            <div className="absolute left-3 top-0 bottom-0 w-px bg-white/10" />
+            <div className="absolute left-3 top-0 bottom-0 w-px bg-outline" />
             <div className="space-y-10">
               {pkg.itinerary.map((day, i) => (
                 <div key={day.day} className="relative flex gap-6">
-                  <div className="absolute -left-8 top-1 w-6 h-6 rounded-full border-2 border-[#ff9d00]/50 bg-[#020617] flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-[#ff9d00]" />
+                  <div className="absolute -left-8 top-1 w-6 h-6 rounded-full border-2 border-primary/50 bg-background flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
                   </div>
                   <div className="flex-1">
-                    <span className="text-[11px] text-[#ff9d00] uppercase tracking-widest font-semibold">
+                    <span className="text-[11px] text-primary uppercase tracking-widest font-semibold">
                       Day {day.day}
                     </span>
-                    <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mt-1 mb-2">
+                    <h3 className="font-[family-name:var(--font-display)] text-xl text-on-surface mt-1 mb-2">
                       {day.title}
                     </h3>
-                    <p className="text-sm text-[#dac2ad] leading-relaxed">
+                    <p className="text-sm text-on-surface-muted leading-relaxed">
                       {day.description}
                     </p>
-                    {/* Thumbnail placeholder row */}
                     {i < 3 && (
                       <div className="flex gap-2 mt-4">
                         <div
@@ -145,14 +140,14 @@ export default async function PackageDetailPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Highlights ── */}
+      {/* Highlights */}
       <section className="py-24 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="flex items-center gap-6 mb-16">
-          <div className="h-px flex-1 bg-white/10" />
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white uppercase tracking-wide shrink-0">
+          <div className="h-px flex-1 bg-outline" />
+          <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface uppercase tracking-wide shrink-0">
             What&apos;s Included
           </h2>
-          <div className="h-px flex-1 bg-white/10" />
+          <div className="h-px flex-1 bg-outline" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -206,13 +201,13 @@ export default async function PackageDetailPage({ params }: Props) {
           ].map((item) => (
             <div
               key={item.title}
-              className="liquid-glass rounded-2xl p-6 hover:border-white/20 transition-all"
+              className="surface-card rounded-2xl p-6 hover:border-outline-hover transition-all"
             >
-              <div className="text-[#ff9d00] mb-4">{item.icon}</div>
-              <h3 className="font-[family-name:var(--font-manrope)] text-base font-bold text-white mb-2">
+              <div className="text-primary mb-4">{item.icon}</div>
+              <h3 className="text-base font-bold text-on-surface mb-2">
                 {item.title}
               </h3>
-              <p className="text-sm text-[#dac2ad] leading-relaxed">
+              <p className="text-sm text-on-surface-muted leading-relaxed">
                 {item.desc}
               </p>
             </div>
@@ -220,25 +215,25 @@ export default async function PackageDetailPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── CTA / Inquiry ── */}
+      {/* CTA */}
       <section id="book" className="relative min-h-[500px] flex items-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${pkg.image}')` }}
         />
-        <div className="absolute inset-0 bg-[#020617]/60" />
+        <div className="absolute inset-0 bg-background/60" />
 
         <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto py-20">
           <div className="max-w-lg">
-            <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white mb-4">
+            <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface mb-4">
               Ready to Experience This?
             </h2>
-            <p className="text-[#dac2ad] mb-8 leading-relaxed">
+            <p className="text-on-surface-muted mb-8 leading-relaxed">
               Sign in to build your custom itinerary with this package as a starting point. Our travel specialists will refine every detail.
             </p>
             <Link
               href="/build"
-              className="inline-block bg-[#ff9d00] text-[#482900] px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:bg-[#e68d00] transition-all hover:scale-105 active:scale-95"
+              className="pressable inline-block bg-primary text-on-primary px-12 py-5 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:brightness-110 transition-all"
             >
               Book Now
             </Link>

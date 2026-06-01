@@ -10,6 +10,60 @@ import type { SendQuoteInput, QuoteResponseInput } from "@/lib/validations";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+export interface AccommodationDetailData {
+  hotelName: string;
+  starRating: string | null;
+  roomType: string | null;
+  mealPlan: string | null;
+  sglRooms: number; sglRate: number;
+  dblRooms: number; dblRate: number;
+  twnRooms: number; twnRate: number;
+  tplRooms: number; tplRate: number;
+  extraAdultQty: number; extraAdultRate: number;
+  childSharingQty: number; childSharingRate: number;
+  childWithBedQty: number; childWithBedRate: number;
+  marginType: string;
+  marginValue: number;
+  rateCode: string | null;
+  remarks: string | null;
+}
+
+export interface TransportDetailData {
+  vehicleType: string;
+  ratePerKm: number;
+  vehicleUnits: number;
+  distanceKm: number;
+  isGroupTransfer: boolean;
+  pickupLocation: string | null;
+  dropoffLocation: string | null;
+  overridePrice: boolean;
+  driverGuideType: string | null;
+  driverRatePerDay: number;
+  driverAccommodation: boolean;
+  driverFee: number;
+  remarks: string | null;
+}
+
+export interface ExcursionDetailData {
+  excursionName: string;
+  sequence: number;
+  costPerPerson: number;
+  adultCount: number;
+  childRate: number;
+  childCount: number;
+  overridePrice: boolean;
+  remarks: string | null;
+}
+
+export interface OtherChargeDetailData {
+  costItem: string;
+  description: string | null;
+  costPerUnit: number;
+  units: number;
+  overridePrice: boolean;
+  remarks: string | null;
+}
+
 export interface QuotingItemData {
   id: string;
   type: string;
@@ -26,6 +80,10 @@ export interface QuotingItemData {
   rateCardMin: number | null;
   rateCardMax: number | null;
   rateCardSeason: string | null;
+  accommodationDetail: AccommodationDetailData | null;
+  transportDetail: TransportDetailData | null;
+  excursionDetail: ExcursionDetailData | null;
+  otherChargeDetail: OtherChargeDetailData | null;
 }
 
 export interface TransportBreakdown {
@@ -131,7 +189,13 @@ export async function getSessionForQuoting(sessionId: string): Promise<QuotingSe
     where: { id: bookingId },
     include: {
       items: {
-        include: { destination: { select: { name: true } } },
+        include: {
+          destination: { select: { name: true } },
+          accommodationDetail: true,
+          transportDetail: true,
+          excursionDetail: true,
+          otherChargeDetail: true,
+        },
         orderBy: { sortOrder: "asc" },
       },
       quotes: {
@@ -176,6 +240,13 @@ export async function getSessionForQuoting(sessionId: string): Promise<QuotingSe
       rateCardMin: match?.minPrice ?? null,
       rateCardMax: match?.maxPrice ?? null,
       rateCardSeason: match?.season ?? null,
+      accommodationDetail: item.accommodationDetail ?? null,
+      transportDetail: item.transportDetail ? {
+        ...item.transportDetail,
+        overridePrice: item.transportDetail.overridePrice,
+      } : null,
+      excursionDetail: item.excursionDetail ?? null,
+      otherChargeDetail: item.otherChargeDetail ?? null,
     };
   });
 
@@ -252,7 +323,17 @@ export async function getSessionForQuoting(sessionId: string): Promise<QuotingSe
 
 export async function priceBookingItems(
   bookingId: string,
-  lineItems: Array<{ bookingItemId: string; estimateMin: number; estimateMax: number; actualPrice?: number; notes?: string }>,
+  lineItems: Array<{
+    bookingItemId: string;
+    estimateMin: number;
+    estimateMax: number;
+    actualPrice?: number;
+    notes?: string;
+    accommodationDetail?: AccommodationDetailData;
+    transportDetail?: TransportDetailData;
+    excursionDetail?: ExcursionDetailData;
+    otherChargeDetail?: OtherChargeDetailData;
+  }>,
 ): Promise<{ success: boolean; error?: string }> {
   await requireAdminOrSpecialist();
   if (!db) return { success: false, error: "Database not available" };
@@ -268,6 +349,7 @@ export async function priceBookingItems(
           notes: item.notes ?? null,
         },
       });
+      await upsertItemDetails(item.bookingItemId, item);
     }
 
     await db.booking.update({
@@ -281,6 +363,53 @@ export async function priceBookingItems(
   }
 }
 
+// ─── Helper: upsert detail records ──────────────────────────────────────────
+
+async function upsertItemDetails(
+  bookingItemId: string,
+  item: {
+    accommodationDetail?: Partial<AccommodationDetailData> & { hotelName: string };
+    transportDetail?: Partial<TransportDetailData> & { vehicleType: string };
+    excursionDetail?: Partial<ExcursionDetailData> & { excursionName: string };
+    otherChargeDetail?: Partial<OtherChargeDetailData> & { costItem: string };
+  },
+) {
+  if (!db) return;
+
+  if (item.accommodationDetail) {
+    const d = item.accommodationDetail;
+    await db.accommodationDetail.upsert({
+      where: { bookingItemId },
+      create: { bookingItemId, ...d },
+      update: d,
+    });
+  }
+  if (item.transportDetail) {
+    const d = item.transportDetail;
+    await db.transportDetail.upsert({
+      where: { bookingItemId },
+      create: { bookingItemId, ...d },
+      update: d,
+    });
+  }
+  if (item.excursionDetail) {
+    const d = item.excursionDetail;
+    await db.excursionDetail.upsert({
+      where: { bookingItemId },
+      create: { bookingItemId, ...d },
+      update: d,
+    });
+  }
+  if (item.otherChargeDetail) {
+    const d = item.otherChargeDetail;
+    await db.otherChargeDetail.upsert({
+      where: { bookingItemId },
+      create: { bookingItemId, ...d },
+      update: d,
+    });
+  }
+}
+
 // ─── Admin: Send quote ──────────────────────────────────────────────────────
 
 export async function sendQuote(input: SendQuoteInput): Promise<{ success: boolean; quoteId?: string; error?: string }> {
@@ -291,9 +420,14 @@ export async function sendQuote(input: SendQuoteInput): Promise<{ success: boole
   if (!parsed.success) return { success: false, error: parsed.error.issues.map((e) => e.message).join(", ") };
 
   const { bookingId, totalPrice, deposit, validUntil, adminNotes, lineItems } = parsed.data;
+  const taxRate = (input as Record<string, unknown>).taxRate as number | undefined;
+  const taxInclusive = (input as Record<string, unknown>).taxInclusive as boolean | undefined;
+  const handlingFeeType = (input as Record<string, unknown>).handlingFeeType as string | undefined;
+  const handlingFeeAmt = (input as Record<string, unknown>).handlingFeeAmt as number | undefined;
+  const discountAmt = (input as Record<string, unknown>).discountAmt as number | undefined;
 
   try {
-    // Update line item prices
+    // Update line item prices and detail records
     for (const item of lineItems) {
       await db.bookingItem.update({
         where: { id: item.bookingItemId },
@@ -304,6 +438,7 @@ export async function sendQuote(input: SendQuoteInput): Promise<{ success: boole
           notes: item.notes ?? null,
         },
       });
+      await upsertItemDetails(item.bookingItemId, item);
     }
 
     // Get next version number
@@ -322,6 +457,11 @@ export async function sendQuote(input: SendQuoteInput): Promise<{ success: boole
         validUntil: new Date(validUntil),
         adminNotes: adminNotes ?? null,
         sentAt: new Date(),
+        taxRate: taxRate ?? 0,
+        taxInclusive: taxInclusive ?? true,
+        handlingFeeType: handlingFeeType ?? null,
+        handlingFeeAmt: handlingFeeAmt ?? 0,
+        discountAmt: discountAmt ?? 0,
       },
     });
 

@@ -198,7 +198,7 @@ export function PricingClient({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 text-sm font-medium transition-[background-color,color,box-shadow] duration-200 ${
               activeTab === tab.id
                 ? "bg-slate-800 text-white rounded-xl shadow-sm"
                 : "text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-xl"

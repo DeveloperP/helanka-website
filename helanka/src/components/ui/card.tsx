@@ -10,7 +10,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-xl border border-slate-200 bg-white shadow-sm",
+        "surface-card rounded-xl",
         className
       )}
       {...props}
@@ -25,7 +25,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("border-b border-slate-200 px-6 py-4", className)}
+      className={cn("border-b border-outline px-6 py-4", className)}
       {...props}
     >
       {children}

@@ -84,7 +84,7 @@ export function ReportsClient({
             <button
               key={p.label}
               onClick={() => applyPreset(p.days)}
-              className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/60 backdrop-blur text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-all"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 bg-white/60 backdrop-blur text-slate-600 hover:bg-slate-800 hover:text-white hover:border-slate-800 transition-colors"
             >
               {p.label}
             </button>
@@ -203,7 +203,7 @@ export function ReportsClient({
                   </div>
                   <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${statusColor(status)}`}
+                      className={`h-full rounded-full transition-[width] ${statusColor(status)}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -291,7 +291,7 @@ export function ReportsClient({
                     </div>
                     <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-blue-400 rounded-full transition-all"
+                        className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-[width]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

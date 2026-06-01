@@ -1,86 +1,97 @@
+"use client";
+
 import Link from "next/link";
-import { packages as allPackages } from "@/lib/packages";
-import { getPackagePriceEstimates } from "@/actions/pricing-actions";
+import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
 
-const FEATURED_SLUGS = [
-  "wildlife-adventure",
-  "hill-country-explorer",
-  "golden-southern-coast",
-  "east-coast-escape",
-];
+interface PackageData {
+  slug: string;
+  name: string;
+  description: string;
+  image: string;
+  durationDays: number;
+  difficulty: string;
+  price: number;
+}
 
-export default async function FeaturedPackages() {
-  const priceEstimates = await getPackagePriceEstimates();
-  const featured = FEATURED_SLUGS
-    .map((slug) => allPackages.find((p) => p.slug === slug))
-    .filter(Boolean) as (typeof allPackages)[number][];
+interface FeaturedPackagesProps {
+  packages: PackageData[];
+  priceEstimates: Record<string, number>;
+}
+
+export default function FeaturedPackages({ packages, priceEstimates }: FeaturedPackagesProps) {
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const gridRef = useStaggerReveal<HTMLDivElement>();
 
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-28 overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/bg-featured-packages.jpg')" }}
       />
-      <div className="absolute inset-0 bg-[#020617]/70" />
-      <div className="relative z-10 px-5 md:px-20 max-w-[1440px] mx-auto">
-      <div className="text-center mb-16">
-        <span className="font-[family-name:var(--font-manrope)] text-xs font-semibold text-[#ff9d00] tracking-[0.2em] uppercase block mb-3">
-          Our Most Popular Trips
-        </span>
-        <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white mb-4">
-          Featured Packages
-        </h2>
-        <p className="text-[#dac2ad] max-w-lg mx-auto">
-          Each trip is designed by someone who knows the island. Flexible dates, experienced guides, and everything included.
-        </p>
-      </div>
+      <div className="absolute inset-0 bg-surface/80" />
+      <div className="relative z-10 px-6 md:px-20 max-w-[1440px] mx-auto">
+        <div ref={headingRef} className="reveal text-center mb-16">
+          <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
+            Curated by Locals
+          </span>
+          <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-white mb-4 tracking-tight">
+            Featured Packages
+          </h2>
+          <p className="text-on-surface-muted max-w-lg mx-auto text-sm leading-relaxed">
+            Each trip is designed by someone who knows the island. Flexible dates, experienced guides, and everything included.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featured.map((pkg) => (
-          <Link
-            key={pkg.slug}
-            href={`/packages/${pkg.slug}`}
-            className="group liquid-glass rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300"
-          >
-            <div className="relative h-56 overflow-hidden">
-              <div
-                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                style={{ backgroundImage: `url('${pkg.image}')` }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent" />
-              <div className="absolute top-4 left-4 flex gap-2">
-                <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
-                  {pkg.durationDays} Days
-                </span>
-                <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
-                  {pkg.difficulty}
-                </span>
-              </div>
-            </div>
-            <div className="p-6">
-              <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-2 group-hover:text-[#ff9d00] transition-colors">
-                {pkg.name}
-              </h3>
-              <p className="text-sm text-[#dac2ad] mb-4 leading-relaxed line-clamp-2">
-                {pkg.description}
-              </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] text-[#dac2ad] uppercase tracking-widest mr-1">
-                    from
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {packages.map((pkg) => (
+            <Link
+              key={pkg.slug}
+              href={`/packages/${pkg.slug}`}
+              data-stagger
+              className="group surface-card rounded-2xl overflow-hidden"
+            >
+              <div className="relative h-52 overflow-hidden">
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                  style={{
+                    backgroundImage: `url('${pkg.image}')`,
+                    transitionTimingFunction: "var(--ease-out)",
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60" />
+                <div className="absolute top-3 left-3 flex gap-1.5">
+                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[10px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
+                    {pkg.durationDays} Days
                   </span>
-                  <span className="font-[family-name:var(--font-playfair)] text-2xl text-[#ff9d00]">
-                    ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
+                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[10px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
+                    {pkg.difficulty}
                   </span>
                 </div>
-                <span className="text-[10px] text-[#dac2ad] uppercase tracking-widest">
-                  per person
-                </span>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+              <div className="p-5">
+                <h3 className="font-[family-name:var(--font-display)] text-lg text-white mb-2 group-hover:text-primary transition-colors duration-200">
+                  {pkg.name}
+                </h3>
+                <p className="text-sm text-on-surface-muted mb-4 leading-relaxed line-clamp-2">
+                  {pkg.description}
+                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-on-surface-subtle uppercase tracking-widest mr-1">
+                      from
+                    </span>
+                    <span className="font-[family-name:var(--font-display)] text-xl text-primary">
+                      ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-on-surface-subtle uppercase tracking-widest">
+                    per person
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

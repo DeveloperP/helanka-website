@@ -162,7 +162,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                 key={s}
                 onClick={() => handleStatusChange(s)}
                 disabled={isPending}
-                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all disabled:opacity-50 ${
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 ${
                   s === "CANCELLED"
                     ? "border border-red-200 text-red-600 hover:bg-red-50"
                     : "bg-slate-900 text-white hover:bg-slate-800"
@@ -185,7 +185,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
           <Section title="Customer">
             <Row label="Name" value={booking.customerName ?? "—"} />
             <Row label="Email" value={booking.customerEmail} />
-            <Link href={`/admin/customers/${booking.customerId}`} className="text-xs text-[#ff9d00] hover:text-[#e68d00] transition-colors">
+            <Link href={`/admin/customers/${booking.customerId}`} className="text-xs text-primary hover:text-primary-light transition-colors">
               View customer profile →
             </Link>
           </Section>
@@ -243,7 +243,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
               </h2>
               <button
                 onClick={() => setShowPaymentModal(true)}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-all"
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
               >
                 Record Payment
               </button>
@@ -288,7 +288,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                   <Link
                     key={s.id}
                     href={`/admin/sessions/${s.id}`}
-                    className="block text-sm text-[#ff9d00] hover:text-[#e68d00] transition-colors"
+                    className="block text-sm text-primary hover:text-primary-light transition-colors"
                   >
                     {s.tripType} session · {s.status}
                   </Link>
@@ -344,14 +344,14 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(false)}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition-all"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium rounded-xl bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50 transition-colors"
                 >
                   {isPending ? "Saving..." : "Record Payment"}
                 </button>

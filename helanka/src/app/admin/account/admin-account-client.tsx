@@ -28,7 +28,7 @@ export function AdminAccountClient({ user }: { user: UserData }) {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <div className="flex items-center gap-4 mb-8">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#ff9d00] to-[#e68d00] flex items-center justify-center text-white text-xl font-bold">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xl font-bold">
           {initials}
         </div>
         <div>
@@ -44,7 +44,7 @@ export function AdminAccountClient({ user }: { user: UserData }) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-all ${
+            className={`flex-1 text-sm font-medium py-2.5 rounded-lg transition-colors ${
               activeTab === tab
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -101,7 +101,7 @@ function ProfileTab({ user }: { user: UserData }) {
           <button
             type="submit"
             disabled={isPending}
-            className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-colors"
           >
             {isPending ? "Saving..." : "Save Changes"}
           </button>
@@ -149,7 +149,7 @@ function SecurityTab({ hasPassword }: { hasPassword: boolean }) {
           <button
             type="submit"
             disabled={isPending}
-            className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-colors"
           >
             {isPending ? "Updating..." : "Update Password"}
           </button>
@@ -190,7 +190,7 @@ function Field({
         defaultValue={defaultValue}
         required={required}
         disabled={disabled}
-        className="block w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        className="block w-full rounded-xl bg-slate-50 border border-slate-200 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 disabled:opacity-50 disabled:cursor-not-allowed transition-shadow"
       />
     </div>
   );

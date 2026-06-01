@@ -69,7 +69,7 @@ export function SuggestionCard({ messageId, suggestion, status }: SuggestionCard
           <button
             onClick={() => handleRespond("ACCEPTED")}
             disabled={isPending}
-            className="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-[#ff9d00] text-white hover:bg-[#e68d00] disabled:opacity-50 transition-all"
+            className="flex-1 text-xs font-semibold py-1.5 rounded-lg bg-primary text-on-primary hover:brightness-110 disabled:opacity-50 transition-all"
           >
             Add to My Trip
           </button>

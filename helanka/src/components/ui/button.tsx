@@ -14,13 +14,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 border border-transparent",
+    "bg-primary text-on-primary hover:brightness-110 active:brightness-90 border border-transparent",
   secondary:
-    "bg-slate-700 text-white hover:bg-slate-800 active:bg-slate-900 border border-transparent",
+    "bg-surface-raised text-on-surface hover:bg-surface-raised/80 active:bg-surface-raised/60 border border-outline",
   outline:
-    "bg-transparent text-slate-700 border border-slate-300 hover:bg-slate-50 active:bg-slate-100",
+    "bg-transparent text-on-surface border border-outline hover:border-outline-hover hover:bg-surface-raised/50 active:bg-surface-raised",
   ghost:
-    "bg-transparent text-slate-700 border border-transparent hover:bg-slate-100 active:bg-slate-200",
+    "bg-transparent text-on-surface border border-transparent hover:bg-surface-raised/50 active:bg-surface-raised",
   danger:
     "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 border border-transparent",
 };
@@ -78,8 +78,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={isDisabled}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
+          "pressable inline-flex items-center justify-center font-medium transition-all",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           "disabled:pointer-events-none disabled:opacity-50",
           variantClasses[variant],
           sizeClasses[size],

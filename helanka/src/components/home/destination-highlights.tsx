@@ -2,6 +2,10 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import {
+  useScrollReveal,
+  useStaggerReveal,
+} from "@/hooks/use-scroll-reveal";
 
 interface Destination {
   name: string;
@@ -45,6 +49,8 @@ const destinations: Destination[] = [
 
 export default function DestinationHighlights() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const cardsRef = useStaggerReveal<HTMLDivElement>();
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -56,32 +62,35 @@ export default function DestinationHighlights() {
   };
 
   return (
-    <section className="py-24 bg-[#0f172a]">
-      <div className="flex items-end justify-between mb-12 px-5 md:px-20 max-w-[1440px] mx-auto">
+    <section className="py-28 bg-surface">
+      <div
+        ref={headingRef}
+        className="reveal flex items-end justify-between mb-14 px-6 md:px-20 max-w-[1440px] mx-auto"
+      >
         <div>
-          <span className="font-[family-name:var(--font-manrope)] text-xs font-semibold text-[#ff9d00] tracking-[0.2em] uppercase block mb-3">
+          <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
             Destinations
           </span>
-          <h2 className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-white">
+          <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-white tracking-tight">
             Explore Sri Lanka
           </h2>
         </div>
         <div className="hidden md:flex gap-3">
           <button
             onClick={() => scroll("left")}
-            className="w-12 h-12 rounded-full border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all flex items-center justify-center"
+            className="pressable w-11 h-11 rounded-full border border-outline text-on-surface-muted hover:text-white hover:border-outline-hover transition-colors duration-200 flex items-center justify-center"
             aria-label="Scroll left"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
           <button
             onClick={() => scroll("right")}
-            className="w-12 h-12 rounded-full border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all flex items-center justify-center"
+            className="pressable w-11 h-11 rounded-full border border-outline text-on-surface-muted hover:text-white hover:border-outline-hover transition-colors duration-200 flex items-center justify-center"
             aria-label="Scroll right"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 18l6-6-6-6" />
             </svg>
           </button>
@@ -89,25 +98,32 @@ export default function DestinationHighlights() {
       </div>
 
       <div
-        ref={scrollRef}
-        className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pl-5 md:pl-20"
+        ref={(node) => {
+          (scrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          (cardsRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }}
+        className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pl-6 md:pl-20"
       >
         {destinations.map((dest) => (
           <Link
             key={dest.name}
             href={`/destinations/${dest.slug}`}
-            className="group relative flex-none w-[300px] md:w-[340px] h-[420px] rounded-2xl overflow-hidden cursor-pointer snap-start"
+            data-stagger
+            className="group relative flex-none w-[280px] md:w-[320px] h-[400px] rounded-2xl overflow-hidden cursor-pointer snap-start"
           >
             <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-              style={{ backgroundImage: `url('${dest.image}')` }}
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+              style={{
+                backgroundImage: `url('${dest.image}')`,
+                transitionTimingFunction: "var(--ease-out)",
+              }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <span className="font-[family-name:var(--font-manrope)] text-[10px] font-semibold text-[#ff9d00] tracking-[0.2em] uppercase block mb-2">
+              <span className="text-[10px] font-semibold text-primary tracking-[0.2em] uppercase block mb-2">
                 {dest.region}
               </span>
-              <h3 className="font-[family-name:var(--font-playfair)] text-2xl text-white">
+              <h3 className="font-[family-name:var(--font-display)] text-2xl text-white tracking-tight">
                 {dest.name}
               </h3>
             </div>

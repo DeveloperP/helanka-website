@@ -86,7 +86,7 @@ export function BookingsClient({ bookings }: { bookings: BookingListItem[] }) {
         placeholder="Search by customer, destination..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full max-w-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all mb-6"
+        className="w-full max-w-sm bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow mb-6"
       />
 
       {view === "pipeline" ? (
@@ -139,7 +139,7 @@ export function BookingsClient({ bookings }: { bookings: BookingListItem[] }) {
               <Link
                 key={b.id}
                 href={`/admin/bookings/${b.id}`}
-                className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+                className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
               >
                 <div className="flex items-center justify-between">
                   <div>

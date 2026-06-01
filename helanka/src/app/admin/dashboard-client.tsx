@@ -86,7 +86,7 @@ export function DashboardClient({
             <GlassCard>
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-sm font-bold text-slate-700">Booking Pipeline</h2>
-                <Link href="/admin/bookings" className="text-xs font-semibold text-blue-500 hover:text-blue-600 transition-colors">
+                <Link href="/admin/bookings" className="text-xs font-semibold text-primary hover:text-primary-light transition-colors">
                   View all
                 </Link>
               </div>
@@ -118,7 +118,7 @@ export function DashboardClient({
                   <Link
                     key={item.id}
                     href={`/admin/sessions/${item.sessionId}`}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50/80 transition-all duration-200 group"
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 group"
                   >
                     <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
                       item.senderRole === "CUSTOMER" ? "bg-blue-400" : "bg-emerald-400"
@@ -168,7 +168,7 @@ export function DashboardClient({
 
 function GlassCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm shadow-slate-200/50 p-6">
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
       {children}
     </div>
   );
@@ -190,7 +190,7 @@ function StatCard({
   return (
     <Link
       href={href}
-      className="group bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm shadow-slate-200/50 p-5 transition-all duration-200 hover:shadow-md hover:shadow-slate-200/60 hover:-translate-y-0.5"
+      className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:shadow-md hover:-translate-y-0.5 pressable"
     >
       <div className="flex items-start justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg shadow-slate-300/30`}>
@@ -205,7 +205,7 @@ function StatCard({
 
 function QuickStat({ label, value, href }: { label: string; value: string | number; href: string }) {
   return (
-    <Link href={href} className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-50/80 transition-all duration-200 -mx-1 group">
+    <Link href={href} className="flex items-center justify-between py-2.5 px-3 rounded-xl hover:bg-slate-50/80 transition-colors duration-200 -mx-1 group">
       <span className="text-[13px] text-slate-500 group-hover:text-slate-700 transition-colors">{label}</span>
       <span className="text-sm font-bold text-slate-700">{value}</span>
     </Link>
@@ -216,7 +216,7 @@ function QuickAction({ href, label, description }: { href: string; label: string
   return (
     <Link
       href={href}
-      className="block p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/60 transition-all duration-200 group"
+      className="block p-3 rounded-xl border border-slate-100 hover:border-slate-200 hover:bg-slate-50/60 transition-colors duration-200 group"
     >
       <p className="text-[13px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">{label}</p>
       <p className="text-[11px] text-slate-400 mt-0.5">{description}</p>

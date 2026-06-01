@@ -2,18 +2,24 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #131313;
-  --foreground: #e5e2e1;
-  --primary: #ff9d00;
-  --primary-light: #ffc485;
-  --on-primary: #482900;
-  --surface: #131313;
-  --surface-container: #20201f;
-  --surface-container-high: #2a2a2a;
-  --on-surface: #e5e2e1;
-  --on-surface-variant: #dac2ad;
-  --outline: #a28d79;
-  --outline-variant: #544433;
+  --background: #0c0f14;
+  --foreground: #e8e4e0;
+  --primary: #d4812a;
+  --primary-light: #e6a85c;
+  --primary-muted: rgba(212, 129, 42, 0.12);
+  --on-primary: #1a0e00;
+  --surface: #0c0f14;
+  --surface-raised: #141820;
+  --surface-overlay: rgba(12, 15, 20, 0.85);
+  --on-surface: #e8e4e0;
+  --on-surface-muted: rgba(232, 228, 224, 0.55);
+  --on-surface-subtle: rgba(232, 228, 224, 0.35);
+  --outline: rgba(232, 228, 224, 0.12);
+  --outline-hover: rgba(232, 228, 224, 0.22);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @theme inline {
@@ -23,12 +29,12 @@
   --color-primary-light: var(--primary-light);
   --color-on-primary: var(--on-primary);
   --color-surface: var(--surface);
-  --color-surface-container: var(--surface-container);
+  --color-surface-raised: var(--surface-raised);
   --color-on-surface: var(--on-surface);
-  --color-on-surface-variant: var(--on-surface-variant);
+  --color-on-surface-muted: var(--on-surface-muted);
+  --color-on-surface-subtle: var(--on-surface-subtle);
   --color-outline: var(--outline);
-  --color-outline-variant: var(--outline-variant);
-  --animate-fade-in-up: fadeInUp 0.8s ease-out both;
+  --color-outline-hover: var(--outline-hover);
 }
 
 body {
@@ -36,41 +42,133 @@ body {
   color: var(--foreground);
 }
 
-@keyframes fadeInUp {
+/* ── Scroll reveal system ── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(8px);
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.7s var(--ease-out),
+    filter 0.7s var(--ease-out);
+  will-change: opacity, transform, filter;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+[data-stagger] {
+  opacity: 0;
+  transform: translateY(16px);
+  filter: blur(6px);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out),
+    filter 0.6s var(--ease-out);
+  will-change: opacity, transform, filter;
+}
+
+[data-stagger].revealed {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* ── Hero crossfade with blur ── */
+
+.hero-slide {
+  transition: opacity 1.2s var(--ease-in-out), filter 1.2s var(--ease-in-out);
+  will-change: opacity, filter;
+}
+
+.hero-slide-active {
+  opacity: 1;
+  filter: blur(0);
+}
+
+.hero-slide-inactive {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.hero-text-enter {
+  animation: heroTextIn 0.8s var(--ease-out) both;
+}
+
+@keyframes heroTextIn {
   from {
     opacity: 0;
     transform: translateY(20px);
+    filter: blur(6px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.liquid-glass {
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-}
+/* ── Hero overlay ── */
 
 .hero-gradient {
   background: linear-gradient(
     to bottom,
-    rgba(15, 23, 42, 0.2) 0%,
-    rgba(15, 23, 42, 0) 20%,
-    rgba(2, 6, 23, 0.3) 80%,
-    rgba(2, 6, 23, 0.5) 100%
+    rgba(12, 15, 20, 0.3) 0%,
+    rgba(12, 15, 20, 0) 25%,
+    rgba(12, 15, 20, 0.4) 75%,
+    rgba(12, 15, 20, 0.7) 100%
   );
 }
+
+/* ── Surface card ── */
+
+.surface-card {
+  background: var(--surface-raised);
+  border: 1px solid var(--outline);
+  transition:
+    border-color 0.25s var(--ease-out),
+    transform 0.25s var(--ease-out);
+}
+
+.surface-card:hover {
+  border-color: var(--outline-hover);
+}
+
+/* ── Glass (used sparingly — hero trip builder only) ── */
+
+.glass-panel {
+  background: rgba(12, 15, 20, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--outline);
+}
+
+/* ── Pressable button ── */
+
+.pressable {
+  transition: transform 160ms var(--ease-out);
+}
+
+.pressable:active {
+  transform: scale(0.97);
+}
+
+/* ── Image reveal on scroll ── */
+
+.img-reveal {
+  clip-path: inset(0 0 8% 0);
+  transition: clip-path 0.9s var(--ease-out);
+}
+
+.img-reveal.revealed {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ── Scrollbar ── */
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -78,4 +176,25 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  [data-stagger],
+  .hero-slide,
+  .hero-text-enter,
+  .img-reveal {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    filter: none !important;
+  }
+
+  .reveal,
+  [data-stagger] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }

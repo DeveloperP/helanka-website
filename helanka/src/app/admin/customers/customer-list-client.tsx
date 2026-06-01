@@ -80,7 +80,7 @@ export function CustomerListClient({
           placeholder={isAdmin ? "Search by name or email..." : "Search by name..."}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all"
+          className="flex-1 min-w-[200px] bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow"
         />
         <select
           value={tripFilter}
@@ -119,7 +119,7 @@ export function CustomerListClient({
               <Link
                 key={customer.id}
                 href={`/admin/customers/${customer.id}`}
-                className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-all"
+                className="block bg-white rounded-xl border border-slate-200 p-5 hover:border-slate-300 hover:shadow-sm transition-[border-color,box-shadow]"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">

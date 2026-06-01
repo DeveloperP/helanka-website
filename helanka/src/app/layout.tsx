@@ -1,26 +1,20 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Manrope, Hanken_Grotesk } from "next/font/google";
+import { DM_Serif_Display, Manrope } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 
-const spaceGrotesk = Space_Grotesk({
+const dmSerif = DM_Serif_Display({
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-playfair",
+  weight: ["400"],
+  variable: "--font-display",
 });
 
 const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-manrope",
-});
-
-const hankenGrotesk = Hanken_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-hanken",
+  variable: "--font-body",
 });
 
 export const metadata: Metadata = {
@@ -40,11 +34,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${spaceGrotesk.variable} ${manrope.variable} ${hankenGrotesk.variable}`}
+      className={`${dmSerif.variable} ${manrope.variable}`}
     >
-      <body className="min-h-screen bg-gradient-to-b from-[#0f172a] to-[#020617] text-[#e5e2e1] font-[family-name:var(--font-manrope)] antialiased">
+      <body className="min-h-screen bg-background text-foreground font-[family-name:var(--font-body)] antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold"
+        >
+          Skip to content
+        </a>
         <Header />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer />
       </body>
     </html>

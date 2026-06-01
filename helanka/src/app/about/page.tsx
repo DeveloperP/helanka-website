@@ -1,5 +1,7 @@
 "use client";
 
+import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
+
 const stats = [
   { value: "8+", label: "Years in Sri Lanka" },
   { value: "2,500+", label: "Travelers Hosted" },
@@ -49,6 +51,17 @@ const team = [
 ];
 
 export default function AboutPage() {
+  const heroRef = useScrollReveal<HTMLDivElement>();
+  const statsRef = useStaggerReveal<HTMLDivElement>();
+  const storyRef = useScrollReveal<HTMLDivElement>();
+  const storyImgRef = useScrollReveal<HTMLDivElement>();
+  const valuesHeadRef = useScrollReveal<HTMLDivElement>();
+  const valuesGridRef = useStaggerReveal<HTMLDivElement>();
+  const teamHeadRef = useScrollReveal<HTMLDivElement>();
+  const teamGridRef = useStaggerReveal<HTMLDivElement>();
+  const parentRef = useScrollReveal<HTMLDivElement>();
+  const ctaRef = useScrollReveal<HTMLDivElement>();
+
   return (
     <>
       {/* Hero */}
@@ -57,30 +70,30 @@ export default function AboutPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/images/public-ella-nine-arch.jpg')" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
-          <span className="inline-block bg-[#ff9d00] text-[#482900] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div ref={heroRef} className="reveal relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+          <span className="inline-block bg-primary text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
             Our Story
           </span>
-          <h1 className="font-[family-name:var(--font-playfair)] text-4xl md:text-6xl text-white mb-4 max-w-3xl">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl md:text-6xl text-on-surface mb-4 max-w-3xl">
             We Live Here. That is the Difference.
           </h1>
-          <p className="text-white/60 max-w-lg">
+          <p className="text-on-surface-muted max-w-lg">
             Helanka Vacations was built by Sri Lankans who got tired of watching visitors miss the real island. We know every road, every guide, and every good spot to eat.
           </p>
         </div>
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-[#020617] border-y border-white/5">
+      <section className="bg-background border-y border-outline">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-[#ff9d00] mb-2">
+              <div key={stat.label} data-stagger className="text-center">
+                <p className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-primary mb-2">
                   {stat.value}
                 </p>
-                <p className="text-white/50 text-sm">{stat.label}</p>
+                <p className="text-on-surface-muted text-sm">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -88,14 +101,14 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story */}
-      <section className="bg-[#020617] py-20">
+      <section className="bg-background py-20">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white mb-6">
+            <div ref={storyRef} className="reveal">
+              <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface mb-6">
                 How We Started
               </h2>
-              <div className="space-y-4 text-white/60 leading-relaxed">
+              <div className="space-y-4 text-on-surface-muted leading-relaxed">
                 <p>
                   Helanka Vacations started because the standard tour felt wrong. Hit five places in five days, take photos, leave. We wanted to show people the Sri Lanka we actually know.
                 </p>
@@ -107,41 +120,43 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
-            <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
+            <div ref={storyImgRef} className="reveal relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden">
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: "url('/images/public-down-south-beach.jpg')" }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
             </div>
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="bg-[#020617] py-20 border-t border-white/5">
+      <section className="bg-background py-20 border-t border-outline">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
+          <div ref={valuesHeadRef} className="reveal text-center mb-16">
+            <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
               How We Work
             </span>
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface">
               Our Values
             </h2>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div ref={valuesGridRef} className="grid md:grid-cols-2 gap-8">
             {values.map((v, i) => (
               <div
                 key={v.title}
-                className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-[#ff9d00]/30 transition-colors"
+                data-stagger
+                className="surface-card rounded-2xl p-8 hover:border-primary/30 transition-colors"
+                style={{ transitionTimingFunction: "var(--ease-out)" }}
               >
-                <span className="font-[family-name:var(--font-playfair)] text-5xl text-[#ff9d00]/20 mb-4 block">
+                <span className="font-[family-name:var(--font-display)] text-5xl text-primary/20 mb-4 block">
                   0{i + 1}
                 </span>
-                <h3 className="font-[family-name:var(--font-playfair)] text-xl text-white mb-3">
+                <h3 className="font-[family-name:var(--font-display)] text-xl text-on-surface mb-3">
                   {v.title}
                 </h3>
-                <p className="text-white/50 leading-relaxed">{v.description}</p>
+                <p className="text-on-surface-muted leading-relaxed">{v.description}</p>
               </div>
             ))}
           </div>
@@ -149,24 +164,26 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="bg-[#020617] py-20 border-t border-white/5">
+      <section className="bg-background py-20 border-t border-outline">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
+          <div ref={teamHeadRef} className="reveal text-center mb-16">
+            <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
               The People You Will Meet
             </span>
-            <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface">
               Meet the Team
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div ref={teamGridRef} className="grid md:grid-cols-3 gap-8">
             {team.map((member) => (
               <div
                 key={member.name}
-                className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#ff9d00]/30 transition-colors"
+                data-stagger
+                className="surface-card rounded-2xl overflow-hidden hover:border-primary/30 transition-colors"
+                style={{ transitionTimingFunction: "var(--ease-out)" }}
               >
-                <div className="h-48 bg-gradient-to-br from-[#ff9d00]/20 to-[#ff9d00]/5 flex items-center justify-center">
-                  <span className="font-[family-name:var(--font-playfair)] text-6xl text-[#ff9d00]/30">
+                <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                  <span className="font-[family-name:var(--font-display)] text-6xl text-primary/30">
                     {member.name
                       .split(" ")
                       .map((n) => n[0])
@@ -174,11 +191,11 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <div className="p-6">
-                  <h3 className="font-[family-name:var(--font-playfair)] text-lg text-white mb-1">
+                  <h3 className="font-[family-name:var(--font-display)] text-lg text-on-surface mb-1">
                     {member.name}
                   </h3>
-                  <p className="text-[#ff9d00] text-sm mb-3">{member.role}</p>
-                  <p className="text-white/50 text-sm leading-relaxed">
+                  <p className="text-primary text-sm mb-3">{member.role}</p>
+                  <p className="text-on-surface-muted text-sm leading-relaxed">
                     {member.bio}
                   </p>
                 </div>
@@ -189,20 +206,20 @@ export default function AboutPage() {
       </section>
 
       {/* MendisOne - Parent Company */}
-      <section className="bg-[#020617] py-20 border-t border-white/5">
+      <section className="bg-background py-20 border-t border-outline">
         <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div ref={parentRef} className="reveal grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <span className="inline-block bg-[#ff9d00]/10 text-[#ff9d00] text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
+              <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
                 Part of Something Bigger
               </span>
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white mb-6">
+              <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface mb-6">
                 A MendisOne Company
               </h2>
-              <div className="space-y-4 text-white/60 leading-relaxed">
+              <div className="space-y-4 text-on-surface-muted leading-relaxed">
                 <p>
                   Helanka Vacations is part of{" "}
-                  <span className="text-white font-medium">MendisOne Pvt Ltd</span>
+                  <span className="text-on-surface font-medium">MendisOne Pvt Ltd</span>
                   , a Sri Lankan business group with operations in shipping, trading, logistics, and leisure.
                 </p>
                 <p>
@@ -236,19 +253,20 @@ export default function AboutPage() {
                   key={company.name}
                   className={`rounded-2xl p-6 border transition-colors ${
                     company.active
-                      ? "bg-[#ff9d00]/10 border-[#ff9d00]/30"
-                      : "bg-white/5 border-white/10 hover:border-white/20"
+                      ? "bg-primary/10 border-primary/30"
+                      : "surface-card hover:border-outline-hover"
                   }`}
+                  style={{ transitionTimingFunction: "var(--ease-out)" }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     {company.active && (
-                      <span className="w-2 h-2 rounded-full bg-[#ff9d00]" />
+                      <span className="w-2 h-2 rounded-full bg-primary" />
                     )}
-                    <h3 className="font-[family-name:var(--font-playfair)] text-lg text-white">
+                    <h3 className="font-[family-name:var(--font-display)] text-lg text-on-surface">
                       {company.name}
                     </h3>
                   </div>
-                  <p className="text-white/50 text-sm leading-relaxed">
+                  <p className="text-on-surface-muted text-sm leading-relaxed">
                     {company.description}
                   </p>
                 </div>
@@ -258,7 +276,7 @@ export default function AboutPage() {
                 href="https://mendisone.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-[#ff9d00] hover:text-[#e68d00] transition-colors text-sm font-medium mt-2"
+                className="inline-flex items-center gap-2 text-primary hover:text-primary-light transition-colors text-sm font-medium mt-2"
               >
                 Visit MendisOne
                 <svg
@@ -281,19 +299,19 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-[#020617] py-20 border-t border-white/5">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-3xl md:text-4xl text-white mb-4">
+      <section className="bg-background py-20 border-t border-outline">
+        <div ref={ctaRef} className="reveal max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 text-center">
+          <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface mb-4">
             Want to See Sri Lanka?
           </h2>
-          <p className="text-white/50 max-w-lg mx-auto mb-8">
+          <p className="text-on-surface-muted max-w-lg mx-auto mb-8">
             Let our team put together a trip that fits what you actually want. No templates, no compromises. Just tell us your dates and interests.
           </p>
           <a
-            href="/login"
-            className="inline-block bg-[#ff9d00] text-[#482900] px-8 py-3 rounded-lg text-base font-semibold hover:bg-[#e68d00] transition-colors"
+            href="/build"
+            className="pressable inline-block bg-primary text-on-primary px-8 py-3 rounded-lg text-base font-semibold hover:brightness-110 transition-all"
           >
-            Sign In to Start
+            Start Planning
           </a>
         </div>
       </section>

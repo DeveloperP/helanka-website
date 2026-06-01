@@ -272,28 +272,125 @@ model BookingItem {
   notes         String?
   sortOrder     Int             @default(0)
 
-  booking     Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  destination Destination? @relation(fields: [destinationId], references: [id])
+  booking              Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  destination          Destination?           @relation(fields: [destinationId], references: [id])
+  accommodationDetail  AccommodationDetail?
+  transportDetail      TransportDetail?
+  excursionDetail      ExcursionDetail?
+  otherChargeDetail    OtherChargeDetail?
 
   @@map("booking_items")
 }
 
 model Quote {
-  id          String         @id @default(cuid())
-  bookingId   String
-  version     Int
-  totalPrice  Float
-  deposit     Float
-  validUntil  DateTime
-  adminNotes  String?
-  sentAt      DateTime?
-  respondedAt DateTime?
-  response    QuoteResponse?
-  createdAt   DateTime       @default(now())
+  id              String         @id @default(cuid())
+  bookingId       String
+  version         Int
+  totalPrice      Float
+  deposit         Float
+  validUntil      DateTime
+  adminNotes      String?
+  sentAt          DateTime?
+  respondedAt     DateTime?
+  response        QuoteResponse?
+  taxRate         Float          @default(0)
+  taxInclusive    Boolean        @default(true)
+  handlingFeeType String?
+  handlingFeeAmt  Float          @default(0)
+  discountAmt     Float          @default(0)
+  lkrExchangeRate Float?
+  createdAt       DateTime       @default(now())
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("quotes")
+}
+
+// ── Category detail models ─────────────────────────────────
+
+model AccommodationDetail {
+  id               String @id @default(cuid())
+  bookingItemId    String @unique
+  hotelName        String
+  starRating       String?
+  roomType         String?
+  mealPlan         String?
+  sglRooms         Int    @default(0)
+  sglRate          Float  @default(0)
+  dblRooms         Int    @default(0)
+  dblRate          Float  @default(0)
+  twnRooms         Int    @default(0)
+  twnRate          Float  @default(0)
+  tplRooms         Int    @default(0)
+  tplRate          Float  @default(0)
+  extraAdultQty    Int    @default(0)
+  extraAdultRate   Float  @default(0)
+  childSharingQty  Int    @default(0)
+  childSharingRate Float  @default(0)
+  childWithBedQty  Int    @default(0)
+  childWithBedRate Float  @default(0)
+  marginType       String @default("fixed")
+  marginValue      Float  @default(0)
+  rateCode         String?
+  remarks          String?
+
+  bookingItem BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  @@map("accommodation_details")
+}
+
+model TransportDetail {
+  id                  String  @id @default(cuid())
+  bookingItemId       String  @unique
+  vehicleType         String
+  ratePerKm           Float   @default(0)
+  vehicleUnits        Int     @default(1)
+  distanceKm          Float   @default(0)
+  isGroupTransfer     Boolean @default(false)
+  pickupLocation      String?
+  dropoffLocation     String?
+  overridePrice       Boolean @default(false)
+  driverGuideType     String?
+  driverRatePerDay    Float   @default(0)
+  driverAccommodation Boolean @default(false)
+  driverFee           Float   @default(0)
+  remarks             String?
+
+  bookingItem BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  @@map("transport_details")
+}
+
+model ExcursionDetail {
+  id            String  @id @default(cuid())
+  bookingItemId String  @unique
+  excursionName String
+  sequence      Int     @default(0)
+  costPerPerson Float   @default(0)
+  adultCount    Int     @default(0)
+  childRate     Float   @default(0)
+  childCount    Int     @default(0)
+  overridePrice Boolean @default(false)
+  remarks       String?
+
+  bookingItem BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  @@map("excursion_details")
+}
+
+model OtherChargeDetail {
+  id            String  @id @default(cuid())
+  bookingItemId String  @unique
+  costItem      String
+  description   String?
+  costPerUnit   Float   @default(0)
+  units         Int     @default(0)
+  overridePrice Boolean @default(false)
+  remarks       String?
+
+  bookingItem BookingItem @relation(fields: [bookingItemId], references: [id], onDelete: Cascade)
+
+  @@map("other_charge_details")
 }
 
 model Payment {

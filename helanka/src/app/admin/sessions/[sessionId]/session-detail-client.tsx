@@ -141,7 +141,7 @@ export function SessionDetailClient({
             {(session.status === "QUOTE_REQUESTED" || session.status === "CLOSED") && (
               <Link
                 href={`/admin/sessions/${initialSession.id}/quote`}
-                className="text-xs font-medium px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-all"
+                className="text-xs font-medium px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors"
               >
                 {session.status === "QUOTE_REQUESTED" ? "Create Quote" : "View Quote"}
               </Link>
@@ -205,7 +205,7 @@ export function SessionDetailClient({
             <p className="text-sm font-semibold text-slate-900">Chat</p>
             <button
               onClick={() => setShowSuggestionPicker(!showSuggestionPicker)}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-all"
+              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
             >
               Send Suggestion
             </button>
@@ -288,12 +288,12 @@ export function SessionDetailClient({
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 placeholder="Type a message to the customer..."
-                className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-all"
+                className="flex-1 bg-slate-50 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-shadow"
               />
               <button
                 type="submit"
                 disabled={isSending}
-                className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white hover:bg-slate-800 disabled:opacity-50 transition-all flex-shrink-0"
+                className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white hover:bg-slate-800 disabled:opacity-50 transition-colors flex-shrink-0"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
@@ -320,7 +320,7 @@ function SuggestionButton({ label, onClick }: { label: string; onClick: () => vo
   return (
     <button
       onClick={onClick}
-      className="text-xs px-3 py-1.5 rounded-lg bg-white border border-amber-200 text-amber-700 hover:bg-amber-100 transition-all"
+      className="text-xs px-3 py-1.5 rounded-lg bg-white border border-amber-200 text-amber-700 hover:bg-amber-100 transition-colors"
     >
       {label}
     </button>

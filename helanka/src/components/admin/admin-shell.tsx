@@ -37,10 +37,10 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
     : "?";
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-blue-200 via-blue-100/60 to-white isolate">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white isolate">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 ${
+        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
           collapsed ? "w-[72px]" : "w-60"
         }`}
       >
@@ -97,7 +97,7 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
               {user.image ? (
                 <img src={user.image} alt="" className="w-7 h-7 rounded-full object-cover ring-2 ring-white" />
               ) : (
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-white shadow-sm shrink-0">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-[10px] font-bold text-on-primary ring-2 ring-white shadow-sm shrink-0">
                   {initials}
                 </div>
               )}
@@ -131,7 +131,7 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
       </aside>
 
       {/* Main content */}
-      <main className={`flex-1 transition-all duration-300 ${collapsed ? "ml-[72px]" : "ml-60"}`}>
+      <main className={`flex-1 transition-[margin] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${collapsed ? "ml-[72px]" : "ml-60"}`}>
         {children}
       </main>
     </div>
