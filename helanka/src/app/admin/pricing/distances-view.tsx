@@ -23,6 +23,7 @@ interface DistancesViewProps {
 export function DistancesView({ initialDestinations, initialDistances, onBack }: DistancesViewProps) {
   const [destinations, setDestinations] = useState(initialDestinations);
   const [distances, setDistances] = useState(initialDistances);
+  const [filterSection, setFilterSection] = useState<"all" | "colombo" | "pairwise">("all");
   const [editingColombo, setEditingColombo] = useState<DestinationWithDistance | null>(null);
   const [colomboVal, setColomboVal] = useState("");
   const [editingPair, setEditingPair] = useState<DestinationDistanceRow | null>(null);
@@ -80,7 +81,20 @@ export function DistancesView({ initialDestinations, initialDistances, onBack }:
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          {(["all", "colombo", "pairwise"] as const).map((section) => (
+            <button
+              key={section}
+              onClick={() => setFilterSection(section)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${
+                filterSection === section ? "bg-slate-800 text-white shadow-sm" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {section === "all" ? "All Distances" : section === "colombo" ? "From Colombo" : "Pairwise Routes"}
+            </button>
+          ))}
+        </div>
         <button onClick={handleExport} className="inline-flex items-center gap-1.5 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-sm font-medium px-3 py-2 transition-colors cursor-pointer">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
           Export Excel
@@ -88,7 +102,7 @@ export function DistancesView({ initialDestinations, initialDistances, onBack }:
       </div>
 
       {/* Section 1: Colombo Distances */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden mb-6">
+      {filterSection !== "pairwise" && <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden mb-6">
         <div className="px-4 py-3 border-b border-slate-100/80">
           <h2 className="text-sm font-bold text-slate-700">Distance from Colombo</h2>
         </div>
@@ -118,10 +132,10 @@ export function DistancesView({ initialDestinations, initialDistances, onBack }:
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {/* Section 2: Pairwise Distances */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
+      {filterSection !== "colombo" && <div className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-100/80">
           <h2 className="text-sm font-bold text-slate-700">Pairwise Distances</h2>
         </div>
@@ -156,7 +170,7 @@ export function DistancesView({ initialDestinations, initialDistances, onBack }:
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {/* Colombo Edit Drawer */}
       <EditDrawer open={!!editingColombo} onClose={() => setEditingColombo(null)} title="Edit Distance from Colombo">

@@ -13,21 +13,38 @@ export function EditDrawer({ open, onClose, title, children }: EditDrawerProps) 
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !drawerRef.current) return;
+    const drawer = drawerRef.current;
+
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    const focusable = drawer.querySelectorAll<HTMLElement>(focusableSelector);
+    if (focusable.length > 0) focusable[0].focus();
+
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key === "Tab") {
+        const els = drawer.querySelectorAll<HTMLElement>(focusableSelector);
+        if (els.length === 0) return;
+        const first = els[0];
+        const last = els[els.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     }
+
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
-
-  useEffect(() => {
-    if (!open || !drawerRef.current) return;
-    const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    );
-    if (focusable.length > 0) focusable[0].focus();
-  }, [open]);
 
   if (!open) return null;
 
