@@ -95,6 +95,21 @@ body {
   filter: blur(4px);
 }
 
+/* ── Slide-out drawer ── */
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.drawer-slide-in {
+  animation: slideInRight 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-slide-in { animation: none; }
+}
+
 .hero-text-enter {
   animation: heroTextIn 0.8s var(--ease-out) both;
 }
