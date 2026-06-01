@@ -25,6 +25,7 @@ const navItems = [
 export function AdminShell({ role, user, children }: AdminShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const filteredNav = navItems.filter((item) => item.roles.includes(role));
 
   function isActive(href: string) {
@@ -38,11 +39,30 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-white isolate">
+      {/* Mobile hamburger */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-40 md:hidden w-10 h-10 rounded-xl bg-white/80 backdrop-blur border border-slate-200 shadow-sm flex items-center justify-center text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
+        aria-label="Open navigation"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-900/20 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
           collapsed ? "w-[72px]" : "w-60"
-        }`}
+        } max-md:w-60 ${mobileOpen ? "max-md:translate-x-0" : "max-md:-translate-x-full"}`}
       >
         <div className="flex flex-col h-full m-3 mr-0 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50">
           {/* Logo */}
@@ -66,7 +86,8 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3 rounded-xl text-[13px] font-medium transition-all duration-200 min-h-[44px] ${
                     collapsed ? "justify-center px-2 py-3" : "px-3.5 py-2.5"
                   } ${
                     active
@@ -119,10 +140,10 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
           </div>
         </div>
 
-        {/* Collapse toggle */}
+        {/* Collapse toggle (desktop only) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-1 top-20 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-400 hover:text-slate-700 hover:shadow-md transition-all duration-200 z-40"
+          className="absolute -right-1.5 top-20 w-7 h-7 rounded-full bg-white border border-slate-200 shadow-sm items-center justify-center text-slate-400 hover:text-slate-700 hover:shadow-md transition-all duration-200 z-40 hidden md:flex cursor-pointer"
         >
           <svg className={`w-3 h-3 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -131,7 +152,7 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
       </aside>
 
       {/* Main content */}
-      <main className={`flex-1 transition-[margin] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${collapsed ? "ml-[72px]" : "ml-60"}`}>
+      <main className={`flex-1 transition-[margin] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] max-md:ml-0 max-md:pt-14 ${collapsed ? "md:ml-[72px]" : "md:ml-60"}`}>
         {children}
       </main>
     </div>
