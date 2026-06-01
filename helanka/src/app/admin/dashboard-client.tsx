@@ -190,7 +190,7 @@ function StatCard({
   return (
     <Link
       href={href}
-      className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:shadow-md hover:-translate-y-0.5 pressable"
+      className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 transition-[transform,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] hover:shadow-md hover:-translate-y-0.5 pressable cursor-pointer"
     >
       <div className="flex items-start justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg shadow-slate-300/30`}>
