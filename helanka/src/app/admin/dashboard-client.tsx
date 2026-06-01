@@ -85,7 +85,7 @@ export function DashboardClient({
           {isAdmin && stats.bookingsByStatus && (
             <GlassCard>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-sm font-bold text-slate-700">Booking Pipeline</h2>
+                <h2 className="text-base font-semibold text-slate-800">Booking Pipeline</h2>
                 <Link href="/admin/bookings" className="text-xs font-semibold text-primary hover:text-primary-light transition-colors">
                   View all
                 </Link>
@@ -104,7 +104,7 @@ export function DashboardClient({
           {/* Recent activity */}
           <GlassCard>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-sm font-bold text-slate-700">Recent Activity</h2>
+              <h2 className="text-base font-semibold text-slate-800">Recent Activity</h2>
               <span className="text-[11px] font-medium text-slate-400">Latest messages</span>
             </div>
             {activity.length === 0 ? (
@@ -143,7 +143,7 @@ export function DashboardClient({
           {/* Quick stats for admin */}
           {isAdmin && (
             <GlassCard>
-              <h2 className="text-sm font-bold text-slate-700 mb-4">Overview</h2>
+              <h2 className="text-base font-semibold text-slate-800 mb-4">Overview</h2>
               <div className="space-y-3">
                 <QuickStat label="Total Bookings" value={stats.totalBookings ?? 0} href="/admin/bookings" />
                 <QuickStat label="Closed Sessions" value={stats.closedSessions} href="/admin/sessions" />
@@ -153,7 +153,7 @@ export function DashboardClient({
 
           {/* Quick actions */}
           <GlassCard>
-            <h2 className="text-sm font-bold text-slate-700 mb-4">Quick Actions</h2>
+            <h2 className="text-base font-semibold text-slate-800 mb-4">Quick Actions</h2>
             <div className="space-y-2">
               <QuickAction href="/admin/sessions" label="View Sessions" description="Manage active trip sessions" />
               <QuickAction href="/admin/customers" label="Customer List" description="Browse all customers" />
