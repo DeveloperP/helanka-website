@@ -419,7 +419,7 @@ model Payment {
   amount          Float
   currency        String        @default("USD")
   method          String?
-  webxpayRef      String?
+  gatewayRef      String?       @map("gateway_ref")
   status          PaymentStatus @default(PENDING)
   paidAt          DateTime?
   createdAt       DateTime      @default(now())

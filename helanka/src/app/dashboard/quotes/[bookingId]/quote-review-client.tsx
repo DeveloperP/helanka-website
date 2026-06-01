@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { respondToQuote } from "@/actions/quote-actions";
 import type { CustomerQuoteData } from "@/actions/quote-actions";
 
@@ -105,70 +106,122 @@ function itemTypeLabel(type: string): string {
 
 // ─── Response banner ─────────────────────────────────────────────────────────
 
-function ResponseBanner({ response, showPayment, deposit, onPayNow, onPayLater }: {
+function PayPalDeposit({ bookingId, deposit, onSuccess, onPayLater }: {
+  bookingId: string;
+  deposit: number;
+  onSuccess: () => void;
+  onPayLater: () => void;
+}) {
+  const [payError, setPayError] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(false);
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-emerald-200 overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border-b border-emerald-200">
+        <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-sm text-emerald-800 font-medium">Quote accepted! Secure your booking with a deposit.</p>
+      </div>
+      <div className="px-5 py-5 space-y-4">
+        <p className="text-sm text-slate-600">
+          Pay your deposit of <span className="font-bold text-slate-900">{formatPrice(deposit)}</span> now to confirm your trip, or choose to pay later.
+        </p>
+
+        <label className="flex items-start gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+          />
+          <span className="text-sm text-slate-600">
+            I agree to the{" "}
+            <Link href="/terms" target="_blank" className="text-emerald-700 underline hover:text-emerald-900">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/cancellation-policy" target="_blank" className="text-emerald-700 underline hover:text-emerald-900">
+              Cancellation Policy
+            </Link>
+          </span>
+        </label>
+
+        <div className={`max-w-sm transition-opacity ${agreed ? "opacity-100" : "opacity-40 pointer-events-none"}`}>
+          <PayPalButtons
+            disabled={!agreed}
+            style={{ layout: "vertical", shape: "rect", label: "pay" }}
+            createOrder={async () => {
+              setPayError(null);
+              const res = await fetch("/api/payments/paypal/create-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bookingId, amount: deposit, currency: "USD" }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error);
+              return data.orderID;
+            }}
+            onApprove={async (data) => {
+              const res = await fetch("/api/payments/paypal/capture-order", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ orderID: data.orderID }),
+              });
+              const result = await res.json();
+              if (!res.ok) {
+                setPayError(result.error ?? "Payment capture failed");
+                return;
+              }
+              onSuccess();
+            }}
+            onError={() => setPayError("Something went wrong with PayPal. Please try again.")}
+          />
+        </div>
+        {payError && <p className="text-sm text-red-600">{payError}</p>}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={onPayLater}
+            className="inline-flex items-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl px-6 py-3 text-sm font-semibold transition-colors"
+          >
+            Pay Later
+          </button>
+        </div>
+        <p className="text-xs text-slate-400">
+          Secure payment via PayPal. You can also pay via bank transfer — contact us for details.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ResponseBanner({ response, showPayment, deposit, bookingId, onPaySuccess, onPayLater }: {
   response: string;
   showPayment?: boolean;
   deposit?: number;
-  onPayNow?: () => void;
+  bookingId: string;
+  onPaySuccess?: () => void;
   onPayLater?: () => void;
 }) {
   if (response === "ACCEPTED" && showPayment) {
     return (
-      <div className="bg-white rounded-2xl shadow-sm border border-emerald-200 overflow-hidden">
-        <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border-b border-emerald-200">
-          <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-sm text-emerald-800 font-medium">Quote accepted! Secure your booking with a deposit.</p>
-        </div>
-        <div className="px-5 py-5 space-y-4">
-          <p className="text-sm text-slate-600">
-            Pay your deposit of <span className="font-bold text-slate-900">{formatPrice(deposit ?? 0)}</span> now to confirm your trip, or choose to pay later.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={onPayNow}
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl px-6 py-3 text-sm font-semibold transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-              </svg>
-              Pay Now via WebXPay
-            </button>
-            <button
-              onClick={onPayLater}
-              className="inline-flex items-center gap-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl px-6 py-3 text-sm font-semibold transition-colors"
-            >
-              Pay Later
-            </button>
-          </div>
-          <p className="text-xs text-slate-400">
-            Secure payment powered by WebXPay. You can also pay via bank transfer — contact us for details.
-          </p>
-        </div>
-      </div>
+      <PayPalDeposit
+        bookingId={bookingId}
+        deposit={deposit ?? 0}
+        onSuccess={onPaySuccess ?? (() => {})}
+        onPayLater={onPayLater ?? (() => {})}
+      />
     );
   }
   if (response === "ACCEPTED") {
     return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
-          <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div className="flex-1">
-            <p className="text-sm text-emerald-800 font-medium">Quote accepted! Your booking is confirmed.</p>
-            <p className="text-xs text-emerald-600 mt-0.5">Pay your deposit to secure your dates.</p>
-          </div>
-          <button
-            onClick={onPayNow}
-            className="shrink-0 inline-flex items-center gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-            </svg>
-            Pay Deposit
-          </button>
+      <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+        <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div className="flex-1">
+          <p className="text-sm text-emerald-800 font-medium">Quote accepted! Your booking is confirmed.</p>
+          <p className="text-xs text-emerald-600 mt-0.5">Your deposit has been received.</p>
         </div>
       </div>
     );
@@ -208,6 +261,7 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
   const [isPending, startTransition] = useTransition();
 
   const [showPaymentPrompt, setShowPaymentPrompt] = useState(quote.quote.response === "ACCEPTED");
+  const [depositPaid, setDepositPaid] = useState(false);
 
   const balanceDue = quote.quote.totalPrice - quote.quote.deposit;
   const alreadyResponded = confirmedResponse !== null;
@@ -228,17 +282,9 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
     });
   }
 
-  function handlePayNow() {
-    // Placeholder: redirect to WebXPay checkout
-    // In production, this will call a server action that creates a WebXPay session
-    // and returns a redirect URL with the deposit amount, booking ID, and return URL
-    const params = new URLSearchParams({
-      bookingId: quote.bookingId,
-      amount: String(quote.quote.deposit),
-      currency: "USD",
-      returnUrl: `${window.location.origin}/dashboard/quotes/${quote.bookingId}`,
-    });
-    window.location.href = `/api/payments/webxpay/checkout?${params.toString()}`;
+  function handlePaySuccess() {
+    setDepositPaid(true);
+    setShowPaymentPrompt(false);
   }
 
   function handlePayLater() {
@@ -282,6 +328,7 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
   }
 
   return (
+    <PayPalScriptProvider options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? "", currency: "USD" }}>
     <div className="min-h-screen bg-slate-50 py-10 px-4">
       <div className="max-w-3xl mx-auto space-y-6">
 
@@ -309,13 +356,27 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
           </span>
         </div>
 
+        {/* ── Deposit paid confirmation ──────────────────────────────────── */}
+        {depositPaid && (
+          <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+            <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm text-emerald-800 font-medium">Deposit received! Your booking is confirmed.</p>
+              <p className="text-xs text-emerald-600 mt-0.5">You will receive a confirmation email shortly.</p>
+            </div>
+          </div>
+        )}
+
         {/* ── Response banner (if already responded) ────────────────────── */}
-        {alreadyResponded && (
+        {alreadyResponded && !depositPaid && (
           <ResponseBanner
             response={confirmedResponse!}
             showPayment={showPaymentPrompt}
             deposit={quote.quote.deposit}
-            onPayNow={handlePayNow}
+            bookingId={quote.bookingId}
+            onPaySuccess={handlePaySuccess}
             onPayLater={handlePayLater}
           />
         )}
@@ -628,5 +689,6 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
 
       </div>
     </div>
+    </PayPalScriptProvider>
   );
 }

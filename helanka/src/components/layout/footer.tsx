@@ -24,8 +24,8 @@ const linkColumns = [
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
+      { label: "Cancellation Policy", href: "/cancellation-policy" },
       { label: "Careers", href: "/careers" },
-      { label: "Sitemap", href: "/sitemap" },
     ],
   },
 ];

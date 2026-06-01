@@ -84,7 +84,7 @@ export default async function BookingDetailPage({
           currency: p.currency,
           method: p.method,
           status: p.status,
-          webxpayRef: p.webxpayRef,
+          gatewayRef: p.gatewayRef,
           paidAt: p.paidAt?.toISOString() ?? null,
           createdAt: p.createdAt.toISOString(),
         })),

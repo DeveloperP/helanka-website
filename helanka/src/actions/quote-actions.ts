@@ -643,7 +643,7 @@ export async function recordPayment(data: {
   amount: number;
   currency?: string;
   method: string;
-  webxpayRef?: string;
+  gatewayRef?: string;
 }): Promise<{ success: boolean; error?: string }> {
   await requireAdmin();
   if (!db) return { success: false, error: "Database not available" };
@@ -655,7 +655,7 @@ export async function recordPayment(data: {
         amount: data.amount,
         currency: data.currency ?? "USD",
         method: data.method,
-        webxpayRef: data.webxpayRef ?? null,
+        gatewayRef: data.gatewayRef ?? null,
         status: "SUCCESS",
         paidAt: new Date(),
       },

@@ -44,7 +44,7 @@ interface BookingData {
     currency: string;
     method: string | null;
     status: string;
-    webxpayRef: string | null;
+    gatewayRef: string | null;
     paidAt: string | null;
     createdAt: string;
   }[];
@@ -70,7 +70,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "bank_transfer", currency: "USD", webxpayRef: "" });
+  const [paymentForm, setPaymentForm] = useState({ amount: "", method: "bank_transfer", currency: "USD", gatewayRef: "" });
 
   const nextStatuses = VALID_TRANSITIONS[booking.status] ?? [];
   const totalPaid = booking.payments
@@ -100,7 +100,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
         amount,
         currency: paymentForm.currency,
         method: paymentForm.method,
-        webxpayRef: paymentForm.webxpayRef || undefined,
+        gatewayRef: paymentForm.gatewayRef || undefined,
       });
       if (result.success) {
         setBooking((prev) => ({
@@ -112,7 +112,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
               currency: paymentForm.currency,
               method: paymentForm.method,
               status: "SUCCESS",
-              webxpayRef: paymentForm.webxpayRef || null,
+              gatewayRef: paymentForm.gatewayRef || null,
               paidAt: new Date().toISOString(),
               createdAt: new Date().toISOString(),
             },
@@ -120,7 +120,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
           ],
         }));
         setShowPaymentModal(false);
-        setPaymentForm({ amount: "", method: "bank_transfer", currency: "USD", webxpayRef: "" });
+        setPaymentForm({ amount: "", method: "bank_transfer", currency: "USD", gatewayRef: "" });
         setMessage({ type: "success", text: "Payment recorded." });
       } else {
         setMessage({ type: "error", text: result.error ?? "Failed to record payment." });
@@ -264,7 +264,7 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                       <p className="text-sm text-slate-900">${p.amount.toLocaleString()} {p.currency}</p>
                       <p className="text-xs text-slate-400">
                         {p.method ?? "—"} · {p.paidAt ? new Date(p.paidAt).toLocaleDateString() : "Pending"}
-                        {p.webxpayRef && ` · Ref: ${p.webxpayRef}`}
+                        {p.gatewayRef && ` · ${p.method === "paypal" ? "PayPal" : "Ref"}: ${p.gatewayRef}`}
                       </p>
                     </div>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -327,15 +327,15 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
                   <option value="bank_transfer">Bank Transfer</option>
                   <option value="cash">Cash</option>
                   <option value="card">Card</option>
-                  <option value="webxpay">WebXPay</option>
+                  <option value="paypal">PayPal</option>
                 </select>
               </div>
               <div>
                 <label className="text-xs font-medium text-slate-500 mb-1 block">Reference (optional)</label>
                 <input
                   type="text"
-                  value={paymentForm.webxpayRef}
-                  onChange={(e) => setPaymentForm((f) => ({ ...f, webxpayRef: e.target.value }))}
+                  value={paymentForm.gatewayRef}
+                  onChange={(e) => setPaymentForm((f) => ({ ...f, gatewayRef: e.target.value }))}
                   className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10"
                   placeholder="Transaction reference"
                 />
