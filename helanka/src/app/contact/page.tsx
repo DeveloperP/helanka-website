@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
+import { submitContactForm } from "@/actions/contact-actions";
 
 const tripTypes = [
   "Luxury Tour",
@@ -16,13 +17,24 @@ const tripTypes = [
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const heroRef = useScrollReveal<HTMLDivElement>();
   const formRef = useScrollReveal<HTMLDivElement>();
   const sidebarRef = useStaggerReveal<HTMLDivElement>();
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const result = await submitContactForm(formData);
+      if (result.success) {
+        setSubmitted(true);
+      } else {
+        setError(result.error ?? "Something went wrong. Please try again.");
+      }
+    });
   }
 
   return (
@@ -202,11 +214,18 @@ export default function ContactPage() {
                     />
                   </div>
 
+                  {error && (
+                    <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-sm text-red-700">{error}</p>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
-                    className="pressable bg-primary text-on-primary px-8 py-3 rounded-lg text-base font-semibold hover:brightness-110 transition-all"
+                    disabled={isPending}
+                    className="pressable bg-primary text-on-primary px-8 py-3 rounded-lg text-base font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Send Inquiry
+                    {isPending ? "Sending..." : "Send Inquiry"}
                   </button>
                 </form>
               )}
