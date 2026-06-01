@@ -53,16 +53,16 @@ export function AdminShell({ role, user, children }: AdminShellProps) {
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-slate-900/20 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] ${
           collapsed ? "w-[72px]" : "w-60"
-        } max-md:w-60 ${mobileOpen ? "max-md:translate-x-0" : "max-md:-translate-x-full"}`}
+        } max-md:w-60 ${mobileOpen ? "max-md:translate-x-0" : "max-md:-translate-x-[calc(100%+12px)]"}`}
       >
         <div className="flex flex-col h-full m-3 mr-0 rounded-2xl bg-white/70 backdrop-blur-xl border border-white/80 shadow-lg shadow-slate-200/50">
           {/* Logo */}
