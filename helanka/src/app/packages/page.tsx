@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { packages } from "@/lib/packages";
 import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 import PackagesGrid from "./packages-grid";

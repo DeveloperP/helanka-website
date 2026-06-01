@@ -14,7 +14,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import type { RevenueDataPoint, FunnelStage, UtmRow, PaymentRow, RevenueData } from "@/actions/report-actions";
+import type { FunnelStage, UtmRow, RevenueData } from "@/actions/report-actions";
 import { toCSV } from "@/lib/csv-export";
 
 const PRESETS = [
@@ -55,17 +55,18 @@ export function ReportsClient({
     [router, pathname]
   );
 
-  const applyPreset = (days: number) => {
+  const applyPreset = useCallback((days: number) => {
     if (days === 0) {
       router.push(pathname);
       return;
     }
-    const f = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
-    const t = new Date().toISOString().slice(0, 10);
+    const now = Date.now();
+    const f = new Date(now - days * 86400000).toISOString().slice(0, 10);
+    const t = new Date(now).toISOString().slice(0, 10);
     setCustomFrom(f);
     setCustomTo(t);
     applyRange(f, t);
-  };
+  }, [router, pathname, applyRange]);
 
   if (!revenue) {
     return <p className="p-8 text-slate-400">Database not connected.</p>;

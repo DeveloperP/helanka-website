@@ -1,9 +1,9 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
-interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
-interface CardBodyProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardProps = React.HTMLAttributes<HTMLDivElement>;
+type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+type CardBodyProps = React.HTMLAttributes<HTMLDivElement>;
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, children, ...props }, ref) => (

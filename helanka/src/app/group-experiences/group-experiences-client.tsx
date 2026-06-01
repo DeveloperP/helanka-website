@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { experiences } from "@/lib/group-experiences";
-import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 export default function GroupExperiencesPage() {
   const heroRef = useScrollReveal<HTMLDivElement>();

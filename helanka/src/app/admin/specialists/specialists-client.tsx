@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 
 interface Specialist {
@@ -15,6 +16,9 @@ interface Specialist {
 }
 
 export function SpecialistsClient({ specialists }: { specialists: Specialist[] }) {
+  // eslint-disable-next-line react-hooks/purity -- snapshot time once on mount for online indicator
+  const now = useMemo(() => Date.now(), []);
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       <div className="mb-8">
@@ -29,7 +33,7 @@ export function SpecialistsClient({ specialists }: { specialists: Specialist[] }
       ) : (
         <div className="space-y-3">
           {specialists.map((s) => {
-            const isOnline = s.lastLogin && Date.now() - new Date(s.lastLogin).getTime() < 15 * 60 * 1000;
+            const isOnline = s.lastLogin && now - new Date(s.lastLogin).getTime() < 15 * 60 * 1000;
             const initials = s.name
               ? s.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase()
               : "?";

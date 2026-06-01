@@ -97,11 +97,9 @@ export default function DestinationHighlights() {
         </div>
       </div>
 
+      <div ref={cardsRef}>
       <div
-        ref={(node) => {
-          (scrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-          (cardsRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-        }}
+        ref={scrollRef}
         className="flex gap-5 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pl-6 md:pl-20"
       >
         {destinations.map((dest) => (
@@ -129,6 +127,7 @@ export default function DestinationHighlights() {
             </div>
           </Link>
         ))}
+      </div>
       </div>
     </section>
   );

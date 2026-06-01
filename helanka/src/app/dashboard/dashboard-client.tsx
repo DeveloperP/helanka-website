@@ -135,8 +135,6 @@ allPackages.forEach((pkg) =>
   })
 );
 
-const DEFAULT_PACKAGE_SLUG = "hill-country-explorer";
-
 export default function DashboardClient({ user, bookings }: DashboardClientProps) {
   const store = useTripSessionStore();
   useSessionSync();
@@ -317,7 +315,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
   useEffect(() => {
     setChatMessages([{ from: "rep", text: specialist.greeting, messageType: "TEXT" }]);
     setChatOpen(false);
-  }, [tripType]);
+  }, [tripType, specialist.greeting, setChatMessages, setChatOpen]);
 
   function switchPackage(slug: string) {
     if (slug === selectedPackageSlug) return;

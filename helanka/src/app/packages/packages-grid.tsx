@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
+import { useStaggerReveal } from "@/hooks/use-scroll-reveal";
 
 interface PackageData {
   slug: string;
@@ -23,7 +23,6 @@ export default function PackagesGrid({
   packages: PackageData[];
   priceEstimates: Record<string, number>;
 }) {
-  const heroRef = useScrollReveal<HTMLDivElement>();
   const gridRef = useStaggerReveal<HTMLDivElement>();
 
   return (

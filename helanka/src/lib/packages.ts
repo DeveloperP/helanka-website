@@ -1,4 +1,3 @@
-import { destinations } from "./destinations";
 
 export type TransportTier = "standard" | "super-luxury";
 

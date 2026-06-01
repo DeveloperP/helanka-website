@@ -41,9 +41,8 @@ export function HeaderClient({ user }: HeaderClientProps) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- close mobile nav on route change
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   return (
     <div className="fixed top-4 w-full px-4 md:px-16 z-50 pointer-events-none">

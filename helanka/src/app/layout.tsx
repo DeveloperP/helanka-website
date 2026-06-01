@@ -24,6 +24,28 @@ export const metadata: Metadata = {
   },
   description:
     "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services. Talk to our team for a free consultation.",
+  metadataBase: new URL("https://helanka.co"),
+  openGraph: {
+    type: "website",
+    siteName: "Helanka Vacations",
+    locale: "en_US",
+    url: "https://helanka.co",
+    title: "Helanka Vacations | Sri Lanka Holiday Tours",
+    description:
+      "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+    images: [{ url: "/images/public-ella-nine-arch.jpg", width: 1200, height: 630, alt: "Sri Lanka — Nine Arch Bridge in Ella" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Helanka Vacations | Sri Lanka Holiday Tours",
+    description:
+      "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+    images: ["/images/public-ella-nine-arch.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

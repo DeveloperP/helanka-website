@@ -325,6 +325,7 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync new items into detail state
     setDetails((prev) => {
       const acc = { ...prev.accommodations };
       const exc = { ...prev.excursions };

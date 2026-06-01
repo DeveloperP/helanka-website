@@ -51,7 +51,7 @@ export default function ContactPage() {
             Get in Touch
           </span>
           <h1 className="font-[family-name:var(--font-display)] text-4xl md:text-6xl text-on-surface mb-4 max-w-3xl">
-            Let's Plan Your Trip
+            Let&apos;s Plan Your Trip
           </h1>
           <p className="text-on-surface-muted max-w-lg">
             Tell us your dates and interests, or just send a rough idea. We will work out the details together.
