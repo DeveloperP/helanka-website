@@ -1,7 +1,4 @@
 import type { NextAuthConfig } from "next-auth";
-import type { UserRole } from "@prisma/client";
-
-import "@/types/index";
 
 /**
  * Edge-compatible auth config (no DB, no bcrypt).
@@ -31,7 +28,8 @@ export const authConfig: NextAuthConfig = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        session.user.role = token.role as any;
       }
       return session;
     },
