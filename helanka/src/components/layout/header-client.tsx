@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { UserMenu } from "./user-menu";
 
@@ -61,9 +62,15 @@ export function HeaderClient({ user }: HeaderClientProps) {
           <div className="flex justify-between items-center px-5 py-3.5">
             <Link
               href="/"
-              className="font-[family-name:var(--font-display)] text-xl font-bold text-primary hover:opacity-80 transition-opacity duration-200"
+              className="hover:opacity-80 transition-opacity duration-200"
             >
-              Helanka Vacations
+              <Image
+                src="/images/logo-header.png"
+                alt="Helanka Vacations"
+                width={160}
+                height={36}
+                priority
+              />
             </Link>
 
             <div className="hidden md:flex space-x-6 items-center">

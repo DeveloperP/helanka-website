@@ -47,21 +47,6 @@ export default async function PackagesPage() {
         </div>
       </section>
 
-      {/* Filter bar */}
-      <section className="border-b border-outline sticky top-0 z-40 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 flex gap-6 overflow-x-auto scrollbar-hide py-4">
-          {["All", "Hill Country", "Southern", "Eastern Coast"].map((region) => (
-            <button
-              key={region}
-              className="text-sm text-on-surface-muted hover:text-primary transition-colors whitespace-nowrap font-semibold tracking-wide first:text-primary"
-              style={{ transitionTimingFunction: "var(--ease-out)" }}
-            >
-              {region}
-            </button>
-          ))}
-        </div>
-      </section>
-
       <PackagesGrid packages={serialized} priceEstimates={priceEstimates} />
     </>
   );
