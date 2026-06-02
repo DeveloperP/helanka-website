@@ -4,6 +4,7 @@ import { Suspense, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { resetPassword } from "@/actions/password-reset-actions";
+import Turnstile from "@/components/turnstile";
 
 export default function ResetPasswordPage() {
   return (
@@ -145,6 +146,8 @@ function ResetPasswordForm() {
                   className="block w-full rounded-xl bg-slate-100/80 border-0 pl-10 pr-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/20 transition-all"
                 />
               </div>
+
+              <Turnstile className="flex justify-center" />
 
               <button
                 type="submit"

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useScrollReveal, useStaggerReveal } from "@/hooks/use-scroll-reveal";
 import { submitContactForm } from "@/actions/contact-actions";
+import Turnstile from "@/components/turnstile";
 
 const tripTypes = [
   "Luxury Tour",
@@ -219,6 +220,8 @@ export default function ContactPage() {
                       <p className="text-sm text-red-700">{error}</p>
                     </div>
                   )}
+
+                  <Turnstile />
 
                   <button
                     type="submit"

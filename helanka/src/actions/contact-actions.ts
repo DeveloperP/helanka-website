@@ -1,6 +1,7 @@
 "use server";
 
 import { sendEmail } from "@/lib/email";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export interface ContactResult {
   success: boolean;
@@ -8,6 +9,12 @@ export interface ContactResult {
 }
 
 export async function submitContactForm(formData: FormData): Promise<ContactResult> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  const turnstileValid = await verifyTurnstile(turnstileToken);
+  if (!turnstileValid) {
+    return { success: false, error: "Verification failed. Please try again." };
+  }
+
   const name = formData.get("name") as string | null;
   const email = formData.get("email") as string | null;
   const phone = formData.get("phone") as string | null;

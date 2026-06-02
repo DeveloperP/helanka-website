@@ -12,6 +12,7 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,6 +32,12 @@ export interface ActionResult {
  * Validates, hashes the password, creates the user, then signs them in.
  */
 export async function registerUser(formData: FormData): Promise<ActionResult> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  const turnstileValid = await verifyTurnstile(turnstileToken);
+  if (!turnstileValid) {
+    return { success: false, error: "Verification failed. Please try again." };
+  }
+
   const raw = {
     name: formData.get("name"),
     email: formData.get("email"),
@@ -87,6 +94,12 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
  * Validates credentials and signs the user in via the credentials provider.
  */
 export async function loginUser(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  const turnstileValid = await verifyTurnstile(turnstileToken);
+  if (!turnstileValid) {
+    return { success: false, error: "Verification failed. Please try again." };
+  }
+
   const raw = {
     email: formData.get("email"),
     password: formData.get("password"),

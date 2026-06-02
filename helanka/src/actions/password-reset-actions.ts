@@ -4,6 +4,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { sendEmail } from "@/lib/email";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export interface ResetResult {
   success: boolean;
@@ -11,6 +12,12 @@ export interface ResetResult {
 }
 
 export async function requestPasswordReset(formData: FormData): Promise<ResetResult> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  const turnstileValid = await verifyTurnstile(turnstileToken);
+  if (!turnstileValid) {
+    return { success: false, error: "Verification failed. Please try again." };
+  }
+
   const email = (formData.get("email") as string | null)?.trim().toLowerCase();
   if (!email) return { success: false, error: "Email is required." };
 
@@ -56,6 +63,12 @@ export async function requestPasswordReset(formData: FormData): Promise<ResetRes
 }
 
 export async function resetPassword(formData: FormData): Promise<ResetResult> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+  const turnstileValid = await verifyTurnstile(turnstileToken);
+  if (!turnstileValid) {
+    return { success: false, error: "Verification failed. Please try again." };
+  }
+
   const token = formData.get("token") as string | null;
   const email = (formData.get("email") as string | null)?.trim().toLowerCase();
   const password = formData.get("password") as string | null;
