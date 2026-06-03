@@ -133,7 +133,7 @@ export async function setPassword(formData: FormData): Promise<ActionResult> {
   }
 }
 
-export async function deleteAccount(formData: FormData): Promise<ActionResult> {
+export async function deleteAccount(formData: FormData): Promise<ActionResult | void> {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
