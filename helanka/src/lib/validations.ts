@@ -22,6 +22,16 @@ export const registerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
+export const setPasswordSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, { error: "Password must be at least 8 characters." })
+    .regex(/[A-Z]/, { error: "Password must contain at least one uppercase letter." })
+    .regex(/[0-9]/, { error: "Password must contain at least one number." }),
+});
+
+export type SetPasswordInput = z.infer<typeof setPasswordSchema>;
+
 export const loginSchema = z.object({
   email: z.string().email({ error: "Please enter a valid email address." }).trim(),
   password: z.string().min(1, { error: "Password is required." }),

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { updateProfile, changePassword } from "@/actions/account-actions";
+import { updateProfile, changePassword, setPassword, deleteAccount } from "@/actions/account-actions";
 
 interface UserData {
   name: string | null;
@@ -77,7 +77,7 @@ export function AccountClient({ user, trips }: { user: UserData; trips: TripSumm
 
         {activeTab === "Profile" && <ProfileTab user={user} />}
         {activeTab === "My Trips" && <TripsTab trips={trips} />}
-        {activeTab === "Security" && <SecurityTab hasPassword={user.hasPassword} />}
+        {activeTab === "Security" && <SecurityTab hasPassword={user.hasPassword} email={user.email} />}
       </div>
     </div>
   );
@@ -189,11 +189,15 @@ function TripsTab({ trips }: { trips: TripSummary[] }) {
   );
 }
 
-function SecurityTab({ hasPassword }: { hasPassword: boolean }) {
+function SecurityTab({ hasPassword, email }: { hasPassword: boolean; email: string }) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [hasPass, setHasPass] = useState(hasPassword);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [isDeleting, startDeleteTransition] = useTransition();
 
-  function handleSubmit(formData: FormData) {
+  function handleChangePassword(formData: FormData) {
     setMessage(null);
     if (formData.get("newPassword") !== formData.get("confirmPassword")) {
       setMessage({ type: "error", text: "New passwords don't match." });
@@ -209,34 +213,74 @@ function SecurityTab({ hasPassword }: { hasPassword: boolean }) {
     });
   }
 
+  function handleSetPassword(formData: FormData) {
+    setMessage(null);
+    if (formData.get("newPassword") !== formData.get("confirmPassword")) {
+      setMessage({ type: "error", text: "Passwords don't match." });
+      return;
+    }
+    startTransition(async () => {
+      const result = await setPassword(formData);
+      if (result.success) {
+        setHasPass(true);
+        setMessage({ type: "success", text: "Backup password set. You can now sign in with your email and password." });
+      } else {
+        setMessage({ type: "error", text: result.error ?? "Failed to set password." });
+      }
+    });
+  }
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-5">Change Password</h2>
-        {hasPassword ? (
-          <form action={handleSubmit} className="space-y-4">
-            <Field label="Current Password" name="currentPassword" type="password" required />
-            <Field label="New Password" name="newPassword" type="password" required />
-            <Field label="Confirm New Password" name="confirmPassword" type="password" required />
+        {hasPass ? (
+          <>
+            <h2 className="text-lg font-bold text-slate-900 mb-5">Change Password</h2>
+            <form action={handleChangePassword} className="space-y-4">
+              <Field label="Current Password" name="currentPassword" type="password" required />
+              <Field label="New Password" name="newPassword" type="password" required />
+              <Field label="Confirm New Password" name="confirmPassword" type="password" required />
 
-            {message && (
-              <p className={`text-sm ${message.type === "success" ? "text-emerald-600" : "text-red-600"}`}>
-                {message.text}
-              </p>
-            )}
+              {message && (
+                <p className={`text-sm ${message.type === "success" ? "text-emerald-600" : "text-red-600"}`}>
+                  {message.text}
+                </p>
+              )}
 
-            <button
-              type="submit"
-              disabled={isPending}
-              className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all"
-            >
-              {isPending ? "Updating..." : "Update Password"}
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={isPending}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all"
+              >
+                {isPending ? "Updating..." : "Update Password"}
+              </button>
+            </form>
+          </>
         ) : (
-          <p className="text-sm text-slate-500">
-            Your account uses social login. Password management is not available.
-          </p>
+          <>
+            <h2 className="text-lg font-bold text-slate-900 mb-2">Set Backup Password</h2>
+            <p className="text-sm text-slate-500 mb-5">
+              Your account uses Google sign-in. Set a backup password so you can still access your account with email and password if you ever lose access to your Google account.
+            </p>
+            <form action={handleSetPassword} className="space-y-4">
+              <Field label="New Password" name="newPassword" type="password" required />
+              <Field label="Confirm Password" name="confirmPassword" type="password" required />
+
+              {message && (
+                <p className={`text-sm ${message.type === "success" ? "text-emerald-600" : "text-red-600"}`}>
+                  {message.text}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isPending}
+                className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-slate-800 disabled:opacity-50 transition-all"
+              >
+                {isPending ? "Setting password..." : "Set Password"}
+              </button>
+            </form>
+          </>
         )}
       </div>
 
@@ -245,12 +289,55 @@ function SecurityTab({ hasPassword }: { hasPassword: boolean }) {
         <p className="text-sm text-slate-500 mb-4">
           Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        <button
-          disabled
-          className="px-5 py-2.5 rounded-xl border border-red-300 text-red-600 text-sm font-semibold opacity-50 cursor-not-allowed"
-        >
-          Delete Account (Coming Soon)
-        </button>
+        {showDeleteConfirm ? (
+          <form
+            action={(formData) => {
+              setDeleteError(null);
+              startDeleteTransition(async () => {
+                const result = await deleteAccount(formData);
+                if (result && !result.success) {
+                  setDeleteError(result.error ?? "Failed to delete account.");
+                }
+              });
+            }}
+            className="space-y-3"
+          >
+            <p className="text-sm text-slate-700">
+              Type <span className="font-semibold">{email}</span> to confirm:
+            </p>
+            <input
+              name="confirmEmail"
+              type="email"
+              required
+              placeholder="your@email.com"
+              className="block w-full rounded-xl bg-slate-50 border border-red-200 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+            />
+            {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={isDeleting}
+                className="px-5 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors"
+              >
+                {isDeleting ? "Deleting..." : "Permanently Delete"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowDeleteConfirm(false); setDeleteError(null); }}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-5 py-2.5 rounded-xl border border-red-300 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors"
+          >
+            Delete Account
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,12 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient(): PrismaClient {
-  const adapter = new PrismaPg(process.env.DATABASE_URL!);
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL!,
+    ssl: process.env.DATABASE_URL!.includes("sslmode=require")
+      ? { rejectUnauthorized: false }
+      : undefined,
+  });
+  const adapter = new PrismaPg(pool);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const opts: any = {
     adapter,

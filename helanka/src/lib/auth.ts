@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import type { UserRole } from "@prisma/client";
 import GoogleProvider from "next-auth/providers/google";
+import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { authConfig } from "@/lib/auth.config";
 
@@ -8,10 +9,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
+        if (account?.provider === "google" || account?.provider === "microsoft-entra-id") {
+          const { db } = await import("@/lib/db");
+          if (db) {
+            let dbUser = await db.user.findUnique({
+              where: { email: user.email! },
+            });
+            if (!dbUser) {
+              dbUser = await db.user.create({
+                data: {
+                  email: user.email!,
+                  name: user.name,
+                  image: user.image,
+                  role: "CUSTOMER",
+                  lastLogin: new Date(),
+                },
+              });
+            } else {
+              db.user.update({
+                where: { id: dbUser.id },
+                data: { lastLogin: new Date(), image: user.image ?? dbUser.image },
+              }).catch(() => void 0);
+            }
+            token.id = dbUser.id;
+            token.role = dbUser.role;
+          }
+        } else {
+          token.id = user.id;
+          token.role = user.role;
+        }
       }
       return token;
     },
@@ -27,6 +55,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID ?? "",
       clientSecret: process.env.AUTH_GOOGLE_SECRET ?? "",
+    }),
+    MicrosoftEntraID({
+      clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID ?? "",
+      clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET ?? "",
+      issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }),
     CredentialsProvider({
       name: "credentials",

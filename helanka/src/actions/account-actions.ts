@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -91,6 +91,76 @@ export async function changePassword(formData: FormData): Promise<ActionResult> 
   } catch {
     return { success: false, error: "Failed to change password." };
   }
+}
+
+export async function setPassword(formData: FormData): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const { setPasswordSchema } = await import("@/lib/validations");
+  const parsed = setPasswordSchema.safeParse({
+    newPassword: formData.get("newPassword"),
+  });
+  if (!parsed.success) {
+    return { success: false, error: "Password must be at least 8 characters, with one uppercase letter and one number." };
+  }
+
+  try {
+    const { db } = await import("@/lib/db");
+    if (!db) return { success: false, error: "Database unavailable." };
+    const bcrypt = (await import("bcryptjs")).default;
+
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { passwordHash: true },
+    });
+    if (!user) {
+      return { success: false, error: "User not found." };
+    }
+    if (user.passwordHash) {
+      return { success: false, error: "You already have a password. Use 'Change Password' instead." };
+    }
+
+    const newHash = await bcrypt.hash(parsed.data.newPassword, 12);
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { passwordHash: newHash },
+    });
+
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to set password." };
+  }
+}
+
+export async function deleteAccount(formData: FormData): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+
+  const confirmEmail = formData.get("confirmEmail");
+  if (!confirmEmail || confirmEmail !== session.user.email) {
+    return { success: false, error: "Email does not match. Please type your email to confirm." };
+  }
+
+  try {
+    const { db } = await import("@/lib/db");
+    if (!db) return { success: false, error: "Database unavailable." };
+
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { role: true },
+    });
+    if (!user) return { success: false, error: "User not found." };
+    if (user.role === "ADMIN") {
+      return { success: false, error: "Admin accounts cannot be self-deleted." };
+    }
+
+    await db.user.delete({ where: { id: session.user.id } });
+  } catch {
+    return { success: false, error: "Failed to delete account." };
+  }
+
+  await signOut({ redirectTo: "/login" });
 }
 
 interface TripSummary {
