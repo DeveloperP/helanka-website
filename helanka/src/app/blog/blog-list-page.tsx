@@ -32,7 +32,7 @@ export function BlogListPage({
             style={{ backgroundImage: `url('${featured[0].coverImage}')` }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-          <div ref={heroRef} className="reveal relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+          <div ref={heroRef} className="reveal relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
             <span className="inline-block bg-primary text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
               Featured
             </span>
@@ -53,7 +53,7 @@ export function BlogListPage({
         </section>
       )}
 
-      <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <section className="py-20 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="flex gap-4 mb-12 overflow-x-auto scrollbar-hide pb-2">
           {allCategories.map((c) => (
             <button

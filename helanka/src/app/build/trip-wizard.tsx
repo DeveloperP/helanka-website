@@ -230,7 +230,7 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
   })();
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 font-[family-name:var(--font-body)]">
+    <div className="min-h-screen bg-background pt-24 sm:pt-32 pb-20 font-[family-name:var(--font-body)]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <ProgressBar currentStep={step} />
 

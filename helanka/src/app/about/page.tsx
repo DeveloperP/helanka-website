@@ -71,7 +71,7 @@ export default function AboutPage() {
           style={{ backgroundImage: "url('/images/public-ella-nine-arch.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div ref={heroRef} className="reveal relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+        <div ref={heroRef} className="reveal relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
           <span className="inline-block bg-primary text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
             Our Story
           </span>
@@ -86,8 +86,8 @@ export default function AboutPage() {
 
       {/* Stats Bar */}
       <section className="bg-background border-y border-outline">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 py-12">
-          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32 py-12">
+          <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             {stats.map((stat) => (
               <div key={stat.label} data-stagger className="text-center">
                 <p className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-primary mb-2">
@@ -102,7 +102,7 @@ export default function AboutPage() {
 
       {/* Our Story */}
       <section className="bg-background py-20">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div ref={storyRef} className="reveal">
               <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface mb-6">
@@ -133,7 +133,7 @@ export default function AboutPage() {
 
       {/* Values */}
       <section className="bg-background py-20 border-t border-outline">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
           <div ref={valuesHeadRef} className="reveal text-center mb-16">
             <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
               How We Work
@@ -165,7 +165,7 @@ export default function AboutPage() {
 
       {/* Team */}
       <section className="bg-background py-20 border-t border-outline">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
           <div ref={teamHeadRef} className="reveal text-center mb-16">
             <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
               The People You Will Meet
@@ -207,7 +207,7 @@ export default function AboutPage() {
 
       {/* MendisOne - Parent Company */}
       <section className="bg-background py-20 border-t border-outline">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
           <div ref={parentRef} className="reveal grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
@@ -300,7 +300,7 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="bg-background py-20 border-t border-outline">
-        <div ref={ctaRef} className="reveal max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 text-center">
+        <div ref={ctaRef} className="reveal max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32 text-center">
           <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface mb-4">
             Want to See Sri Lanka?
           </h2>

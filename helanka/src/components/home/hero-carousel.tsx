@@ -124,7 +124,7 @@ export default function HeroCarousel() {
 
       {/* Content */}
       <div className="relative z-20 w-full px-6 md:px-20 lg:px-28 max-w-[1440px] mx-auto flex flex-col justify-center h-full pt-20">
-        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-12">
+        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
           {/* Left: Hero text with blur entrance */}
           <div
             key={`hero-text-${active}`}
@@ -139,19 +139,27 @@ export default function HeroCarousel() {
             <h1 className="font-[family-name:var(--font-display)] text-5xl md:text-[72px] leading-[1.05] text-white mb-6 whitespace-pre-line tracking-tight">
               {slide.destination}
             </h1>
-            <p className="text-base leading-7 text-white/70 mb-10 max-w-sm">
+            <p className="text-base leading-7 text-white/70 mb-6 lg:mb-10 max-w-sm">
               {slide.tagline}
             </p>
-            <button
-              onClick={() => router.push(`/destinations/${slide.slug}`)}
-              className="pressable bg-white/8 border border-white/15 text-white px-10 py-4 rounded-lg text-xs font-semibold tracking-[0.1em] uppercase hover:bg-white/12 transition-colors"
-            >
-              Explore {slide.label.split("The ")[1] || slide.label}
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => router.push(`/destinations/${slide.slug}`)}
+                className="pressable bg-white/8 border border-white/15 text-white px-10 py-4 rounded-lg text-xs font-semibold tracking-[0.1em] uppercase hover:bg-white/12 transition-colors"
+              >
+                Explore {slide.label.split("The ")[1] || slide.label}
+              </button>
+              <button
+                onClick={() => router.push("/build")}
+                className="pressable lg:hidden bg-primary text-on-primary px-10 py-4 rounded-lg text-xs font-bold tracking-[0.1em] uppercase hover:brightness-110 transition-all"
+              >
+                Build Your Trip
+              </button>
+            </div>
           </div>
 
-          {/* Right: Trip builder */}
-          <div className="w-full max-w-[420px] glass-panel p-8 md:p-10 rounded-2xl">
+          {/* Right: Trip builder (desktop only) */}
+          <div className="hidden lg:block w-full max-w-[420px] glass-panel p-8 md:p-10 rounded-2xl">
             <h2 className="font-[family-name:var(--font-display)] text-[28px] leading-9 text-white mb-2">
               Build Your Trip
             </h2>

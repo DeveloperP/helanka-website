@@ -283,7 +283,7 @@ export default function Footer() {
             {/* Nav columns */}
             <div
               ref={navRef}
-              className="grid grid-cols-2 sm:grid-cols-3 gap-x-10 md:gap-x-14 gap-y-8 lg:pt-1"
+              className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 sm:gap-x-10 md:gap-x-14 gap-y-8 lg:pt-1"
             >
               {linkColumns.map((col) => (
                 <div key={col.heading} data-stagger>

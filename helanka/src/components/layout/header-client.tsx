@@ -33,7 +33,7 @@ export function HeaderClient({ user }: HeaderClientProps) {
   const pathname = usePathname();
 
   const isLightPage = LIGHT_PAGES.some((p) => pathname === p);
-  const lightMode = scrolled || isLightPage;
+  const lightMode = isLightPage;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -55,7 +55,9 @@ export function HeaderClient({ user }: HeaderClientProps) {
           className={`rounded-xl transition-all duration-500 ${
             lightMode
               ? "bg-white/85 backdrop-blur-xl border-black/5 shadow-lg shadow-black/5"
-              : "bg-white/5 backdrop-blur-md border-white/8"
+              : scrolled
+                ? "bg-black/40 backdrop-blur-2xl border-white/10 shadow-lg shadow-black/20"
+                : "bg-white/5 backdrop-blur-md border-white/8"
           }`}
           style={{ transitionTimingFunction: "var(--ease-out)" }}
         >
@@ -81,7 +83,7 @@ export function HeaderClient({ user }: HeaderClientProps) {
                   className={`text-sm transition-colors duration-200 ${
                     lightMode
                       ? "text-slate-500 hover:text-primary"
-                      : "text-on-surface-muted hover:text-white"
+                      : "text-white/80 hover:text-white"
                   }`}
                 >
                   {link.label}
@@ -145,7 +147,7 @@ export function HeaderClient({ user }: HeaderClientProps) {
                   className={`block py-2.5 text-sm transition-colors duration-200 ${
                     lightMode
                       ? "text-slate-500 hover:text-primary"
-                      : "text-on-surface-muted hover:text-white"
+                      : "text-white/80 hover:text-white"
                   }`}
                 >
                   {link.label}

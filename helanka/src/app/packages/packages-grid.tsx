@@ -37,7 +37,7 @@ export default function PackagesGrid({
     <>
       {/* Filter bar */}
       <section className="border-b border-outline sticky top-0 z-40 bg-background/80 backdrop-blur-xl">
-        <div className="max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32 flex gap-6 overflow-x-auto scrollbar-hide py-4">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32 flex gap-6 overflow-x-auto scrollbar-hide py-4">
           {regions.map((region) => (
             <button
               key={region}
@@ -53,7 +53,7 @@ export default function PackagesGrid({
         </div>
       </section>
 
-      <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <section className="py-20 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filtered.map((pkg) => (
             <Link
@@ -70,18 +70,18 @@ export default function PackagesGrid({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/60 to-transparent" />
                 <div className="absolute top-4 left-4 flex gap-2">
-                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
+                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[11px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
                     {pkg.durationDays} Days
                   </span>
-                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
+                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[11px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
                     {pkg.difficulty}
                   </span>
-                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[10px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
+                  <span className="bg-surface-raised/60 backdrop-blur-sm text-on-surface text-[11px] font-semibold tracking-wider uppercase px-3 py-1 rounded-full">
                     {pkg.minGuests}-{pkg.maxGuests} Guests
                   </span>
                 </div>
                 <div className="absolute bottom-4 left-4">
-                  <span className="text-[10px] font-semibold text-primary tracking-[0.2em] uppercase">
+                  <span className="text-[11px] font-semibold text-primary tracking-[0.2em] uppercase">
                     {pkg.region}
                   </span>
                 </div>
@@ -95,13 +95,13 @@ export default function PackagesGrid({
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-on-surface-muted uppercase tracking-widest mr-1">
+                    <span className="text-[11px] text-on-surface-muted uppercase tracking-widest mr-1">
                       from
                     </span>
                     <span className="font-[family-name:var(--font-display)] text-2xl text-primary">
                       ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
                     </span>
-                    <span className="text-[10px] text-on-surface-muted uppercase tracking-widest ml-2">
+                    <span className="text-[11px] text-on-surface-muted uppercase tracking-widest ml-2">
                       per person
                     </span>
                   </div>

@@ -34,7 +34,7 @@ export default async function PackagesPage() {
           style={{ backgroundImage: "url('/images/bg-featured-packages.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+        <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
           <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
             Our Packages
           </span>

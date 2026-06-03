@@ -54,17 +54,17 @@ export default async function PackageDetailPage({ params }: Props) {
             All Packages
           </Link>
 
-          <h1 className="font-[family-name:var(--font-display)] text-6xl md:text-8xl lg:text-9xl text-on-surface uppercase tracking-tight">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-on-surface uppercase tracking-tight">
             {pkg.name}
           </h1>
         </div>
 
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
-          <div className="flex flex-wrap gap-4">
+        <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             {stats.map((s) => (
               <div
                 key={s.label}
-                className="glass-panel rounded-xl px-5 py-4 min-w-[140px]"
+                className="glass-panel rounded-xl px-4 sm:px-5 py-3 sm:py-4 min-w-[110px] sm:min-w-[140px]"
               >
                 <span className="block text-on-surface font-[family-name:var(--font-display)] text-lg">
                   {s.value}
@@ -85,7 +85,7 @@ export default async function PackageDetailPage({ params }: Props) {
       </section>
 
       {/* About the Tour */}
-      <section className="py-24 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <section className="py-24 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="flex items-center gap-6 mb-16">
           <div className="h-px flex-1 bg-outline" />
           <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface uppercase tracking-wide shrink-0">
@@ -141,7 +141,7 @@ export default async function PackageDetailPage({ params }: Props) {
       </section>
 
       {/* Highlights */}
-      <section className="py-24 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <section className="py-24 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="flex items-center gap-6 mb-16">
           <div className="h-px flex-1 bg-outline" />
           <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface uppercase tracking-wide shrink-0">

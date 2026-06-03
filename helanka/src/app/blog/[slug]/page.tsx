@@ -45,7 +45,7 @@ export default async function BlogPostPage({ params }: Props) {
           style={{ backgroundImage: `url('${post.coverImage}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+        <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
           <Link
             href="/blog"
             className="inline-flex items-center gap-2 text-sm text-on-surface-muted hover:text-on-surface transition-colors mb-6"
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </section>
 
-      <article className="py-16 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <article className="py-16 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div
           className="prose prose-invert prose-lg max-w-3xl mx-auto prose-p:text-on-surface-muted prose-p:leading-relaxed prose-h2:text-on-surface prose-h3:text-on-surface prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl"
           dangerouslySetInnerHTML={{ __html: post.content }}
@@ -79,7 +79,7 @@ export default async function BlogPostPage({ params }: Props) {
       </article>
 
       {related.length > 0 && (
-        <section className="py-16 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto border-t border-outline">
+        <section className="py-16 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto border-t border-outline">
           <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-10">
             More in {post.category}
           </h2>
@@ -88,9 +88,9 @@ export default async function BlogPostPage({ params }: Props) {
               <Link
                 key={r.slug}
                 href={`/blog/${r.slug}`}
-                className="group flex gap-6 items-start"
+                className="group flex gap-4 sm:gap-6 items-start"
               >
-                <div className="shrink-0 w-32 h-24 rounded-xl overflow-hidden">
+                <div className="shrink-0 w-24 sm:w-32 h-20 sm:h-24 rounded-xl overflow-hidden">
                   <div
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
                     style={{ backgroundImage: `url('${r.coverImage}')`, transitionTimingFunction: "var(--ease-out)" }}

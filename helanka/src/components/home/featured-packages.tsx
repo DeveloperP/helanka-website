@@ -42,7 +42,7 @@ export default function FeaturedPackages({ packages, priceEstimates }: FeaturedP
           </p>
         </div>
 
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {packages.map((pkg) => (
             <Link
               key={pkg.slug}
@@ -60,10 +60,10 @@ export default function FeaturedPackages({ packages, priceEstimates }: FeaturedP
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60" />
                 <div className="absolute top-3 left-3 flex gap-1.5">
-                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[10px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
+                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[11px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
                     {pkg.durationDays} Days
                   </span>
-                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[10px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
+                  <span className="bg-surface/60 backdrop-blur-sm text-white text-[11px] font-medium tracking-wider uppercase px-2.5 py-1 rounded-md">
                     {pkg.difficulty}
                   </span>
                 </div>
@@ -77,14 +77,14 @@ export default function FeaturedPackages({ packages, priceEstimates }: FeaturedP
                 </p>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] text-on-surface-subtle uppercase tracking-widest mr-1">
+                    <span className="text-[11px] text-on-surface-subtle uppercase tracking-widest mr-1">
                       from
                     </span>
                     <span className="font-[family-name:var(--font-display)] text-xl text-primary">
                       ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
                     </span>
                   </div>
-                  <span className="text-[10px] text-on-surface-subtle uppercase tracking-widest">
+                  <span className="text-[11px] text-on-surface-subtle uppercase tracking-widest">
                     per person
                   </span>
                 </div>

@@ -45,7 +45,7 @@ export default async function DestinationDetailPage({ params }: Props) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
 
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pt-32">
+        <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pt-32">
           <Link
             href="/destinations"
             className="inline-flex items-center gap-2 text-sm text-on-surface-muted hover:text-on-surface transition-colors mb-6"
@@ -58,12 +58,12 @@ export default async function DestinationDetailPage({ params }: Props) {
           <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
             {dest.region}
           </span>
-          <h1 className="font-[family-name:var(--font-display)] text-6xl md:text-8xl text-on-surface uppercase tracking-tight">
+          <h1 className="font-[family-name:var(--font-display)] text-4xl sm:text-6xl md:text-8xl text-on-surface uppercase tracking-tight">
             {dest.name}
           </h1>
         </div>
 
-        <div className="relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
+        <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-12">
           <div className="flex flex-wrap gap-4">
             {dest.facts.map((f) => (
               <div key={f.label} className="glass-panel rounded-xl px-5 py-4">
@@ -76,7 +76,7 @@ export default async function DestinationDetailPage({ params }: Props) {
       </section>
 
       {/* About */}
-      <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+      <section className="py-20 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div>
             <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-6">
@@ -111,7 +111,7 @@ export default async function DestinationDetailPage({ params }: Props) {
         const excursions = getExcursionsForDestination(dest.slug);
         if (excursions.length === 0) return null;
         return (
-          <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+          <section className="py-20 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
             <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-3">
               Excursions in {dest.name}
             </h2>
@@ -156,7 +156,7 @@ export default async function DestinationDetailPage({ params }: Props) {
 
       {/* Related packages */}
       {relatedPackages.length > 0 && (
-        <section className="py-20 px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
+        <section className="py-20 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
           <h2 className="font-[family-name:var(--font-display)] text-3xl text-on-surface mb-10">
             Packages featuring {dest.name}
           </h2>
@@ -187,7 +187,7 @@ export default async function DestinationDetailPage({ params }: Props) {
       )}
 
       {/* CTA */}
-      <section className="py-16 px-8 md:px-24 lg:px-32">
+      <section className="py-16 px-6 sm:px-8 md:px-24 lg:px-32">
         <div className="max-w-[1440px] mx-auto surface-card rounded-3xl p-12 md:p-16 text-center">
           <h2 className="font-[family-name:var(--font-display)] text-4xl text-on-surface mb-4">
             Want to visit {dest.name}?

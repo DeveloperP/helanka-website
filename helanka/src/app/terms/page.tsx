@@ -16,7 +16,7 @@ export default function TermsPage() {
           style={{ backgroundImage: "url('/images/public-sigiriya.jpg')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div ref={heroRef} className="reveal relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+        <div ref={heroRef} className="reveal relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
           <span className="inline-block bg-primary text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
             Legal
           </span>
@@ -31,7 +31,7 @@ export default function TermsPage() {
 
       {/* Content */}
       <section className="py-20">
-        <div ref={contentRef} className="reveal max-w-[1440px] mx-auto px-8 md:px-24 lg:px-32">
+        <div ref={contentRef} className="reveal max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
           <div className="max-w-3xl space-y-12">
             <p className="text-sm text-on-surface-muted">Last updated: June 2026</p>
 

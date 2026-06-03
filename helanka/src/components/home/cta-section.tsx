@@ -10,7 +10,7 @@ export default function CtaSection() {
     <section className="py-28 px-6 md:px-20">
       <div
         ref={ref}
-        className="reveal max-w-[1440px] mx-auto surface-card rounded-3xl p-12 md:p-20 text-center"
+        className="reveal max-w-[1440px] mx-auto surface-card rounded-3xl p-6 sm:p-12 md:p-20 text-center"
       >
         <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-4">
           Start Planning

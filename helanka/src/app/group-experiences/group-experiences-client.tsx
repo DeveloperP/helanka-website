@@ -17,7 +17,7 @@ export default function GroupExperiencesPage() {
           style={{ backgroundImage: `url('${experiences[0].image}')` }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div ref={heroRef} className="reveal relative z-10 w-full px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
+        <div ref={heroRef} className="reveal relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
           <span className="text-xs font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
             Travel Together
           </span>
@@ -31,7 +31,7 @@ export default function GroupExperiencesPage() {
       </section>
 
       {/* Alternating feature sections */}
-      <section className="relative py-20 px-8 md:px-24 lg:px-32 overflow-hidden">
+      <section className="relative py-20 px-6 sm:px-8 md:px-24 lg:px-32 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed opacity-[0.07]"
           style={{ backgroundImage: "url('/images/public-sigiriya.jpg')" }}
@@ -44,7 +44,7 @@ export default function GroupExperiencesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-8 md:px-24 lg:px-32">
+      <section className="py-24 px-6 sm:px-8 md:px-24 lg:px-32">
         <div ref={ctaRef} className="reveal max-w-[1440px] mx-auto surface-card rounded-3xl p-12 md:p-20 text-center">
           <h2 className="font-[family-name:var(--font-display)] text-4xl md:text-5xl text-on-surface mb-4">
             Something else in mind?
@@ -70,9 +70,9 @@ function ExperienceRow({ exp, reversed }: { exp: typeof experiences[number]; rev
   return (
     <div
       ref={ref}
-      className={`reveal flex flex-col ${reversed ? "lg:flex-row-reverse" : "lg:flex-row"} gap-10 items-center`}
+      className={`reveal flex flex-col ${reversed ? "lg:flex-row-reverse" : "lg:flex-row"} gap-6 lg:gap-10 items-center`}
     >
-      <div className="w-full lg:w-1/2 h-[400px] rounded-2xl overflow-hidden">
+      <div className="w-full lg:w-1/2 h-[250px] sm:h-[320px] lg:h-[400px] rounded-2xl overflow-hidden">
         <div
           className="w-full h-full bg-cover bg-center hover:scale-105 transition-transform duration-700"
           style={{ backgroundImage: `url('${exp.image}')`, transitionTimingFunction: "var(--ease-out)" }}
@@ -80,7 +80,7 @@ function ExperienceRow({ exp, reversed }: { exp: typeof experiences[number]; rev
       </div>
 
       <div className="w-full lg:w-1/2">
-        <span className="text-[10px] font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
+        <span className="text-[11px] font-semibold text-primary tracking-[0.2em] uppercase block mb-3">
           {exp.tagline}
         </span>
         <h2 className="font-[family-name:var(--font-display)] text-4xl text-on-surface mb-4">
@@ -92,15 +92,15 @@ function ExperienceRow({ exp, reversed }: { exp: typeof experiences[number]; rev
 
         <div className="flex gap-6 mb-6 text-sm">
           <div>
-            <span className="block text-on-surface-muted text-[10px] uppercase tracking-widest mb-1">Group Size</span>
+            <span className="block text-on-surface-muted text-[11px] uppercase tracking-widest mb-1">Group Size</span>
             <span className="text-on-surface font-medium">{exp.groupSize} people</span>
           </div>
           <div>
-            <span className="block text-on-surface-muted text-[10px] uppercase tracking-widest mb-1">Duration</span>
+            <span className="block text-on-surface-muted text-[11px] uppercase tracking-widest mb-1">Duration</span>
             <span className="text-on-surface font-medium">{exp.durationDays} Days</span>
           </div>
           <div>
-            <span className="block text-on-surface-muted text-[10px] uppercase tracking-widest mb-1">From</span>
+            <span className="block text-on-surface-muted text-[11px] uppercase tracking-widest mb-1">From</span>
             <span className="text-primary font-medium">${exp.price}/person</span>
           </div>
         </div>

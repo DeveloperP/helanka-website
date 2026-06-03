@@ -53,10 +53,10 @@ export default function DestinationsPage() {
         </div>
 
         {/* Center content */}
-        <div className="relative z-20 flex-1 flex flex-col items-start justify-center px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto w-full">
+        <div className="relative z-20 flex-1 flex flex-col items-start justify-center px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto w-full">
           <h1
             key={`dest-title-${active}`}
-            className="hero-text-enter font-[family-name:var(--font-display)] text-6xl md:text-8xl lg:text-9xl text-on-surface uppercase tracking-tight mb-6"
+            className="hero-text-enter font-[family-name:var(--font-display)] text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-on-surface uppercase tracking-tight mb-6"
           >
             Visit
             <br />

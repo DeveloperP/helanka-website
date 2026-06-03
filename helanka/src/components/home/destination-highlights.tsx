@@ -107,7 +107,7 @@ export default function DestinationHighlights() {
             key={dest.name}
             href={`/destinations/${dest.slug}`}
             data-stagger
-            className="group relative flex-none w-[280px] md:w-[320px] h-[400px] rounded-2xl overflow-hidden cursor-pointer snap-start"
+            className="group relative flex-none w-[240px] sm:w-[280px] md:w-[320px] h-[400px] rounded-2xl overflow-hidden cursor-pointer snap-start"
           >
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
@@ -118,7 +118,7 @@ export default function DestinationHighlights() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-6">
-              <span className="text-[10px] font-semibold text-primary tracking-[0.2em] uppercase block mb-2">
+              <span className="text-[11px] font-semibold text-primary tracking-[0.2em] uppercase block mb-2">
                 {dest.region}
               </span>
               <h3 className="font-[family-name:var(--font-display)] text-2xl text-white tracking-tight">
