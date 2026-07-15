@@ -3,10 +3,10 @@ import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 import FeaturedPackages from "./featured-packages";
 
 const FEATURED_SLUGS = [
-  "wildlife-adventure",
-  "hill-country-explorer",
-  "golden-southern-coast",
-  "east-coast-escape",
+  "heritage-hill-country-escape",
+  "golden-sands-southern-coast",
+  "honeymoon-package",
+  "wildlife-getaway",
 ];
 
 export default async function FeaturedPackagesServer() {

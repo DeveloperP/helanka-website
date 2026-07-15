@@ -54,6 +54,11 @@ async function main() {
     colombo: 0, bentota: 64, galle: 126, ella: 200, "nuwara-eliya": 180,
     kandy: 116, sigiriya: 170, anuradhapura: 200, yala: 305,
     "arugam-bay": 320, kitulgala: 87, wilpattu: 180,
+    negombo: 37, chilaw: 80, kalpitiya: 165, jaffna: 395,
+    trincomalee: 260, passikudah: 280, polonnaruwa: 215, matale: 140,
+    mahiyangana: 185, "gal-oya": 280, hatton: 150, haputale: 190,
+    udawalawe: 170, hambantota: 240, hikkaduwa: 100, mirissa: 150,
+    sinharaja: 130, belihuloya: 160,
   };
 
   const destinationData = [
@@ -249,6 +254,293 @@ async function main() {
       photos: [] as string[],
       isActive: true,
     },
+    {
+      name: "Negombo",
+      slug: "negombo",
+      region: "Western Coast",
+      description:
+        "Gateway beach town near Bandaranaike Airport, known for its fishing culture, golden beaches, Dutch canal heritage, and lively fish markets.",
+      highlights: [
+        "Negombo Fish Market",
+        "Dutch Canal",
+        "Muthurajawela Marsh",
+        "Catamaran sailing",
+        "Beach relaxation",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Chilaw",
+      slug: "chilaw",
+      region: "North Western",
+      description:
+        "A quiet coastal town on Sri Lanka's west coast, known for the sacred Munneswaram Hindu temple and its proximity to the pristine beaches of Kalpitiya.",
+      highlights: [
+        "Munneswaram Temple",
+        "Coastal fishing villages",
+        "Quiet beaches",
+        "Gateway to Kalpitiya",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Kalpitiya",
+      slug: "kalpitiya",
+      region: "North Western",
+      description:
+        "A windswept peninsula on the northwest coast, Kalpitiya is the kitesurfing capital of Sri Lanka with dolphin watching, bar reef snorkelling, and unspoilt coastal wilderness.",
+      highlights: [
+        "Kitesurfing",
+        "Dolphin watching",
+        "Bar Reef Marine Sanctuary",
+        "Kalpitiya lagoon",
+        "Pristine beaches",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Jaffna",
+      slug: "jaffna",
+      region: "Northern",
+      description:
+        "The cultural capital of Sri Lanka's Tamil heritage, Jaffna is a vibrant city of Hindu temples, colonial forts, and unique cuisine, set on a peninsula surrounded by islands.",
+      highlights: [
+        "Nallur Kandaswamy Kovil",
+        "Jaffna Fort",
+        "Nagadeepa Island",
+        "Casuarina Beach",
+        "Jaffna Public Library",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Trincomalee",
+      slug: "trincomalee",
+      region: "Eastern Coast",
+      description:
+        "A historic port city on the east coast with one of the world's finest natural harbours, sacred Hindu temples atop dramatic cliffs, and pristine beaches.",
+      highlights: [
+        "Koneswaram Temple",
+        "Pigeon Island",
+        "Nilaveli Beach",
+        "Kanniya Hot Springs",
+        "Fort Frederick",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Passikudah",
+      slug: "passikudah",
+      region: "Eastern Coast",
+      description:
+        "A crescent-shaped bay on the east coast with calm, shallow turquoise waters, making it one of Sri Lanka's safest and most beautiful swimming beaches.",
+      highlights: [
+        "Calm shallow bay",
+        "Coral reef snorkelling",
+        "Kalkudah Beach",
+        "Water sports",
+        "Batticaloa nearby",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Polonnaruwa",
+      slug: "polonnaruwa",
+      region: "Cultural Triangle",
+      description:
+        "The medieval capital of Sri Lanka and a UNESCO World Heritage Site, Polonnaruwa contains spectacular ruins of palaces, temples, and the famous Gal Vihara rock-carved Buddha statues.",
+      highlights: [
+        "Gal Vihara Buddha statues",
+        "Royal Palace ruins",
+        "Parakrama Samudra reservoir",
+        "UNESCO World Heritage Site",
+        "Ancient audience halls",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Matale",
+      slug: "matale",
+      region: "Central",
+      description:
+        "A verdant town in the central hills surrounded by spice gardens, the dramatic Knuckles Mountain Range, and the Riverston cliff viewpoints.",
+      highlights: [
+        "Knuckles Mountain Range",
+        "Riverston viewpoints",
+        "Spice gardens",
+        "Aluvihare Rock Temple",
+        "Sembuwatta Lake",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Mahiyangana",
+      slug: "mahiyangana",
+      region: "Eastern Hills",
+      description:
+        "A sacred Buddhist town on the edge of the Vedda homeland, Mahiyangana is believed to be the first place the Buddha visited in Sri Lanka.",
+      highlights: [
+        "Mahiyangana Raja Maha Viharaya",
+        "Vedda indigenous village",
+        "Sorabora Wewa",
+        "Scenic drives",
+        "Gateway to Gal Oya",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Gal Oya",
+      slug: "gal-oya",
+      region: "Eastern",
+      description:
+        "Home to Sri Lanka's largest reservoir, Senanayake Samudra, Gal Oya National Park offers unique boat safaris where elephants swim between islands.",
+      highlights: [
+        "Boat safari on Senanayake Samudra",
+        "Swimming elephants",
+        "Pristine wilderness",
+        "Birdwatching",
+        "Indigenous Vedda culture",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Hatton",
+      slug: "hatton",
+      region: "Hill Country",
+      description:
+        "A hill country town at the heart of Sri Lanka's tea country, Hatton is the gateway to Adam's Peak and the Ceylon Tea Trails luxury bungalow experience.",
+      highlights: [
+        "Adam's Peak pilgrimage",
+        "Ceylon Tea Trails",
+        "Tea estate bungalows",
+        "St. Clair's Falls",
+        "Plantation heritage",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Haputale",
+      slug: "haputale",
+      region: "Hill Country",
+      description:
+        "A narrow ridge town perched on the edge of Sri Lanka's southern escarpment, offering views from both coasts on a clear day and access to Lipton's famous Dambatenne estate.",
+      highlights: [
+        "Lipton's Seat viewpoint",
+        "Dambatenne Tea Factory",
+        "Adisham Bungalow",
+        "Dramatic escarpment views",
+        "Cool mountain climate",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Udawalawe",
+      slug: "udawalawe",
+      region: "Southern",
+      description:
+        "One of Sri Lanka's best national parks for guaranteed elephant sightings, Udawalawe features open grasslands and is home to over 600 wild elephants.",
+      highlights: [
+        "Elephant safaris",
+        "Elephant Transit Home",
+        "600+ wild elephants",
+        "Open grassland landscape",
+        "Bird diversity",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Hambantota",
+      slug: "hambantota",
+      region: "Southern",
+      description:
+        "A coastal district on Sri Lanka's southeastern tip featuring championship golf, salt pans, bird parks, and proximity to Yala and Bundala national parks.",
+      highlights: [
+        "Shangri-La Golf Resort",
+        "Bundala National Park",
+        "Salt pans",
+        "Hambantota Bird Park",
+        "Southern coast beaches",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Hikkaduwa",
+      slug: "hikkaduwa",
+      region: "Southern Coast",
+      description:
+        "A vibrant beach town on the southern coast known for its coral reef, surf breaks, and lively nightlife, with a marine national park just offshore.",
+      highlights: [
+        "Coral reef snorkelling",
+        "Surf breaks",
+        "Marine National Park",
+        "Beach nightlife",
+        "Glass-bottom boat rides",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Mirissa",
+      slug: "mirissa",
+      region: "Southern Coast",
+      description:
+        "A scenic crescent beach on the southern coast, Mirissa is Sri Lanka's premier whale watching destination and a popular spot for surfing and sunset views.",
+      highlights: [
+        "Blue whale watching",
+        "Coconut Tree Hill",
+        "Surfing",
+        "Secret Beach snorkelling",
+        "Sunset catamaran cruises",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Sinharaja",
+      slug: "sinharaja",
+      region: "Southern Hills",
+      description:
+        "A UNESCO World Heritage rainforest and one of the last viable areas of primary tropical forest in Sri Lanka, home to over 50% of the island's endemic species.",
+      highlights: [
+        "UNESCO World Heritage rainforest",
+        "Endemic wildlife",
+        "Guided trekking",
+        "Bird watching",
+        "Mixed-species feeding flocks",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
+    {
+      name: "Belihuloya",
+      slug: "belihuloya",
+      region: "Hill Country",
+      description:
+        "A quiet highland village in the Sabaragamuwa Province, Belihuloya offers treehouse accommodations, nature trails, and proximity to the Horton Plains.",
+      highlights: [
+        "Treehouse chalets",
+        "Nature trails",
+        "Samanala mountain",
+        "Belihul Oya river",
+        "Peaceful highland retreat",
+      ],
+      photos: [] as string[],
+      isActive: true,
+    },
   ];
 
   const destinations: Record<string, string> = {};
@@ -265,88 +557,224 @@ async function main() {
   // ─── Packages ─────────────────────────────────────────────────────────────
   const packageData = [
     {
-      name: "Hill Country Explorer",
-      slug: "hill-country-explorer",
+      name: "Heritage & Hill Country Escape",
+      slug: "heritage-hill-country-escape",
       description:
-        "Wind through misty mountains, colonial tea estates, and sacred cultural sites on this classic Sri Lanka hill country circuit. Travel by scenic train from Nuwara Eliya down to Ella before finishing in the cultural capital Kandy.",
-      durationDays: 6,
+        "Journey through Sri Lanka's misty highlands and ancient Cultural Triangle on a seven-day circuit of tea estates, sacred temples, and colonial-era railway towns. From the Temple of the Tooth in Kandy to the Nine Arch Bridge in Ella, every stop reveals a new layer of the island's rich heritage.",
+      durationDays: 7,
       highlights: [
-        "Iconic Kandy to Ella train journey",
-        "Tea factory and estate tour in Nuwara Eliya",
+        "Scenic Kandy to Ella train journey",
+        "Temple of the Tooth guided tour",
+        "Tea factory visit in Nuwara Eliya",
         "Nine Arch Bridge at sunrise",
-        "Temple of the Tooth in Kandy",
-        "Little Adam's Peak hike",
+        "Sigiriya Rock Fortress climb",
       ],
       difficulty: "Easy",
       region: "Hill Country",
       isActive: true,
     },
     {
-      name: "Wildlife Adventure",
-      slug: "wildlife-adventure",
+      name: "Golden Sands of the Southern Coast",
+      slug: "golden-sands-southern-coast",
       description:
-        "Track leopards, elephants, and exotic birds across two of Sri Lanka's premier national parks. Combine dawn game drives in Yala with a twilight excursion to Wilpattu for an unparalleled wildlife experience.",
-      durationDays: 4,
+        "Unwind along Sri Lanka's sun-drenched southern coastline, from the UNESCO-listed Galle Fort to the whale watching waters of Mirissa and the coral reefs of Hikkaduwa. This seven-day beach escape blends colonial heritage walks with snorkelling, surfing, and sunset catamaran cruises.",
+      durationDays: 7,
       highlights: [
-        "Yala leopard safari",
-        "Wilpattu villu lake game drive",
-        "Elephant herds",
-        "Sloth bear spotting",
-        "Expert naturalist guide",
-      ],
-      difficulty: "Easy",
-      region: "Southern",
-      isActive: true,
-    },
-    {
-      name: "Golden Southern Coast",
-      slug: "golden-southern-coast",
-      description:
-        "Explore the sun-kissed southern coastline from the UNESCO-listed Galle Fort to the turtle-nesting beaches of Bentota. Enjoy colonial heritage, world-class snorkelling, and relaxing beachside evenings.",
-      durationDays: 5,
-      highlights: [
-        "Guided tour of Galle Fort",
-        "Turtle hatchery visit",
+        "Guided Galle Fort walking tour",
+        "Blue whale watching from Mirissa",
+        "Hikkaduwa coral reef snorkelling",
+        "Coconut Tree Hill sunset",
         "Bentota water sports",
-        "Whale watching (seasonal)",
-        "Beachfront sunset dining",
       ],
       difficulty: "Easy",
-      region: "Southern",
+      region: "Southern Coast",
       isActive: true,
     },
     {
-      name: "Throbbing Adventure",
-      slug: "throbbing-adventure",
+      name: "Boundaries in Paradise",
+      slug: "boundaries-in-paradise",
       description:
-        "An action-packed hill country escape for thrill-seekers. Raft the Grade 3–4 rapids of the Kelani River in Kitulgala, abseil cliff faces through jungle canyons, and summit Ella Rock for sweeping highland panoramas.",
-      durationDays: 3,
+        "A curated eight-day journey designed for travellers seeking a balanced mix of culture, nature, and relaxation across Sri Lanka's most iconic regions. Explore ancient ruins, hike misty highlands, and end with lazy beach days on the southern coast.",
+      durationDays: 8,
       highlights: [
-        "White water rafting on Kelani River",
-        "Jungle canyoning and abseiling",
-        "Ella Rock summit hike",
-        "Nine Arch Bridge photography",
-        "Adventure-camp accommodation",
+        "Sigiriya and Polonnaruwa UNESCO sites",
+        "Kandy cultural immersion",
+        "Hill country train ride",
+        "Udawalawe elephant safari",
+        "Southern beach finale in Mirissa",
       ],
-      difficulty: "Challenging",
-      region: "Hill Country",
+      difficulty: "Easy",
+      region: "Multi-region",
       isActive: true,
     },
     {
-      name: "East Coast Escape",
-      slug: "east-coast-escape",
+      name: "Jaffna Escape",
+      slug: "jaffna-escape",
       description:
-        "Discover the raw, unhurried beauty of Sri Lanka's east coast. Ride consistent surf breaks at Arugam Bay, explore the wildlife-rich Kumana lagoon, and unwind on some of the island's most pristine and uncrowded beaches.",
-      durationDays: 5,
+        "Venture north to the Tamil heartland on this nine-day cultural odyssey through Jaffna, Trincomalee, and the ancient cities of the Cultural Triangle. Discover Hindu kovils, colonial forts, pristine eastern beaches, and a cuisine found nowhere else on the island.",
+      durationDays: 9,
       highlights: [
-        "Surfing at Arugam Bay Main Point",
-        "Kumana National Park lagoon safari",
-        "Pristine eastern beaches",
-        "Local fishing village visit",
-        "Stargazing on the beach",
+        "Nallur Kandaswamy Kovil ceremony",
+        "Jaffna Fort and Public Library",
+        "Pigeon Island snorkelling from Trincomalee",
+        "Anuradhapura sacred city",
+        "Nagadeepa Island pilgrimage",
       ],
       difficulty: "Moderate",
-      region: "Eastern Coast",
+      region: "Northern & Cultural",
+      isActive: true,
+    },
+    {
+      name: "Honeymoon Package",
+      slug: "honeymoon-package",
+      description:
+        "A ten-day romantic escape crafted for couples, weaving together boutique hill country retreats, private wildlife experiences, and secluded southern beaches. Candlelit dinners, spa treatments, and sunrise moments make every day feel like a celebration.",
+      durationDays: 10,
+      highlights: [
+        "Private tea estate bungalow stay",
+        "Couples Ayurveda spa retreat",
+        "Sunset catamaran cruise in Mirissa",
+        "Candlelit dinner at Galle Fort",
+        "Hot air balloon ride over Sigiriya",
+      ],
+      difficulty: "Easy",
+      region: "Multi-region",
+      isActive: true,
+    },
+    {
+      name: "Wildlife Getaway",
+      slug: "wildlife-getaway",
+      description:
+        "Track leopards, swimming elephants, and exotic birdlife across four of Sri Lanka's premier national parks on this ten-day wilderness circuit. From Yala's thorny scrubland to Gal Oya's boat safaris and Udawalawe's open grasslands, every game drive brings a new encounter.",
+      durationDays: 10,
+      highlights: [
+        "Yala leopard safari at dawn",
+        "Gal Oya boat safari with swimming elephants",
+        "Udawalawe Elephant Transit Home",
+        "Wilpattu villu lake game drive",
+        "Sinharaja rainforest bird walk",
+      ],
+      difficulty: "Easy",
+      region: "Wildlife Circuit",
+      isActive: true,
+    },
+    {
+      name: "Elite Golf Escape",
+      slug: "elite-golf-escape",
+      description:
+        "A fourteen-day luxury golf tour linking Sri Lanka's finest championship courses with five-star resort stays and cultural excursions. Play oceanfront fairways in Hambantota, highland greens in Nuwara Eliya, and finish with a spa retreat on the southern coast.",
+      durationDays: 14,
+      highlights: [
+        "Shangri-La Hambantota championship course",
+        "Victoria Golf & Country Resort in Kandy",
+        "Nuwara Eliya Golf Club (est. 1889)",
+        "Luxury resort accommodation throughout",
+        "Guided Galle Fort heritage walk",
+      ],
+      difficulty: "Easy",
+      region: "Multi-region",
+      isActive: true,
+    },
+    {
+      name: "Birdies by the Beach",
+      slug: "birdies-by-the-beach",
+      description:
+        "A seven-day coastal golf getaway pairing beachside rounds with surf, seafood, and sunset relaxation along Sri Lanka's western and southern shores. Tee off with ocean views in the morning and unwind on golden sand by afternoon.",
+      durationDays: 7,
+      highlights: [
+        "Oceanfront golf at Shangri-La Hambantota",
+        "Beach relaxation in Bentota",
+        "Hikkaduwa surf and snorkel session",
+        "Galle Fort evening walk",
+        "Fresh seafood dining on the coast",
+      ],
+      difficulty: "Easy",
+      region: "Southern & Western",
+      isActive: true,
+    },
+    {
+      name: "Fairways and Greens",
+      slug: "fairways-and-greens",
+      description:
+        "An eight-day hill country golf tour threading together highland courses, tea estate stays, and scenic train journeys through Sri Lanka's most dramatic landscapes. Play the colonial-era Nuwara Eliya links before descending through misty valleys to Kandy.",
+      durationDays: 8,
+      highlights: [
+        "Nuwara Eliya Golf Club heritage round",
+        "Victoria Golf & Country Resort",
+        "Tea estate bungalow accommodation",
+        "Scenic highland train journey",
+        "Royal Botanical Gardens Peradeniya",
+      ],
+      difficulty: "Easy",
+      region: "Hill Country & Western",
+      isActive: true,
+    },
+    {
+      name: "Golf Among the Misty Hills",
+      slug: "golf-among-the-misty-hills",
+      description:
+        "A ten-day grand golf tour combining all of Sri Lanka's top courses with cultural highlights, wildlife safaris, and coastal relaxation. From the highlands of Nuwara Eliya to the championship fairways of Hambantota, this is the definitive Sri Lanka golf experience.",
+      durationDays: 10,
+      highlights: [
+        "Three championship golf courses",
+        "Yala National Park leopard safari",
+        "Kandy Temple of the Tooth visit",
+        "Southern coast beach days",
+        "Luxury transfers throughout",
+      ],
+      difficulty: "Easy",
+      region: "Multi-region",
+      isActive: true,
+    },
+    {
+      name: "Maldives Holidays",
+      slug: "maldives-holidays",
+      description:
+        "Extend your Sri Lanka journey with a five-day Maldives add-on featuring overwater villas, world-class diving, and powder-white beaches. A short flight from Colombo delivers you to one of the most pristine island paradises on Earth.",
+      durationDays: 5,
+      highlights: [
+        "Overwater villa accommodation",
+        "World-class reef diving and snorkelling",
+        "Sunset dolphin cruise",
+        "Private sandbank picnic",
+        "Spa treatments over the lagoon",
+      ],
+      difficulty: "Easy",
+      region: "Maldives",
+      isActive: true,
+    },
+    {
+      name: "Throbbing Adventure Sri Lanka",
+      slug: "throbbing-adventure",
+      description:
+        "A ten-day adrenaline-fuelled expedition for thrill-seekers, from white water rafting on the Kelani River and jungle canyoning in Kitulgala to Ella Rock summit hikes and mountain biking through tea country. Every day pushes the pace with a new outdoor challenge.",
+      durationDays: 10,
+      highlights: [
+        "White water rafting on Kelani River",
+        "Jungle canyoning and abseiling in Kitulgala",
+        "Ella Rock summit hike at dawn",
+        "Mountain biking through tea plantations",
+        "Sinharaja rainforest trek",
+      ],
+      difficulty: "Challenging",
+      region: "Hill Country & Southern",
+      isActive: true,
+    },
+    {
+      name: "Luxury Travel Sri Lanka",
+      slug: "luxury-travel-sri-lanka",
+      description:
+        "A ten-day ultra-premium circuit of Sri Lanka's finest five-star properties, private guided experiences, and exclusive dining. Travel by seaplane, helicopter, and luxury vehicle as you explore ancient cities, misty tea estates, and secluded coastal retreats.",
+      durationDays: 10,
+      highlights: [
+        "Five-star boutique hotel stays throughout",
+        "Private helicopter transfer to Sigiriya",
+        "Exclusive Galle Fort dinner experience",
+        "Ceylon Tea Trails bungalow in Hatton",
+        "Personal chauffeur and naturalist guide",
+      ],
+      difficulty: "Easy",
+      region: "Multi-region",
       isActive: true,
     },
   ];
@@ -362,9 +790,9 @@ async function main() {
   }
   console.log(`  ${packageData.length} packages upserted.`);
 
-  // ─── Package Items for Hill Country Explorer ──────────────────────────────
+  // ─── Package Items for Heritage & Hill Country Escape ─────────────────────
   // Only seed items if the package currently has none (idempotent)
-  const hillCountryPkgId = packages["hill-country-explorer"];
+  const hillCountryPkgId = packages["heritage-hill-country-escape"];
   const existingItems = await prisma.packageItem.count({
     where: { packageId: hillCountryPkgId },
   });
@@ -468,9 +896,9 @@ async function main() {
         },
       ],
     });
-    console.log("  Hill Country Explorer package items created.");
+    console.log("  Heritage & Hill Country Escape package items created.");
   } else {
-    console.log("  Hill Country Explorer package items already exist, skipping.");
+    console.log("  Heritage & Hill Country Escape package items already exist, skipping.");
   }
 
   // ─── Rate Cards ───────────────────────────────────────────────────────────
@@ -609,6 +1037,26 @@ async function main() {
       ["bentota", "galle", 65],
       ["wilpattu", "anuradhapura", 60], ["wilpattu", "sigiriya", 120],
       ["kitulgala", "nuwara-eliya", 110], ["kitulgala", "ella", 150],
+      // New destination pairs
+      ["negombo", "colombo", 37], ["negombo", "kandy", 120],
+      ["negombo", "sigiriya", 175],
+      ["colombo", "chilaw", 80], ["chilaw", "kalpitiya", 85],
+      ["colombo", "jaffna", 395], ["jaffna", "trincomalee", 200],
+      ["trincomalee", "sigiriya", 150], ["trincomalee", "passikudah", 100],
+      ["sigiriya", "polonnaruwa", 60], ["kandy", "matale", 26],
+      ["sigiriya", "mahiyangana", 85], ["mahiyangana", "gal-oya", 95],
+      ["kandy", "hatton", 65], ["nuwara-eliya", "hatton", 45],
+      ["ella", "haputale", 35], ["ella", "udawalawe", 85],
+      ["udawalawe", "yala", 100],
+      ["colombo", "hikkaduwa", 100], ["galle", "hikkaduwa", 20],
+      ["galle", "mirissa", 35], ["hikkaduwa", "mirissa", 50],
+      ["colombo", "sinharaja", 130], ["udawalawe", "sinharaja", 60],
+      ["nuwara-eliya", "belihuloya", 55],
+      ["colombo", "hambantota", 240], ["yala", "hambantota", 40],
+      ["galle", "hambantota", 120],
+      ["kitulgala", "udawalawe", 110], ["gal-oya", "yala", 120],
+      ["mirissa", "yala", 170],
+      ["colombo", "udawalawe", 170], ["colombo", "mirissa", 150],
     ];
 
     const distanceData = distancePairs.flatMap(([from, to, km]) => {

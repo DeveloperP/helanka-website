@@ -26,7 +26,7 @@ export function useSessionSync() {
 
       store.hydrate({
         tripType: w.tripType ?? null,
-        selectedPackageSlug: w.packageSlug ?? "hill-country-explorer",
+        selectedPackageSlug: w.packageSlug ?? "heritage-hill-country-escape",
         selectedDestinationSlugs: w.destinations ?? [],
         selectedExcursionIds: w.excursionIds ?? [],
         transport: w.transport ?? "standard",
@@ -143,7 +143,7 @@ async function tryRestoreFromServer() {
     useTripSessionStore.getState().hydrate({
       sessionId: session.id,
       tripType: (state.tripType as "package" | "custom" | "mice") ?? null,
-      selectedPackageSlug: (state.selectedPackageSlug as string) ?? "hill-country-explorer",
+      selectedPackageSlug: (state.selectedPackageSlug as string) ?? "heritage-hill-country-escape",
       selectedDestinationSlugs: (state.selectedDestinationSlugs as string[]) ?? [],
       selectedExcursionIds: (state.selectedExcursionIds as string[]) ?? [],
       transport: (state.transport as "standard" | "super-luxury") ?? "standard",

@@ -4,84 +4,79 @@ export interface GroupExperience {
   tagline: string;
   description: string;
   groupSize: string;
-  durationDays: number;
-  price: number;
+  duration: string;
   includes: string[];
   image: string;
 }
 
 export const experiences: GroupExperience[] = [
   {
-    slug: "corporate-retreat",
-    name: "Corporate Retreat",
-    tagline: "Team building in paradise",
+    slug: "incentives",
+    name: "Incentives",
+    tagline: "Transform Business into Experiences",
     description:
-      "Combine strategic off-sites with immersive Sri Lankan experiences. Your team will bond over white-water rafting in Kitulgala, brainstorm in a colonial-era hill country villa, and celebrate milestones with a private beach dinner under the stars.",
-    groupSize: "10–40",
-    durationDays: 4,
-    price: 950,
+      "Host impactful meetings, incentive trips, conferences, and corporate retreats across Sri Lanka's most inspiring destinations. From beachfront boardrooms to luxury hill country resorts, create memorable events that combine productivity with authentic local experiences.",
+    groupSize: "20–500",
+    duration: "2–7 Days",
     includes: [
-      "Dedicated event coordinator",
-      "Private meeting rooms with AV",
-      "Team-building activities",
-      "All meals and transfers",
-      "Welcome dinner and closing ceremony",
+      "Dedicated event management team",
+      "Venue sourcing and logistics",
+      "Team-building experiences",
+      "Conference and AV support",
+      "Gala dinners and networking events",
     ],
-    image: "/images/groups/grp-corporate-retreat.jpg",
+    image: "/images/groups/grp-incentives.jpg",
   },
   {
-    slug: "wedding-celebration",
-    name: "Wedding Celebration",
-    tagline: "Say \"I do\" on the island",
+    slug: "cricket-tours",
+    name: "Cricket Tours",
+    tagline: "Play Where Legends Were Made",
     description:
-      "Exchange vows on a private southern coast beach or inside the walls of a heritage fort. We handle every detail — from floral mandaps to traditional drummers, multi-day guest itineraries, and post-ceremony excursions for your wedding party.",
-    groupSize: "20–100",
-    durationDays: 3,
-    price: 1200,
+      "Experience Sri Lanka through cricket. Whether you're a school team, club side, or professional squad, enjoy competitive fixtures, training sessions, and unforgettable cultural experiences on and off the field.",
+    groupSize: "15–40",
+    duration: "5–12 Days",
     includes: [
-      "Venue scouting and booking",
-      "Wedding planner on-site",
-      "Guest accommodation blocks",
-      "Welcome bags and farewell brunch",
-      "Photography coordination",
+      "International and local fixtures",
+      "Practice facilities and coaching",
+      "Match logistics and transportation",
+      "Accommodation and meals",
+      "Cultural excursions included",
     ],
-    image: "/images/groups/grp-wedding-celebration.jpg",
+    image: "/images/groups/grp-cricket-tours.jpg",
   },
   {
-    slug: "school-expedition",
-    name: "School Expedition",
-    tagline: "Learning beyond the classroom",
+    slug: "rugby-tours",
+    name: "Rugby Tours",
+    tagline: "Challenge Your Team. Discover Sri Lanka.",
     description:
-      "Designed for student groups, this expedition blends wildlife conservation, cultural immersion, and soft adventure. Students track elephants in Udawalawe, learn traditional mask-carving in Ambalangoda, and explore the living history of Galle Fort.",
-    groupSize: "15–50",
-    durationDays: 7,
-    price: 750,
+      "Take your rugby team beyond the ordinary with competitive matches, training camps, and adventure-filled experiences across Sri Lanka's stunning landscapes.",
+    groupSize: "20–50",
+    duration: "5–12 Days",
     includes: [
-      "Qualified trip leaders (1:10 ratio)",
-      "Risk assessments and safety plans",
-      "Educational workshop programme",
-      "Student journals and certificates",
-      "24/7 ground support",
+      "Competitive rugby fixtures",
+      "Training facilities",
+      "Team bonding activities",
+      "Dedicated tour coordinator",
+      "Accommodation and transport",
     ],
-    image: "/images/groups/grp-school-expedition.jpg",
+    image: "/images/groups/grp-rugby-tours.jpg",
   },
   {
-    slug: "family-reunion",
-    name: "Family Reunion",
-    tagline: "Generations together",
+    slug: "golf-holidays",
+    name: "Golf Holidays",
+    tagline: "Tee Off in Paradise",
     description:
-      "Bring the whole family — from grandparents to toddlers. We design multi-pace itineraries so everyone enjoys the trip: gentle temple visits and cooking classes for elders, surf lessons and wildlife safaris for the kids, spa days for parents who need a break.",
-    groupSize: "8–30",
-    durationDays: 5,
-    price: 850,
+      "Play championship golf courses surrounded by breathtaking scenery. Combine world-class golfing with luxury accommodations, fine dining, and unforgettable Sri Lankan experiences.",
+    groupSize: "2–20",
+    duration: "4–10 Days",
     includes: [
-      "Multi-generational activity planning",
-      "Child-friendly meals and rooms",
-      "Private villa or adjoining suites",
-      "Family photo session",
-      "Flexible daily schedule",
+      "Championship golf rounds",
+      "Luxury accommodation",
+      "Private transfers",
+      "Caddie and tee-time arrangements",
+      "Sightseeing experiences",
     ],
-    image: "/images/groups/grp-family-reunion.jpg",
+    image: "/images/groups/grp-golf-holidays.jpg",
   },
 ];
 

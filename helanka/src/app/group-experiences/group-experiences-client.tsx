@@ -97,11 +97,7 @@ function ExperienceRow({ exp, reversed }: { exp: typeof experiences[number]; rev
           </div>
           <div>
             <span className="block text-on-surface-muted text-[11px] uppercase tracking-widest mb-1">Duration</span>
-            <span className="text-on-surface font-medium">{exp.durationDays} Days</span>
-          </div>
-          <div>
-            <span className="block text-on-surface-muted text-[11px] uppercase tracking-widest mb-1">From</span>
-            <span className="text-primary font-medium">${exp.price}/person</span>
+            <span className="text-on-surface font-medium">{exp.duration}</span>
           </div>
         </div>
 

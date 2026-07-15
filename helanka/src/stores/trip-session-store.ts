@@ -64,10 +64,10 @@ export interface TripSessionStore extends TripSessionState, ChatState, SessionMe
 const DEFAULT_STATE: TripSessionState = {
   tripType: null,
   activeTab: "overview",
-  selectedPackageSlug: "hill-country-explorer",
+  selectedPackageSlug: "heritage-hill-country-escape",
   showPackagePicker: false,
   selectedDestinationSlugs: [],
-  selectedExcursionIds: ["hce-1", "hce-3", "hce-5", "hce-7"],
+  selectedExcursionIds: ["sig-1", "sig-3", "kan-1", "kan-4"],
   transport: "standard",
   guideLanguage: "english",
   accommodation: "boutique",
