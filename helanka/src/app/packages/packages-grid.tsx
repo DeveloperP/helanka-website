@@ -19,10 +19,8 @@ interface PackageData {
 
 export default function PackagesGrid({
   packages,
-  priceEstimates,
 }: {
   packages: PackageData[];
-  priceEstimates: Record<string, number>;
 }) {
   const gridRef = useStaggerReveal<HTMLDivElement>();
   const [activeRegion, setActiveRegion] = useState("All");
@@ -93,18 +91,7 @@ export default function PackagesGrid({
                 <p className="text-sm text-on-surface-muted mb-5 leading-relaxed line-clamp-2">
                   {pkg.description}
                 </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] text-on-surface-muted uppercase tracking-widest mr-1">
-                      from
-                    </span>
-                    <span className="font-[family-name:var(--font-display)] text-2xl text-primary">
-                      ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
-                    </span>
-                    <span className="text-[11px] text-on-surface-muted uppercase tracking-widest ml-2">
-                      per person
-                    </span>
-                  </div>
+                <div className="flex items-center justify-end">
                   <span className="text-on-surface-subtle group-hover:text-primary group-hover:translate-x-1 transition-all">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M5 12h14M12 5l7 7-7 7" />

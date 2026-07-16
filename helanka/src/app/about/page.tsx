@@ -32,24 +32,6 @@ const values = [
   },
 ];
 
-const team = [
-  {
-    name: "Kasun Perera",
-    role: "Founder and Head of Operations",
-    bio: "Kasun is from Kandy. He spent years taking friends on trips across the island before turning it into a business. He still designs every itinerary personally.",
-  },
-  {
-    name: "Dilini Wickramasinghe",
-    role: "Guest Relations Manager",
-    bio: "Dilini handles first contact. She is the one you email first and the voice on the other end of the phone. She makes sure nothing gets missed.",
-  },
-  {
-    name: "Nimal Silva",
-    role: "Wildlife and Adventure Guide",
-    bio: "Nimal is a trained naturalist who grew up near Yala. He leads safaris and treks across the island and can spot birds you would walk right past.",
-  },
-];
-
 export default function AboutPage() {
   const heroRef = useScrollReveal<HTMLDivElement>();
   const statsRef = useStaggerReveal<HTMLDivElement>();
@@ -57,8 +39,6 @@ export default function AboutPage() {
   const storyImgRef = useScrollReveal<HTMLDivElement>();
   const valuesHeadRef = useScrollReveal<HTMLDivElement>();
   const valuesGridRef = useStaggerReveal<HTMLDivElement>();
-  const teamHeadRef = useScrollReveal<HTMLDivElement>();
-  const teamGridRef = useStaggerReveal<HTMLDivElement>();
   const parentRef = useScrollReveal<HTMLDivElement>();
   const ctaRef = useScrollReveal<HTMLDivElement>();
 
@@ -157,48 +137,6 @@ export default function AboutPage() {
                   {v.title}
                 </h3>
                 <p className="text-on-surface-muted leading-relaxed">{v.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="bg-background py-20 border-t border-outline">
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-24 lg:px-32">
-          <div ref={teamHeadRef} className="reveal text-center mb-16">
-            <span className="inline-block bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-4">
-              The People You Will Meet
-            </span>
-            <h2 className="font-[family-name:var(--font-display)] text-3xl md:text-4xl text-on-surface">
-              Meet the Team
-            </h2>
-          </div>
-          <div ref={teamGridRef} className="grid md:grid-cols-3 gap-8">
-            {team.map((member) => (
-              <div
-                key={member.name}
-                data-stagger
-                className="surface-card rounded-2xl overflow-hidden hover:border-primary/30 transition-colors"
-                style={{ transitionTimingFunction: "var(--ease-out)" }}
-              >
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                  <span className="font-[family-name:var(--font-display)] text-6xl text-primary/30">
-                    {member.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </span>
-                </div>
-                <div className="p-6">
-                  <h3 className="font-[family-name:var(--font-display)] text-lg text-on-surface mb-1">
-                    {member.name}
-                  </h3>
-                  <p className="text-primary text-sm mb-3">{member.role}</p>
-                  <p className="text-on-surface-muted text-sm leading-relaxed">
-                    {member.bio}
-                  </p>
-                </div>
               </div>
             ))}
           </div>

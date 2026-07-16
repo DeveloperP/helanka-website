@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { packages } from "@/lib/packages";
-import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 import PackagesGrid from "./packages-grid";
 
 export const metadata: Metadata = {
@@ -10,7 +9,6 @@ export const metadata: Metadata = {
 };
 
 export default async function PackagesPage() {
-  const priceEstimates = await getPackagePriceEstimates();
 
   const serialized = packages.map((pkg) => ({
     slug: pkg.slug,
@@ -47,7 +45,7 @@ export default async function PackagesPage() {
         </div>
       </section>
 
-      <PackagesGrid packages={serialized} priceEstimates={priceEstimates} />
+      <PackagesGrid packages={serialized} />
     </>
   );
 }
