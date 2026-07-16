@@ -106,15 +106,15 @@ function TabNavigation({ tabs, activeTab, onNavigate }: { tabs: SidebarTab[]; ac
   const prev = idx > 0 ? tabs[idx - 1] : null;
   const next = idx < tabs.length - 1 ? tabs[idx + 1] : null;
   return (
-    <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
+    <div className="flex items-center justify-between pt-6 mt-6">
       {prev ? (
-        <button onClick={() => onNavigate(prev.id)} className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors group">
+        <button onClick={() => onNavigate(prev.id)} className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors group">
           <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" /></svg>
           {prev.label}
         </button>
       ) : <span />}
       {next ? (
-        <button onClick={() => onNavigate(next.id)} className="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-light transition-colors group">
+        <button onClick={() => onNavigate(next.id)} className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold bg-primary text-on-primary hover:brightness-110 shadow-sm shadow-primary/20 transition-all group">
           {next.label}
           <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </button>
