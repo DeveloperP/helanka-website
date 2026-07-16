@@ -3,13 +3,15 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { respondToQuote } from "@/actions/quote-actions";
+import { respondToQuote, respondToQuoteWithToken } from "@/actions/quote-actions";
 import type { CustomerQuoteData } from "@/actions/quote-actions";
+import { upgradeGuestAccount } from "@/actions/guest-actions";
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
 interface QuoteReviewClientProps {
   quote: CustomerQuoteData;
+  token?: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -251,7 +253,7 @@ function ResponseBanner({ response, showPayment, deposit, bookingId, onPaySucces
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
+export function QuoteReviewClient({ quote, token }: QuoteReviewClientProps) {
   const [showRevisionBox, setShowRevisionBox] = useState(false);
   const [revisionNotes, setRevisionNotes] = useState("");
   const [confirmedResponse, setConfirmedResponse] = useState<string | null>(
@@ -262,17 +264,30 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
 
   const [showPaymentPrompt, setShowPaymentPrompt] = useState(quote.quote.response === "ACCEPTED");
   const [depositPaid, setDepositPaid] = useState(false);
+  const [upgradePassword, setUpgradePassword] = useState("");
+  const [upgradeConfirm, setUpgradeConfirm] = useState("");
+  const [upgradeResult, setUpgradeResult] = useState<{ success: boolean; error?: string } | null>(null);
+  const [upgrading, startUpgrade] = useTransition();
 
   const balanceDue = quote.quote.totalPrice - quote.quote.deposit;
   const alreadyResponded = confirmedResponse !== null;
 
+  async function sendResponse(response: "ACCEPTED" | "REVISION" | "EXPIRED") {
+    if (token) {
+      return respondToQuoteWithToken({
+        bookingId: quote.bookingId,
+        token,
+        quoteId: quote.quote.id,
+        response,
+      });
+    }
+    return respondToQuote({ quoteId: quote.quote.id, response });
+  }
+
   function handleAccept() {
     setError(null);
     startTransition(async () => {
-      const result = await respondToQuote({
-        quoteId: quote.quote.id,
-        response: "ACCEPTED",
-      });
+      const result = await sendResponse("ACCEPTED");
       if (result.success) {
         setConfirmedResponse("ACCEPTED");
         setShowPaymentPrompt(true);
@@ -295,10 +310,7 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
     if (!revisionNotes.trim()) return;
     setError(null);
     startTransition(async () => {
-      const result = await respondToQuote({
-        quoteId: quote.quote.id,
-        response: "REVISION",
-      });
+      const result = await sendResponse("REVISION");
       if (result.success) {
         setConfirmedResponse("REVISION");
         setShowRevisionBox(false);
@@ -315,10 +327,7 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
     if (!confirmed) return;
     setError(null);
     startTransition(async () => {
-      const result = await respondToQuote({
-        quoteId: quote.quote.id,
-        response: "EXPIRED",
-      });
+      const result = await sendResponse("EXPIRED");
       if (result.success) {
         setConfirmedResponse("EXPIRED");
       } else {
@@ -334,13 +343,13 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
 
         {/* ── Back link ─────────────────────────────────────────────────── */}
         <Link
-          href="/dashboard"
+          href={token ? "/" : "/dashboard"}
           className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
-          Back to Dashboard
+          {token ? "Back to Helanka" : "Back to Dashboard"}
         </Link>
 
         {/* ── Header ────────────────────────────────────────────────────── */}
@@ -674,6 +683,68 @@ export function QuoteReviewClient({ quote }: QuoteReviewClientProps) {
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Account upgrade (guest only) ──────────────────────────────── */}
+        {token && confirmedResponse === "ACCEPTED" && !upgradeResult?.success && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-700">Want to track your trip?</h2>
+              <p className="text-sm text-slate-500 mt-1">
+                Set a password to create an account and access your booking dashboard.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md">
+              <input
+                type="password"
+                placeholder="Password"
+                value={upgradePassword}
+                onChange={(e) => setUpgradePassword(e.target.value)}
+                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              />
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={upgradeConfirm}
+                onChange={(e) => setUpgradeConfirm(e.target.value)}
+                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+              />
+            </div>
+            {upgradeResult?.error && (
+              <p className="text-sm text-red-600">{upgradeResult.error}</p>
+            )}
+            <button
+              disabled={upgrading || !upgradePassword || upgradePassword !== upgradeConfirm}
+              onClick={() => {
+                startUpgrade(async () => {
+                  const result = await upgradeGuestAccount({
+                    bookingId: quote.bookingId,
+                    token: token!,
+                    password: upgradePassword,
+                    confirmPassword: upgradeConfirm,
+                  });
+                  setUpgradeResult(result);
+                });
+              }}
+              className="bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {upgrading ? "Creating account..." : "Create Account"}
+            </button>
+          </div>
+        )}
+
+        {token && upgradeResult?.success && (
+          <div className="flex items-center gap-3 px-5 py-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+            <svg className="w-5 h-5 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <p className="text-sm text-emerald-800 font-medium">Account created!</p>
+              <p className="text-xs text-emerald-600 mt-0.5">
+                You can now <Link href="/login" className="underline font-medium">sign in</Link> to access your booking dashboard.
+              </p>
+            </div>
           </div>
         )}
 

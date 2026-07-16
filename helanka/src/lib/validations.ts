@@ -232,6 +232,7 @@ export const tripSessionStateSchema = z.object({
   transport: z.enum(["standard", "super-luxury"]),
   mealPlan: z.string(),
   allergies: z.array(z.string()),
+  dietaryPreferences: z.array(z.string()),
   dietaryNotes: z.string(),
   guests: z.number().int().positive(),
   arrivalDate: z.string(),
@@ -298,3 +299,16 @@ export const respondToSuggestionSchema = z.object({
 });
 
 export type RespondToSuggestionInput = z.infer<typeof respondToSuggestionSchema>;
+
+// ---------------------------------------------------------------------------
+// Guest checkout
+// ---------------------------------------------------------------------------
+
+export const guestQuoteRequestSchema = z.object({
+  email: z.string().email().trim(),
+  name: z.string().max(100).trim().optional(),
+  turnstileToken: z.string().min(1),
+  state: tripSessionStateSchema,
+});
+
+export type GuestQuoteRequestInput = z.infer<typeof guestQuoteRequestSchema>;

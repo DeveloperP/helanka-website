@@ -45,8 +45,8 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));
   }
 
-  // /dashboard/*, /build — must be authenticated
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/build")) {
+  // /dashboard/* — must be authenticated
+  if (pathname.startsWith("/dashboard")) {
     if (!session) {
       const loginUrl = new URL("/login", req.nextUrl.origin);
       loginUrl.searchParams.set("callbackUrl", pathname);
@@ -58,5 +58,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/build/:path*", "/account/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/account/:path*"],
 };

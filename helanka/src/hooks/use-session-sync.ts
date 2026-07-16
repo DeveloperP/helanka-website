@@ -32,6 +32,7 @@ export function useSessionSync() {
         transport: w.transport ?? "standard",
         mealPlan: w.mealPlan ?? "Full Board",
         allergies: w.allergies ?? [],
+        dietaryPreferences: w.dietaryPreferences ?? [],
         dietaryNotes: w.dietaryNotes ?? "",
         guests: w.guests ?? 2,
         arrivalDate: w.arrivalDate ?? "",
@@ -71,6 +72,7 @@ export function useSessionSync() {
         state.departureDate !== prev.departureDate ||
         state.mealPlan !== prev.mealPlan ||
         state.allergies !== prev.allergies ||
+        state.dietaryPreferences !== prev.dietaryPreferences ||
         state.guideLanguage !== prev.guideLanguage ||
         state.accommodation !== prev.accommodation ||
         state.miceEventType !== prev.miceEventType ||
@@ -105,6 +107,7 @@ function storeStateToServerState(s: ReturnType<typeof useTripSessionStore.getSta
     transport: s.transport,
     mealPlan: s.mealPlan,
     allergies: s.allergies,
+    dietaryPreferences: s.dietaryPreferences,
     dietaryNotes: s.dietaryNotes,
     guests: s.guests,
     arrivalDate: s.arrivalDate,
@@ -139,27 +142,28 @@ async function tryRestoreFromServer() {
     const { getActiveTripSession } = await import("@/actions/session-actions");
     const session = await getActiveTripSession();
     if (!session) return;
-    const state = session.state as Record<string, unknown>;
+    const w = session.state as Record<string, unknown>;
     useTripSessionStore.getState().hydrate({
       sessionId: session.id,
-      tripType: (state.tripType as "package" | "custom" | "mice") ?? null,
-      selectedPackageSlug: (state.selectedPackageSlug as string) ?? "heritage-hill-country-escape",
-      selectedDestinationSlugs: (state.selectedDestinationSlugs as string[]) ?? [],
-      selectedExcursionIds: (state.selectedExcursionIds as string[]) ?? [],
-      transport: (state.transport as "standard" | "super-luxury") ?? "standard",
-      mealPlan: (state.mealPlan as string) ?? "Full Board",
-      allergies: (state.allergies as string[]) ?? [],
-      dietaryNotes: (state.dietaryNotes as string) ?? "",
-      guests: (state.guests as number) ?? 2,
-      arrivalDate: (state.arrivalDate as string) ?? "",
-      departureDate: (state.departureDate as string) ?? "",
-      guideLanguage: (state.guideLanguage as string) ?? "english",
-      accommodation: (state.accommodation as string) ?? "boutique",
-      miceEventType: (state.miceEventType as string) ?? "",
-      miceGroupSize: (state.miceGroupSize as number) ?? 30,
-      miceVenuePrefs: (state.miceVenuePrefs as string[]) ?? [],
-      miceRequirements: (state.miceRequirements as string) ?? "",
-      miceBudgetRange: (state.miceBudgetRange as string) ?? "$5k–$15k",
+      tripType: (w.tripType as "package" | "custom" | "mice") ?? null,
+      selectedPackageSlug: (w.packageSlug as string) ?? "heritage-hill-country-escape",
+      selectedDestinationSlugs: (w.destinations as string[]) ?? [],
+      selectedExcursionIds: (w.excursionIds as string[]) ?? [],
+      transport: (w.transport as "standard" | "super-luxury") ?? "standard",
+      mealPlan: (w.mealPlan as string) ?? "Full Board",
+      allergies: (w.allergies as string[]) ?? [],
+      dietaryPreferences: (w.dietaryPreferences as string[]) ?? [],
+      dietaryNotes: (w.dietaryNotes as string) ?? "",
+      guests: (w.guests as number) ?? 2,
+      arrivalDate: (w.arrivalDate as string) ?? "",
+      departureDate: (w.departureDate as string) ?? "",
+      guideLanguage: (w.guideLanguage as string) ?? "english",
+      accommodation: (w.accommodation as string) ?? "boutique",
+      miceEventType: (w.miceEventType as string) ?? "",
+      miceGroupSize: (w.miceGroupSize as number) ?? 30,
+      miceVenuePrefs: (w.miceVenuePrefs as string[]) ?? [],
+      miceRequirements: (w.miceRequirements as string) ?? "",
+      miceBudgetRange: (w.miceBudgetRange as string) ?? "$5k–$15k",
     });
   } catch {
     // DB unavailable — continue in memory-only mode

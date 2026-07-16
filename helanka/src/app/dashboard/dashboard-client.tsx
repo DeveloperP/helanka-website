@@ -2,7 +2,8 @@
 
 import { useEffect, useTransition } from "react";
 import Link from "next/link";
-import { packages as allPackages, getExcursionCap, getExcursionsForDestination } from "@/lib/packages";
+import { packages as allPackages, getExcursionsForDestination } from "@/lib/packages";
+import { COMMON_ALLERGIES, DIETARY_PREFERENCES } from "@/lib/dietary";
 import { destinations as allDestinations } from "@/lib/destinations";
 import { GUIDE_LANGUAGES } from "@/lib/guide-languages";
 import { ACCOMMODATION_TIERS } from "@/lib/accommodation";
@@ -10,6 +11,7 @@ import { useTripSessionStore } from "@/stores/trip-session-store";
 import { useSessionSync } from "@/hooks/use-session-sync";
 import { useSSE } from "@/hooks/use-sse";
 import { sendChatMessage } from "@/actions/chat-actions";
+import { requestQuote } from "@/actions/session-actions";
 import { SuggestionCard } from "@/components/chat/suggestion-card";
 
 interface DashboardClientProps {
@@ -214,6 +216,8 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
   const setMealPlan = (v: string) => store.set("mealPlan", v);
   const allergies = store.allergies;
   const setAllergies = (v: string[]) => store.set("allergies", v);
+  const dietaryPreferences = store.dietaryPreferences;
+  const setDietaryPreferences = (v: string[]) => store.set("dietaryPreferences", v);
   const dietaryNotes = store.dietaryNotes;
   const setDietaryNotes = (v: string) => store.set("dietaryNotes", v);
   const quoteRequested = store.quoteRequested;
@@ -237,7 +241,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
   const fmtYear = (d: Date) => d.getFullYear();
   const datesValid = arrivalDate && departureDate && depDate > arrDate;
   const effectiveDays = nights || tripInfo.days;
-  const EXCURSION_CAP = getExcursionCap(effectiveDays);
+  const EXCURSIONS_PER_DESTINATION = 2;
   const DESTINATION_CAP = Math.max(1, Math.floor(effectiveDays / 2));
 
   // Price calculation
@@ -282,7 +286,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
       }
     : {
         itinerary: true,
-        excursions: selectedExcursionIds.length === EXCURSION_CAP,
+        excursions: selectedExcursionIds.length > 0,
         transport: true,
         dining: true,
       };
@@ -293,9 +297,19 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
     const prev = selectedExcursionIds;
     if (prev.includes(id)) {
       setSelectedExcursionIds(prev.filter((x) => x !== id));
-    } else if (prev.length < EXCURSION_CAP) {
+    } else {
+      const exc = activeExcursions.find((e) => e.id === id);
+      if (!exc) return;
+      const countForDest = prev.filter((eid) =>
+        activeExcursions.find((e) => e.id === eid)?.destinationSlug === exc.destinationSlug
+      ).length;
+      if (countForDest >= EXCURSIONS_PER_DESTINATION) return;
       setSelectedExcursionIds([...prev, id]);
     }
+  }
+
+  function toggleDietaryPref(p: string) {
+    setDietaryPreferences(dietaryPreferences.includes(p) ? dietaryPreferences.filter((x) => x !== p) : [...dietaryPreferences, p]);
   }
 
   function toggleAllergy(a: string) {
@@ -503,7 +517,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   )}
                   {activeTab === "itinerary" && "Your day-by-day plan — review stops and timing"}
                   {activeTab === "destinations" && "Select the places you want to visit"}
-                  {activeTab === "excursions" && (tripType === "custom" ? `Pick up to ${EXCURSION_CAP} activities across your ${effectiveDays}-day trip` : `Select up to ${EXCURSION_CAP} excursions for your ${effectiveDays}-day stay`)}
+                  {activeTab === "excursions" && `Pick up to ${EXCURSIONS_PER_DESTINATION} excursions per destination`}
                   {activeTab === "transport" && "Vehicle, accommodation, and guide for your trip"}
                   {activeTab === "dining" && "Set your meal plan and dietary requirements"}
                   {activeTab === "event-details" && "Tell us about your event"}
@@ -684,14 +698,14 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                       <button onClick={() => setActiveTab("excursions")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                     </div>
                     <p className="font-[family-name:var(--font-display)] text-3xl text-slate-900">
-                      {selectedExcursionIds.length}<span className="text-lg text-slate-400">/{EXCURSION_CAP}</span>
+                      {selectedExcursionIds.length}
                     </p>
                     <p className="text-xs text-slate-400 mt-1">selected &middot; ${excursionTotal}</p>
                     <div className="mt-3 flex items-center gap-1.5">
-                      {selectedExcursionIds.length === EXCURSION_CAP ? (
-                        <><span className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[10px] text-emerald-600 font-medium">Complete</span></>
+                      {selectedExcursionIds.length > 0 ? (
+                        <><span className="w-2 h-2 rounded-full bg-emerald-400" /><span className="text-[10px] text-emerald-600 font-medium">{EXCURSIONS_PER_DESTINATION} per destination</span></>
                       ) : (
-                        <><span className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[10px] text-amber-600 font-medium">{EXCURSION_CAP - selectedExcursionIds.length} remaining</span></>
+                        <><span className="w-2 h-2 rounded-full bg-amber-400" /><span className="text-[10px] text-amber-600 font-medium">None selected</span></>
                       )}
                     </div>
                   </div>
@@ -725,7 +739,9 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                     <p className="text-sm font-semibold text-slate-900">{mealPlan}</p>
                     <p className="text-xs text-slate-400 mt-1">
-                      {allergies.length > 0 ? allergies.join(", ") : "No allergies"}
+                      {dietaryPreferences.length > 0 ? dietaryPreferences.join(", ") : ""}
+                      {dietaryPreferences.length > 0 && allergies.length > 0 ? " · " : ""}
+                      {allergies.length > 0 ? allergies.join(", ") : dietaryPreferences.length === 0 ? "No preferences set" : ""}
                     </p>
                     <div className="mt-3 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400" />
@@ -889,14 +905,14 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500">Excursions</span>
-                          <span className="text-slate-900 font-medium">{selectedExcursionIds.length} / {EXCURSION_CAP} max</span>
+                          <span className="text-slate-900 font-medium">{selectedExcursionIds.length} selected ({EXCURSIONS_PER_DESTINATION} per dest.)</span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-slate-500">Stay</span>
                           <span className="text-slate-900 font-medium">{effectiveDays} days</span>
                         </div>
                       </div>
-                      <p className="text-xs text-slate-400 mt-3">~2 days per destination, excursion cap scales with trip length</p>
+                      <p className="text-xs text-slate-400 mt-3">~2 days per destination, up to {EXCURSIONS_PER_DESTINATION} excursions each</p>
                     </div>
                   </div>
 
@@ -941,6 +957,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         <button onClick={() => setActiveTab("dining")} className="text-xs text-primary font-semibold hover:underline">Edit</button>
                       </div>
                       <p className="text-sm font-semibold text-slate-900">{mealPlan}</p>
+                      {dietaryPreferences.length > 0 && <p className="text-xs text-slate-400 mt-1">{dietaryPreferences.join(", ")}</p>}
                     </div>
                     <div className="bg-white rounded-2xl p-5 shadow-sm">
                       <h3 className="text-sm font-semibold text-slate-900 mb-3">Guests</h3>
@@ -1149,7 +1166,7 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     <div>
                       <p className="text-sm text-slate-500">Selected excursions</p>
                       <p className="text-2xl font-bold text-slate-900">
-                        {selectedExcursionIds.length} <span className="text-base text-slate-400 font-normal">of {EXCURSION_CAP} max</span>
+                        {selectedExcursionIds.length}
                       </p>
                     </div>
                     <div className="text-right">
@@ -1158,40 +1175,8 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 mt-3">
-                    Your {effectiveDays}-day stay allows up to {EXCURSION_CAP} excursions — 1 rest/travel day per arrival + every 4 days.
-                    {datesValid && <> Change your dates to adjust the cap.</>}
+                    Up to {EXCURSIONS_PER_DESTINATION} excursions per destination. Select from each destination below.
                   </p>
-                  {selectedExcursionIds.length > EXCURSION_CAP && (
-                    <div className="mt-3 px-4 py-3 bg-amber-50 rounded-xl flex items-start gap-2">
-                      <svg className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
-                      <p className="text-sm text-amber-700">
-                        You have {selectedExcursionIds.length} excursions selected but your dates only allow {EXCURSION_CAP}. Please deselect {selectedExcursionIds.length - EXCURSION_CAP} or extend your trip below.
-                      </p>
-                    </div>
-                  )}
-                  {selectedExcursionIds.length >= EXCURSION_CAP && (
-                    <div className="mt-3 px-4 py-4 bg-primary/5 rounded-xl border border-primary/20">
-                      <p className="text-sm font-medium text-slate-800">Your {effectiveDays}-day stay limits you to {EXCURSION_CAP} excursions</p>
-                      <p className="text-xs text-slate-500 mt-1">Extend your departure to unlock more.</p>
-                      <div className="flex items-center gap-3 mt-3">
-                        <label className="text-xs text-slate-500 flex-shrink-0">Depart</label>
-                        <input
-                          type="date"
-                          value={departureDate}
-                          min={arrivalDate}
-                          onChange={(e) => setDepartureDate(e.target.value)}
-                          className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:border-primary transition-colors"
-                        />
-                        {datesValid && (() => {
-                          const previewNights = Math.round((new Date(departureDate + "T00:00:00").getTime() - new Date(arrivalDate + "T00:00:00").getTime()) / 86400000);
-                          const nextCap = getExcursionCap(previewNights + 1);
-                          return nextCap > EXCURSION_CAP ? (
-                            <span className="text-[11px] text-slate-400">+1 day → {nextCap} excursions</span>
-                          ) : null;
-                        })()}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Grid — grouped by destination for custom tours, flat for packages */}
@@ -1204,17 +1189,20 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                         price: EXCURSION_PRICES[exc.id] ?? 35,
                       }));
                       if (destExcursions.length === 0) return null;
+                      const destSelectedCount = selectedExcursionIds.filter((eid) =>
+                        destExcursions.some((e) => e.id === eid)
+                      ).length;
                       return (
                         <div key={slug}>
                           <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-primary" />
                             {dest?.name ?? slug}
-                            <span className="text-xs text-slate-400 font-normal">({destExcursions.length} available)</span>
+                            <span className={`text-xs font-medium ${destSelectedCount >= EXCURSIONS_PER_DESTINATION ? "text-primary" : "text-slate-400"}`}>{destSelectedCount} / {EXCURSIONS_PER_DESTINATION}</span>
                           </h3>
                           <div className="grid md:grid-cols-2 gap-4">
                             {destExcursions.map((exc) => {
                               const picked = selectedExcursionIds.includes(exc.id);
-                              const atCap = selectedExcursionIds.length >= EXCURSION_CAP && !picked;
+                              const atCap = destSelectedCount >= EXCURSIONS_PER_DESTINATION && !picked;
                               return (
                                 <button
                                   key={exc.id}
@@ -1254,43 +1242,64 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                     })}
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {activeExcursions.map((exc) => {
-                      const picked = selectedExcursionIds.includes(exc.id);
-                      const atCap = selectedExcursionIds.length >= EXCURSION_CAP && !picked;
-                      return (
-                        <button
-                          key={exc.id}
-                          onClick={() => toggleExcursion(exc.id)}
-                          disabled={atCap}
-                          className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
-                            picked
-                              ? "border-primary ring-1 ring-primary/20"
-                              : atCap
-                              ? "border-transparent opacity-40 cursor-not-allowed"
-                              : "border-transparent hover:border-slate-200"
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0 flex-1">
-                              <h4 className="text-sm font-semibold text-slate-900">{exc.name}</h4>
-                              <p className="text-xs text-slate-500 mt-1 line-clamp-2">{exc.description}</p>
-                              <div className="flex items-center gap-3 mt-3">
-                                <span className="text-[10px] text-slate-400 uppercase tracking-wider">{exc.durationHours}h</span>
-                                <span className="text-sm font-semibold text-slate-900">${exc.price}</span>
-                              </div>
+                  <div className="space-y-6">
+                    {(() => {
+                      const destSlugs = [...new Set(activeExcursions.map((e) => e.destinationSlug))];
+                      return destSlugs.map((slug) => {
+                        const dest = allDestinations.find((d) => d.slug === slug);
+                        const destExcursions = activeExcursions.filter((e) => e.destinationSlug === slug);
+                        const destSelectedCount = selectedExcursionIds.filter((eid) =>
+                          destExcursions.some((e) => e.id === eid)
+                        ).length;
+                        return (
+                          <div key={slug}>
+                            <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                              <span className="w-2 h-2 rounded-full bg-primary" />
+                              {dest?.name ?? slug}
+                              <span className={`text-xs font-medium ${destSelectedCount >= EXCURSIONS_PER_DESTINATION ? "text-primary" : "text-slate-400"}`}>{destSelectedCount} / {EXCURSIONS_PER_DESTINATION}</span>
+                            </h3>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              {destExcursions.map((exc) => {
+                                const picked = selectedExcursionIds.includes(exc.id);
+                                const atCap = destSelectedCount >= EXCURSIONS_PER_DESTINATION && !picked;
+                                return (
+                                  <button
+                                    key={exc.id}
+                                    onClick={() => toggleExcursion(exc.id)}
+                                    disabled={atCap}
+                                    className={`text-left bg-white rounded-2xl p-5 shadow-sm transition-[border-color,background-color] border-2 ${
+                                      picked
+                                        ? "border-primary ring-1 ring-primary/20"
+                                        : atCap
+                                        ? "border-transparent opacity-40 cursor-not-allowed"
+                                        : "border-transparent hover:border-slate-200"
+                                    }`}
+                                  >
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="min-w-0 flex-1">
+                                        <h4 className="text-sm font-semibold text-slate-900">{exc.name}</h4>
+                                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{exc.description}</p>
+                                        <div className="flex items-center gap-3 mt-3">
+                                          <span className="text-[10px] text-slate-400 uppercase tracking-wider">{exc.durationHours}h</span>
+                                          <span className="text-sm font-semibold text-slate-900">${exc.price}</span>
+                                        </div>
+                                      </div>
+                                      <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-primary border-primary" : "border-slate-200"}`}>
+                                        {picked && (
+                                          <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                          </svg>
+                                        )}
+                                      </span>
+                                    </div>
+                                  </button>
+                                );
+                              })}
                             </div>
-                            <span className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${picked ? "bg-primary border-primary" : "border-slate-200"}`}>
-                              {picked && (
-                                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                              )}
-                            </span>
                           </div>
-                        </button>
-                      );
-                    })}
+                        );
+                      });
+                    })()}
                   </div>
                 )}
                 <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
@@ -1456,33 +1465,58 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   </div>
                 </div>
 
-                {/* Allergies */}
+                {/* Dietary Preferences & Allergies */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <h3 className="text-sm font-semibold text-slate-900 mb-4">Allergies &amp; Dietary Restrictions</h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {["Nuts", "Shellfish", "Dairy", "Gluten", "Eggs", "Soy", "Fish", "Sesame"].map((a) => {
-                      const on = allergies.includes(a);
-                      return (
-                        <button
-                          key={a}
-                          onClick={() => toggleAllergy(a)}
-                          className={`px-3.5 py-1.5 rounded-full text-sm border transition-colors ${
-                            on
-                              ? "bg-red-50 border-red-200 text-red-600 font-medium"
-                              : "bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200"
-                          }`}
-                        >
-                          {a}
-                        </button>
-                      );
-                    })}
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-3">Dietary Preferences</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {DIETARY_PREFERENCES.map((p) => {
+                          const on = dietaryPreferences.includes(p);
+                          return (
+                            <button
+                              key={p}
+                              onClick={() => toggleDietaryPref(p)}
+                              className={`px-3.5 py-1.5 rounded-full text-sm border transition-colors ${
+                                on
+                                  ? "bg-primary/10 border-primary/30 text-primary font-medium"
+                                  : "bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-900 mb-3">Allergies &amp; Restrictions</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {COMMON_ALLERGIES.map((a) => {
+                          const on = allergies.includes(a);
+                          return (
+                            <button
+                              key={a}
+                              onClick={() => toggleAllergy(a)}
+                              className={`px-3.5 py-1.5 rounded-full text-sm border transition-colors ${
+                                on
+                                  ? "bg-red-50 border-red-200 text-red-600 font-medium"
+                                  : "bg-slate-50 border-slate-100 text-slate-500 hover:border-slate-200"
+                              }`}
+                            >
+                              {a}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                   <textarea
                     rows={3}
                     value={dietaryNotes}
                     onChange={(e) => setDietaryNotes(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-slate-300 resize-none"
-                    placeholder="Any other dietary notes — vegan, halal, kosher, specific preferences..."
+                    className="mt-4 w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-slate-300 resize-none"
+                    placeholder="Any other dietary notes or specific preferences..."
                   />
                 </div>
                 <TabNavigation tabs={sidebarTabs} activeTab={activeTab} onNavigate={setActiveTab} />
@@ -1950,6 +1984,13 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                               <button onClick={() => setActiveTab("dining")} className="text-xs text-primary font-semibold hover:underline">Change</button>
                             </div>
                             <p className="text-sm text-slate-700 font-medium">{mealPlan}</p>
+                            {dietaryPreferences.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                {dietaryPreferences.map((p) => (
+                                  <span key={p} className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">{p}</span>
+                                ))}
+                              </div>
+                            )}
                             {allergies.length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
                                 {allergies.map((a) => (
@@ -2021,8 +2062,13 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           : `${specialist.name.split(" ")[0]} will review your selections and prepare a detailed quotation. No payment required yet.`}
                       </p>
                       <button
-                        onClick={() => setQuoteRequested(true)}
-                        disabled={tripType === "mice" ? !miceEventType || !datesValid : !guestsValid || !datesValid || selectedExcursionIds.length > EXCURSION_CAP}
+                        onClick={async () => {
+                          setQuoteRequested(true);
+                          if (store.sessionId) {
+                            await requestQuote(store.sessionId);
+                          }
+                        }}
+                        disabled={tripType === "mice" ? !miceEventType || !datesValid : !guestsValid || !datesValid}
                         className="bg-primary text-on-primary px-10 py-4 rounded-xl text-base font-bold hover:brightness-110 transition-colors shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed pressable"
                       >
                         {tripType === "mice" ? "Submit Event Inquiry" : "Request My Quote"}

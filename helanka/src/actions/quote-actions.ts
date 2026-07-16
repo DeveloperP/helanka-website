@@ -7,6 +7,9 @@ import { createBookingFromSession } from "@/lib/session-to-booking";
 import { calculateTransportDistance, calculateTransportCost, determineSeason } from "@/lib/pricing-engine";
 import { sendQuoteSchema, quoteResponseSchema } from "@/lib/validations";
 import type { SendQuoteInput, QuoteResponseInput } from "@/lib/validations";
+import { randomBytes } from "crypto";
+import { sendEmail } from "@/lib/email";
+import { buildQuoteDeliveryEmail } from "@/lib/email-templates";
 import { getHotelsGroupedByDestination, getTransportRateCards, getDailyBufferRate, getAllExcursionsGrouped } from "@/actions/hotel-actions";
 import type { HotelOption, ExcursionOption } from "@/actions/hotel-actions";
 
@@ -535,10 +538,64 @@ export async function sendQuote(input: SendQuoteInput): Promise<{ success: boole
       data: { status: "QUOTE_SENT" },
     });
 
+    // Generate magic link token for guest quote review
+    const magicToken = randomBytes(32).toString("hex");
+    const tokenExpires = new Date(new Date(validUntil).getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    await db.verificationToken.create({
+      data: {
+        identifier: `quote:${bookingId}`,
+        token: magicToken,
+        expires: tokenExpires,
+      },
+    });
+
+    // Email quote to customer
+    const bookingWithUser = await db.booking.findUnique({
+      where: { id: bookingId },
+      include: { user: { select: { name: true, email: true } } },
+    });
+    const tripSession = await db.tripSession.findFirst({
+      where: { bookingId },
+      select: { state: true },
+    });
+
+    if (bookingWithUser?.user.email) {
+      const baseUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+      const quoteUrl = `${baseUrl}/quote/${bookingId}?token=${magicToken}`;
+      const tripState = tripSession?.state as Record<string, unknown> | null;
+      const tripSummary = tripState
+        ? buildTripSummaryFromState(tripState)
+        : `${bookingWithUser.numTravelers} travelers`;
+
+      await sendEmail({
+        to: bookingWithUser.user.email,
+        subject: "Your personalized quote is ready!",
+        html: buildQuoteDeliveryEmail(
+          bookingWithUser.user.name ?? "Traveler",
+          quoteUrl,
+          totalPrice,
+          deposit,
+          new Date(validUntil),
+          tripSummary,
+        ),
+      });
+    }
+
     return { success: true, quoteId: quote.id };
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : "Failed to send quote" };
   }
+}
+
+function buildTripSummaryFromState(state: Record<string, unknown>): string {
+  const parts: string[] = [];
+  if (state.tripType === "package") parts.push(`Package trip`);
+  if (state.tripType === "custom") parts.push(`Custom tour`);
+  if (state.tripType === "mice") parts.push(`MICE event`);
+  if (typeof state.guests === "number") parts.push(`${state.guests} travelers`);
+  if (state.arrivalDate) parts.push(`${state.arrivalDate} to ${state.departureDate}`);
+  return parts.join(" | ");
 }
 
 // ─── Customer: Respond to quote ─────────────────────────────────────────────
@@ -701,4 +758,114 @@ export async function getCustomerBookings(): Promise<CustomerBookingListItem[]> 
     totalPaid: b.payments.reduce((sum, p) => sum + p.amount, 0),
     createdAt: b.createdAt.toISOString(),
   }));
+}
+
+// ─── Magic link: Token-validated quote access ──────────────────────────────
+
+async function validateQuoteToken(bookingId: string, token: string): Promise<boolean> {
+  if (!db) return false;
+  const record = await db.verificationToken.findFirst({
+    where: {
+      identifier: `quote:${bookingId}`,
+      token,
+      expires: { gt: new Date() },
+    },
+  });
+  return !!record;
+}
+
+export async function getQuoteForToken(
+  bookingId: string,
+  token: string,
+): Promise<CustomerQuoteData | null> {
+  if (!db) return null;
+  if (!(await validateQuoteToken(bookingId, token))) return null;
+
+  const booking = await db.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      user: { select: { name: true } },
+      items: {
+        include: { destination: { select: { name: true } } },
+        orderBy: { sortOrder: "asc" },
+      },
+      quotes: {
+        orderBy: { version: "desc" },
+        take: 1,
+      },
+    },
+  });
+
+  if (!booking || booking.quotes.length === 0) return null;
+
+  const quote = booking.quotes[0];
+
+  return {
+    bookingId: booking.id,
+    customerName: booking.user.name,
+    arrivalDate: booking.arrivalDate?.toISOString() ?? null,
+    departureDate: booking.departureDate?.toISOString() ?? null,
+    numTravelers: booking.numTravelers,
+    items: booking.items.map((item) => ({
+      type: item.type,
+      description: item.description,
+      destinationName: item.destination?.name ?? null,
+      price: item.actualPrice,
+    })),
+    quote: {
+      id: quote.id,
+      version: quote.version,
+      totalPrice: quote.totalPrice,
+      deposit: quote.deposit,
+      validUntil: quote.validUntil.toISOString(),
+      adminNotes: quote.adminNotes,
+      response: quote.response,
+    },
+  };
+}
+
+export async function respondToQuoteWithToken(input: {
+  bookingId: string;
+  token: string;
+  quoteId: string;
+  response: "ACCEPTED" | "REVISION" | "EXPIRED";
+}): Promise<{ success: boolean; error?: string }> {
+  if (!db) return { success: false, error: "Database not available" };
+  if (!(await validateQuoteToken(input.bookingId, input.token))) {
+    return { success: false, error: "Invalid or expired link" };
+  }
+
+  const quote = await db.quote.findUnique({
+    where: { id: input.quoteId },
+    include: { booking: { select: { id: true } } },
+  });
+
+  if (!quote || quote.booking.id !== input.bookingId) {
+    return { success: false, error: "Quote not found" };
+  }
+
+  try {
+    await db.quote.update({
+      where: { id: quote.id },
+      data: { response: input.response, respondedAt: new Date() },
+    });
+
+    const statusMap: Record<string, string> = {
+      ACCEPTED: "CONFIRMED",
+      REVISION: "REVISION_REQUESTED",
+      EXPIRED: "EXPIRED",
+    };
+
+    const newStatus = statusMap[input.response];
+    if (newStatus) {
+      await db.booking.update({
+        where: { id: quote.booking.id },
+        data: { status: newStatus as "CONFIRMED" | "REVISION_REQUESTED" | "EXPIRED" },
+      });
+    }
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Failed to respond to quote" };
+  }
 }

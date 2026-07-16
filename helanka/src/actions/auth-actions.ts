@@ -59,19 +59,28 @@ export async function registerUser(formData: FormData): Promise<ActionResult> {
   // Check for duplicate email
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) {
-    return {
-      success: false,
-      error: "An account with this email already exists.",
-    };
+    if (existing.passwordHash === null) {
+      // Shell account from guest checkout -- upgrade it
+      const passwordHash = await bcrypt.hash(password, 12);
+      await db.user.update({
+        where: { id: existing.id },
+        data: { name: name || existing.name, passwordHash },
+      });
+    } else {
+      return {
+        success: false,
+        error: "An account with this email already exists.",
+      };
+    }
+  } else {
+    // Hash password (cost factor 12)
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    // Create the user
+    await db.user.create({
+      data: { name, email, passwordHash },
+    });
   }
-
-  // Hash password (cost factor 12)
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  // Create the user
-  await db.user.create({
-    data: { name, email, passwordHash },
-  });
 
   // Sign in immediately using the credentials provider
   try {

@@ -12,20 +12,20 @@ export default async function BuildPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   let user = DEV_USER;
+  let isAuthenticated = false;
 
-  if (process.env.NODE_ENV === "production" || process.env.AUTH_ENABLED === "1") {
-    try {
-      const { auth } = await import("@/lib/auth");
-      const session = await auth();
-      if (session?.user) {
-        user = {
-          name: session.user.name ?? "Traveler",
-          email: session.user.email ?? "",
-        };
-      }
-    } catch {
-      // DB/auth unavailable — fall through to dev user
+  try {
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+    if (session?.user) {
+      user = {
+        name: session.user.name ?? "Traveler",
+        email: session.user.email ?? "",
+      };
+      isAuthenticated = true;
     }
+  } catch {
+    // DB/auth unavailable — fall through to dev user
   }
 
   const params = await searchParams;
@@ -36,6 +36,7 @@ export default async function BuildPage({
   return (
     <TripWizard
       user={user}
+      isAuthenticated={isAuthenticated}
       initialDestination={initialDestination}
       initialGuests={initialGuests}
       initialArrival={initialArrival}

@@ -28,6 +28,7 @@ export interface TripSessionState {
   departureDate: string;
   mealPlan: string;
   allergies: string[];
+  dietaryPreferences: string[];
   dietaryNotes: string;
   quoteRequested: boolean;
   miceEventType: string;
@@ -76,6 +77,7 @@ const DEFAULT_STATE: TripSessionState = {
   departureDate: "2026-12-20",
   mealPlan: "Full Board",
   allergies: ["Nuts"],
+  dietaryPreferences: [],
   dietaryNotes: "",
   quoteRequested: false,
   miceEventType: "",
@@ -143,6 +145,7 @@ export const useTripSessionStore = create<TripSessionStore>((set, get) => ({
       departureDate: s.departureDate,
       mealPlan: s.mealPlan,
       allergies: s.allergies,
+      dietaryPreferences: s.dietaryPreferences,
       dietaryNotes: s.dietaryNotes,
       quoteRequested: s.quoteRequested,
       miceEventType: s.miceEventType,

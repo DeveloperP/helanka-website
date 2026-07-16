@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { submitGuestQuoteRequest, type GuestQuoteResult } from "@/actions/guest-actions";
+import Turnstile from "@/components/turnstile";
 import { destinations } from "@/lib/destinations";
 import {
   packages,
-  getExcursionCap,
   getExcursionsForDestination,
   type TransportTier,
   type Excursion,
 } from "@/lib/packages";
-import { COMMON_ALLERGIES, MEAL_PLANS, type CommonAllergy, type MealPlanId } from "@/lib/dietary";
+import { COMMON_ALLERGIES, DIETARY_PREFERENCES, MEAL_PLANS, type CommonAllergy, type DietaryPreference, type MealPlanId } from "@/lib/dietary";
 import { GUIDE_LANGUAGES } from "@/lib/guide-languages";
 import { ACCOMMODATION_TIERS } from "@/lib/accommodation";
 
@@ -24,6 +25,7 @@ interface WizardState {
   transport: TransportTier;
   mealPlan: MealPlanId;
   allergies: CommonAllergy[];
+  dietaryPreferences: DietaryPreference[];
   dietaryNotes: string;
   guests: number;
   arrivalDate: string;
@@ -39,6 +41,7 @@ interface WizardState {
 
 interface TripWizardProps {
   user: { name: string; email: string };
+  isAuthenticated?: boolean;
   initialDestination?: string;
   initialGuests?: string;
   initialArrival?: string;
@@ -70,7 +73,8 @@ const MICE_BUDGET_RANGES = [
   "Over $100,000",
 ] as const;
 
-const STEP_LABELS = ["Trip Type", "Destination", "Customize", "Review"];
+const STEP_LABELS = ["Your Trip", "Destination", "Excursions", "Preferences", "Review"];
+const EXCURSIONS_PER_DESTINATION = 2;
 
 const SvgIcon = ({ d, className = "w-8 h-8" }: { d: string | string[]; className?: string }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -92,7 +96,7 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-export default function TripWizard({ initialDestination, initialGuests, initialArrival }: TripWizardProps) {
+export default function TripWizard({ isAuthenticated = false, initialDestination, initialGuests, initialArrival }: TripWizardProps) {
   const router = useRouter();
 
   const initialTripType: TripType | null = initialDestination ? "custom" : null;
@@ -107,6 +111,7 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
     transport: "standard",
     mealPlan: "full-board",
     allergies: [],
+    dietaryPreferences: [],
     dietaryNotes: "",
     guests: initialGuests ? parseInt(initialGuests, 10) : 2,
     arrivalDate: initialArrival ?? "",
@@ -126,12 +131,6 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
 
   const activePackage = state.packageSlug ? packages.find((p) => p.slug === state.packageSlug) ?? null : null;
 
-  const excursionCap = activePackage
-    ? getExcursionCap(activePackage.durationDays)
-    : state.destinations.length > 0
-    ? getExcursionCap(state.destinations.length * 2 + 2)
-    : 4;
-
   const availableExcursions: Excursion[] = activePackage
     ? activePackage.excursions
     : state.destinations.flatMap((slug) => getExcursionsForDestination(slug));
@@ -146,11 +145,16 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
   function toggleExcursion(id: string) {
     setState((prev) => {
       const has = prev.excursionIds.includes(id);
-      if (!has && prev.excursionIds.length >= excursionCap) return prev;
-      return {
-        ...prev,
-        excursionIds: has ? prev.excursionIds.filter((e) => e !== id) : [...prev.excursionIds, id],
-      };
+      if (has) {
+        return { ...prev, excursionIds: prev.excursionIds.filter((e) => e !== id) };
+      }
+      const exc = availableExcursions.find((e) => e.id === id);
+      if (!exc) return prev;
+      const countForDest = prev.excursionIds.filter((eid) =>
+        availableExcursions.find((e) => e.id === eid)?.destinationSlug === exc.destinationSlug
+      ).length;
+      if (countForDest >= EXCURSIONS_PER_DESTINATION) return prev;
+      return { ...prev, excursionIds: [...prev.excursionIds, id] };
     });
   }
 
@@ -176,6 +180,16 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
     });
   }
 
+  function toggleDietaryPref(pref: DietaryPreference) {
+    setState((prev) => {
+      const has = prev.dietaryPreferences.includes(pref);
+      return {
+        ...prev,
+        dietaryPreferences: has ? prev.dietaryPreferences.filter((p) => p !== pref) : [...prev.dietaryPreferences, pref],
+      };
+    });
+  }
+
   function toggleVenuePref(venue: string) {
     setState((prev) => {
       const has = prev.miceVenuePrefs.includes(venue);
@@ -195,6 +209,7 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
       transport: state.transport,
       mealPlan: state.mealPlan,
       allergies: state.allergies,
+      dietaryPreferences: state.dietaryPreferences,
       dietaryNotes: state.dietaryNotes,
       guests: state.guests,
       arrivalDate: state.arrivalDate,
@@ -235,19 +250,38 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
         <ProgressBar currentStep={step} />
 
         <div className="mt-10">
-          {step === 1 && <Step1TripType onSelect={(type) => { update("tripType", type); setStep(2); }} />}
+          {step === 1 && (
+            <Step1TripAndDates
+              tripType={state.tripType}
+              onTripType={(type) => update("tripType", type)}
+              guests={state.guests}
+              onGuests={(v) => update("guests", v)}
+              arrivalDate={state.arrivalDate}
+              onArrivalDate={(v) => update("arrivalDate", v)}
+              departureDate={state.departureDate}
+              onDepartureDate={(v) => update("departureDate", v)}
+              miceGroupSize={state.miceGroupSize}
+              onMiceGroupSize={(v) => update("miceGroupSize", v)}
+              miceEventType={state.miceEventType}
+              onMiceEventType={(v) => update("miceEventType", v)}
+              onContinue={() => setStep(2)}
+            />
+          )}
 
           {step === 2 && state.tripType === "package" && (
             <Step2Packages
               selectedSlug={state.packageSlug}
-              onSelect={(slug) => { update("packageSlug", slug); update("excursionIds", []); setStep(3); }}
+              onSelect={(slug) => { update("packageSlug", slug); update("excursionIds", []); }}
               onBack={() => setStep(1)}
+              onContinue={() => setStep(3)}
             />
           )}
 
           {step === 2 && state.tripType === "custom" && (
             <Step2Destinations
               selected={state.destinations}
+              arrivalDate={state.arrivalDate}
+              departureDate={state.departureDate}
               onToggle={toggleDestination}
               onBack={() => setStep(1)}
               onContinue={() => setStep(3)}
@@ -255,63 +289,6 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
           )}
 
           {step === 2 && state.tripType === "mice" && (
-            <Step2Mice
-              eventType={state.miceEventType}
-              groupSize={state.miceGroupSize}
-              onEventType={(v) => update("miceEventType", v)}
-              onGroupSize={(v) => update("miceGroupSize", v)}
-              onBack={() => setStep(1)}
-              onContinue={() => setStep(3)}
-            />
-          )}
-
-          {step === 3 && state.tripType === "package" && (
-            <Step3Package
-              pkg={activePackage}
-              selectedExcursions={state.excursionIds}
-              excursionCap={excursionCap}
-              onToggleExcursion={toggleExcursion}
-              transport={state.transport}
-              mealPlan={state.mealPlan}
-              allergies={state.allergies}
-              dietaryNotes={state.dietaryNotes}
-              onTransport={(v) => update("transport", v)}
-              onMealPlan={(v) => update("mealPlan", v)}
-              onToggleAllergy={toggleAllergy}
-              onDietaryNotes={(v) => update("dietaryNotes", v)}
-              accommodation={state.accommodation}
-              guideLanguage={state.guideLanguage}
-              onAccommodation={(v) => update("accommodation", v)}
-              onGuideLanguage={(v) => update("guideLanguage", v)}
-              onBack={() => setStep(2)}
-              onContinue={() => setStep(4)}
-            />
-          )}
-
-          {step === 3 && state.tripType === "custom" && (
-            <Step3Custom
-              excursionsByDestination={excursionsByDestination}
-              selectedExcursions={state.excursionIds}
-              excursionCap={excursionCap}
-              onToggleExcursion={toggleExcursion}
-              transport={state.transport}
-              mealPlan={state.mealPlan}
-              allergies={state.allergies}
-              dietaryNotes={state.dietaryNotes}
-              onTransport={(v) => update("transport", v)}
-              onMealPlan={(v) => update("mealPlan", v)}
-              onToggleAllergy={toggleAllergy}
-              onDietaryNotes={(v) => update("dietaryNotes", v)}
-              accommodation={state.accommodation}
-              guideLanguage={state.guideLanguage}
-              onAccommodation={(v) => update("accommodation", v)}
-              onGuideLanguage={(v) => update("guideLanguage", v)}
-              onBack={() => setStep(2)}
-              onContinue={() => setStep(4)}
-            />
-          )}
-
-          {step === 3 && state.tripType === "mice" && (
             <Step3Mice
               venuePrefs={state.miceVenuePrefs}
               requirements={state.miceRequirements}
@@ -319,19 +296,65 @@ export default function TripWizard({ initialDestination, initialGuests, initialA
               onToggleVenue={toggleVenuePref}
               onRequirements={(v) => update("miceRequirements", v)}
               onBudgetRange={(v) => update("miceBudgetRange", v)}
+              onBack={() => setStep(1)}
+              onContinue={() => setStep(5)}
+            />
+          )}
+
+          {step === 3 && state.tripType === "package" && (
+            <StepExcursionsPackage
+              pkg={activePackage}
+              selectedExcursions={state.excursionIds}
+              availableExcursions={availableExcursions}
+              onToggleExcursion={toggleExcursion}
               onBack={() => setStep(2)}
               onContinue={() => setStep(4)}
             />
           )}
 
-          {step === 4 && (
-            <Step4Review
+          {step === 3 && state.tripType === "custom" && (
+            <StepExcursionsCustom
+              excursionsByDestination={excursionsByDestination}
+              selectedExcursions={state.excursionIds}
+              availableExcursions={availableExcursions}
+              onToggleExcursion={toggleExcursion}
+              onBack={() => setStep(2)}
+              onContinue={() => setStep(4)}
+            />
+          )}
+
+          {step === 4 && (state.tripType === "package" || state.tripType === "custom") && (
+            <StepPreferences
+              transport={state.transport}
+              mealPlan={state.mealPlan}
+              allergies={state.allergies}
+              dietaryPreferences={state.dietaryPreferences}
+              dietaryNotes={state.dietaryNotes}
+              onTransport={(v) => update("transport", v)}
+              onMealPlan={(v) => update("mealPlan", v)}
+              onToggleAllergy={toggleAllergy}
+              onToggleDietaryPref={toggleDietaryPref}
+              onDietaryNotes={(v) => update("dietaryNotes", v)}
+              accommodation={state.accommodation}
+              guideLanguage={state.guideLanguage}
+              onAccommodation={(v) => update("accommodation", v)}
+              onGuideLanguage={(v) => update("guideLanguage", v)}
+              onBack={() => setStep(3)}
+              onContinue={() => setStep(5)}
+            />
+          )}
+
+          {step === 5 && (
+            <Step5Review
               state={state}
               activePackage={activePackage}
               availableExcursions={availableExcursions}
               estimatedPrice={estimatedPrice}
-              onBack={() => setStep(3)}
-              onConfirm={handleSignInContinue}
+              isAuthenticated={isAuthenticated}
+              onBack={() => setStep(state.tripType === "mice" ? 2 : 4)}
+              onSignIn={handleSignInContinue}
+              onArrivalDate={(v) => update("arrivalDate", v)}
+              onDepartureDate={(v) => update("departureDate", v)}
             />
           )}
         </div>
@@ -410,24 +433,56 @@ function StepNav({ onBack, onContinue, continueLabel = "Continue", continueDisab
   );
 }
 
-function Step1TripType({ onSelect }: { onSelect: (type: TripType) => void }) {
+function Step1TripAndDates({
+  tripType, onTripType,
+  guests, onGuests,
+  arrivalDate, onArrivalDate,
+  departureDate, onDepartureDate,
+  miceGroupSize, onMiceGroupSize,
+  miceEventType, onMiceEventType,
+  onContinue,
+}: {
+  tripType: TripType | null;
+  onTripType: (type: TripType) => void;
+  guests: number;
+  onGuests: (v: number) => void;
+  arrivalDate: string;
+  onArrivalDate: (v: string) => void;
+  departureDate: string;
+  onDepartureDate: (v: string) => void;
+  miceGroupSize: number;
+  onMiceGroupSize: (v: number) => void;
+  miceEventType: string;
+  onMiceEventType: (v: string) => void;
+  onContinue: () => void;
+}) {
   const cards = [
     { type: "package" as TripType, title: "Curated Package", description: "Choose from our expert-designed itineraries", icon: MAP_PATH },
     { type: "custom" as TripType, title: "Custom Tour", description: "Pick your own destinations and excursions", icon: COMPASS_PATH },
     { type: "mice" as TripType, title: "MICE & Groups", description: "Corporate events, incentives, and group travel", icon: USERS_PATH },
   ];
 
+  const today = new Date().toISOString().split("T")[0];
+  const canContinue = tripType !== null && arrivalDate !== "" && departureDate !== "" && departureDate > arrivalDate
+    && (tripType !== "mice" || miceEventType !== "");
+
   return (
     <div>
-      <StepHeading title="What kind of trip?" subtitle="Tell us how you'd like to travel and we'll tailor everything to you." />
+      <StepHeading title="Tell us about your trip" subtitle="Choose how you'd like to travel, when, and how many are joining." />
+
+      {/* Trip type cards */}
       <div className="grid gap-4 sm:grid-cols-3">
         {cards.map(({ type, title, description, icon }) => (
           <button
             key={type}
-            onClick={() => onSelect(type)}
-            className="surface-card p-7 rounded-2xl text-left group hover:border-primary border border-white/10 transition-all hover:ring-1 hover:ring-primary/20"
+            onClick={() => onTripType(type)}
+            className={`surface-card p-7 rounded-2xl text-left group transition-all ${
+              tripType === type
+                ? "border-primary ring-1 ring-primary/20 border"
+                : "border border-white/10 hover:border-white/25"
+            }`}
           >
-            <div className="text-primary mb-4 group-hover:scale-110 transition-transform">
+            <div className={`mb-4 transition-transform group-hover:scale-110 ${tripType === type ? "text-primary" : "text-white/40"}`}>
               <SvgIcon d={icon} />
             </div>
             <h3 className="font-[family-name:var(--font-display)] text-lg text-white mb-1">{title}</h3>
@@ -435,6 +490,103 @@ function Step1TripType({ onSelect }: { onSelect: (type: TripType) => void }) {
           </button>
         ))}
       </div>
+
+      {/* Dates and travelers - shown after trip type is selected */}
+      {tripType && (
+        <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          {/* MICE event type */}
+          {tripType === "mice" && (
+            <div>
+              <label className="block text-sm text-white/60 mb-1.5">Event type *</label>
+              <select
+                value={miceEventType}
+                onChange={(e) => onMiceEventType(e.target.value)}
+                className="w-full bg-white/5 border border-white/15 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary/50"
+              >
+                <option value="" className="bg-background text-on-surface">Select event type</option>
+                {MICE_EVENT_TYPES.map((t) => (
+                  <option key={t} value={t} className="bg-background text-on-surface">{t}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Dates */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="arrival" className="block text-sm text-white/60 mb-1.5">Arrival date *</label>
+              <input
+                id="arrival"
+                type="date"
+                min={today}
+                value={arrivalDate}
+                onChange={(e) => onArrivalDate(e.target.value)}
+                className="w-full bg-white/5 border border-white/15 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary/50 [color-scheme:dark]"
+              />
+            </div>
+            <div>
+              <label htmlFor="departure" className="block text-sm text-white/60 mb-1.5">Departure date *</label>
+              <input
+                id="departure"
+                type="date"
+                min={arrivalDate || today}
+                value={departureDate}
+                onChange={(e) => onDepartureDate(e.target.value)}
+                className="w-full bg-white/5 border border-white/15 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary/50 [color-scheme:dark]"
+              />
+            </div>
+          </div>
+
+          {/* Travelers */}
+          <div>
+            <label className="block text-sm text-white/60 mb-1.5">
+              {tripType === "mice" ? "Group size *" : "Number of travelers *"}
+            </label>
+            {tripType === "mice" ? (
+              <input
+                type="number"
+                min={2}
+                max={500}
+                value={miceGroupSize}
+                onChange={(e) => onMiceGroupSize(Math.max(2, parseInt(e.target.value, 10) || 2))}
+                className="w-full sm:w-48 bg-white/5 border border-white/15 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary/50"
+              />
+            ) : (
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => onGuests(Math.max(1, guests - 1))}
+                  className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/15 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                  </svg>
+                </button>
+                <span className="font-[family-name:var(--font-display)] text-2xl text-white w-8 text-center">{guests}</span>
+                <button
+                  onClick={() => onGuests(Math.min(20, guests + 1))}
+                  className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 text-white flex items-center justify-center hover:bg-white/15 transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+                <span className="text-white/40 text-sm">{guests === 1 ? "traveler" : "travelers"}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Continue */}
+          <div className="flex justify-end pt-4 border-t border-white/10">
+            <button
+              onClick={onContinue}
+              disabled={!canContinue}
+              className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-bold hover:brightness-110 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -443,10 +595,12 @@ function Step2Packages({
   selectedSlug,
   onSelect,
   onBack,
+  onContinue,
 }: {
   selectedSlug: string | null;
   onSelect: (slug: string) => void;
   onBack: () => void;
+  onContinue: () => void;
 }) {
   return (
     <div>
@@ -487,33 +641,51 @@ function Step2Packages({
           );
         })}
       </div>
-      <div className="flex justify-start mt-10 pt-6 border-t border-white/10">
-        <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
-          Back
-        </button>
-      </div>
+      <StepNav onBack={onBack} onContinue={onContinue} continueDisabled={!selectedSlug} />
     </div>
   );
 }
 
 function Step2Destinations({
   selected,
+  arrivalDate,
+  departureDate,
   onToggle,
   onBack,
   onContinue,
 }: {
   selected: string[];
+  arrivalDate: string;
+  departureDate: string;
   onToggle: (slug: string) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
   const atMax = selected.length >= 6;
+  const tripDays = arrivalDate && departureDate
+    ? Math.round((new Date(departureDate).getTime() - new Date(arrivalDate).getTime()) / 86400000)
+    : 0;
+  const minDaysNeeded = selected.length * 2;
+  const durationTooShort = selected.length > 0 && tripDays > 0 && tripDays < minDaysNeeded;
+
   return (
     <div>
       <StepHeading
         title="Where to?"
         subtitle={`Pick up to 6 destinations. ${selected.length > 0 ? `${selected.length} selected.` : ""}`}
       />
+
+      {durationTooShort && (
+        <div className="mb-6 flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3">
+          <svg className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+          <p className="text-amber-200/80 text-sm">
+            Your {tripDays}-day trip may be tight for {selected.length} destinations. We recommend at least {minDaysNeeded} days so you can enjoy 2 excursions per destination.
+          </p>
+        </div>
+      )}
+
       <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
         {destinations.map((dest) => {
           const isSelected = selected.includes(dest.slug);
@@ -554,89 +726,34 @@ function Step2Destinations({
   );
 }
 
-function Step2Mice({
-  eventType,
-  groupSize,
-  onEventType,
-  onGroupSize,
-  onBack,
-  onContinue,
-}: {
-  eventType: string;
-  groupSize: number;
-  onEventType: (v: string) => void;
-  onGroupSize: (v: number) => void;
-  onBack: () => void;
-  onContinue: () => void;
-}) {
-  return (
-    <div>
-      <StepHeading title="Tell us about your event" subtitle="We'll build a proposal around your requirements." />
-      <div className="space-y-8">
-        <div>
-          <p className="text-white/60 text-sm mb-3">Event Type</p>
-          <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
-            {MICE_EVENT_TYPES.map((type) => (
-              <button
-                key={type}
-                onClick={() => onEventType(type)}
-                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  eventType === type
-                    ? "bg-primary/20 border border-primary text-primary"
-                    : "surface-card border border-white/10 text-white/70 hover:border-white/25"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-white/60 text-sm mb-3">Group Size</p>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => onGroupSize(Math.max(10, groupSize - 10))}
-              className="bg-white/10 border border-white/20 text-white w-10 h-10 rounded-lg flex items-center justify-center text-lg hover:bg-white/15 transition-colors"
-            >
-              −
-            </button>
-            <span className="text-white text-2xl font-semibold w-16 text-center">{groupSize}</span>
-            <button
-              onClick={() => onGroupSize(Math.min(500, groupSize + 10))}
-              className="bg-white/10 border border-white/20 text-white w-10 h-10 rounded-lg flex items-center justify-center text-lg hover:bg-white/15 transition-colors"
-            >
-              +
-            </button>
-            <span className="text-white/40 text-sm">people (10–500)</span>
-          </div>
-        </div>
-      </div>
-      <StepNav onBack={onBack} onContinue={onContinue} continueDisabled={!eventType} />
-    </div>
-  );
-}
-
 function ExcursionSection({
   excursions,
   selectedIds,
-  cap,
+  perDestCap,
+  destCount,
+  allExcursions,
   onToggle,
   groupLabel,
 }: {
   excursions: Excursion[];
   selectedIds: string[];
-  cap: number;
+  perDestCap: number;
+  destCount: number;
+  allExcursions: Excursion[];
   onToggle: (id: string) => void;
   groupLabel?: string;
 }) {
+  const atDestCap = destCount >= perDestCap;
   return (
-    <div>
-      {groupLabel && <h4 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-3">{groupLabel}</h4>}
+    <div className="surface-card border border-white/10 rounded-2xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        {groupLabel && <h4 className="text-white text-sm font-semibold">{groupLabel}</h4>}
+        <span className={`text-xs font-medium ${atDestCap ? "text-primary" : "text-white/40"}`}>{destCount} / {perDestCap}</span>
+      </div>
       <div className="grid gap-2 sm:grid-cols-2">
         {excursions.map((exc) => {
           const isSelected = selectedIds.includes(exc.id);
-          const isDisabled = !isSelected && selectedIds.length >= cap;
+          const isDisabled = !isSelected && atDestCap;
           return (
             <button
               key={exc.id}
@@ -672,10 +789,12 @@ interface DietProps {
   transport: TransportTier;
   mealPlan: MealPlanId;
   allergies: CommonAllergy[];
+  dietaryPreferences: DietaryPreference[];
   dietaryNotes: string;
   onTransport: (v: TransportTier) => void;
   onMealPlan: (v: MealPlanId) => void;
   onToggleAllergy: (a: CommonAllergy) => void;
+  onToggleDietaryPref: (p: DietaryPreference) => void;
   onDietaryNotes: (v: string) => void;
   accommodation: string;
   guideLanguage: string;
@@ -684,8 +803,8 @@ interface DietProps {
 }
 
 function TransportAndDining({
-  transport, mealPlan, allergies, dietaryNotes,
-  onTransport, onMealPlan, onToggleAllergy, onDietaryNotes,
+  transport, mealPlan, allergies, dietaryPreferences, dietaryNotes,
+  onTransport, onMealPlan, onToggleAllergy, onToggleDietaryPref, onDietaryNotes,
   accommodation, guideLanguage, onAccommodation, onGuideLanguage,
 }: DietProps) {
   return (
@@ -772,105 +891,149 @@ function TransportAndDining({
         </div>
       </div>
 
-      <div>
-        <p className="text-white text-sm font-semibold mb-3">Dietary Restrictions</p>
-        <div className="flex flex-wrap gap-2">
-          {COMMON_ALLERGIES.map((allergy) => (
-            <button
-              key={allergy}
-              onClick={() => onToggleAllergy(allergy)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                allergies.includes(allergy)
-                  ? "bg-primary/20 border border-primary text-primary"
-                  : "bg-white/10 border border-white/20 text-white/60 hover:border-white/35"
-              }`}
-            >
-              {allergy}
-            </button>
-          ))}
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <p className="text-white text-sm font-semibold mb-3">Dietary Preferences</p>
+          <div className="flex flex-wrap gap-2">
+            {DIETARY_PREFERENCES.map((pref) => (
+              <button
+                key={pref}
+                onClick={() => onToggleDietaryPref(pref)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  dietaryPreferences.includes(pref)
+                    ? "bg-primary/20 border border-primary text-primary"
+                    : "bg-white/10 border border-white/20 text-white/60 hover:border-white/35"
+                }`}
+              >
+                {pref}
+              </button>
+            ))}
+          </div>
         </div>
-        <textarea
-          value={dietaryNotes}
-          onChange={(e) => onDietaryNotes(e.target.value)}
-          placeholder="Any other dietary notes..."
-          rows={2}
-          className="mt-3 w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-primary/50 resize-none"
-        />
+        <div>
+          <p className="text-white text-sm font-semibold mb-3">Allergies & Restrictions</p>
+          <div className="flex flex-wrap gap-2">
+            {COMMON_ALLERGIES.map((allergy) => (
+              <button
+                key={allergy}
+                onClick={() => onToggleAllergy(allergy)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  allergies.includes(allergy)
+                    ? "bg-red-500/20 border border-red-500/60 text-red-400"
+                    : "bg-white/10 border border-white/20 text-white/60 hover:border-white/35"
+                }`}
+              >
+                {allergy}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
+      <textarea
+        value={dietaryNotes}
+        onChange={(e) => onDietaryNotes(e.target.value)}
+        placeholder="Any other dietary notes..."
+        rows={2}
+        className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-white/80 text-sm placeholder:text-white/30 focus:outline-none focus:border-primary/50 resize-none"
+      />
     </div>
   );
 }
 
-function Step3Package({
-  pkg, selectedExcursions, excursionCap, onToggleExcursion, onBack, onContinue, ...dietProps
-}: DietProps & {
+function StepExcursionsPackage({
+  pkg, selectedExcursions, availableExcursions, onToggleExcursion, onBack, onContinue,
+}: {
   pkg: typeof packages[number] | null;
   selectedExcursions: string[];
-  excursionCap: number;
+  availableExcursions: Excursion[];
   onToggleExcursion: (id: string) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
   if (!pkg) return null;
 
+  const destSlugs = [...new Set(pkg.excursions.map((e) => e.destinationSlug))];
+
   return (
     <div>
       <StepHeading
-        title="Customize your trip"
-        subtitle={`Select up to ${excursionCap} excursions for ${pkg.name}.`}
+        title="Choose your excursions"
+        subtitle={`Pick up to ${EXCURSIONS_PER_DESTINATION} per destination for ${pkg.name}.`}
       />
-      <div className="space-y-8">
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white text-sm font-semibold">Excursions</p>
-            <span className="text-white/40 text-xs">{selectedExcursions.length} / {excursionCap} selected</span>
-          </div>
-          <ExcursionSection excursions={pkg.excursions} selectedIds={selectedExcursions} cap={excursionCap} onToggle={onToggleExcursion} />
-        </div>
-        <TransportAndDining {...dietProps} />
+      <div className="space-y-6">
+        {destSlugs.map((slug) => {
+          const dest = destinations.find((d) => d.slug === slug);
+          const excursions = pkg.excursions.filter((e) => e.destinationSlug === slug);
+          const countForDest = selectedExcursions.filter((eid) =>
+            availableExcursions.find((e) => e.id === eid)?.destinationSlug === slug
+          ).length;
+          return (
+            <ExcursionSection
+              key={slug}
+              excursions={excursions}
+              selectedIds={selectedExcursions}
+              perDestCap={EXCURSIONS_PER_DESTINATION}
+              destCount={countForDest}
+              allExcursions={availableExcursions}
+              onToggle={onToggleExcursion}
+              groupLabel={dest?.name ?? slug}
+            />
+          );
+        })}
       </div>
       <StepNav onBack={onBack} onContinue={onContinue} />
     </div>
   );
 }
 
-function Step3Custom({
-  excursionsByDestination, selectedExcursions, excursionCap, onToggleExcursion, onBack, onContinue, ...dietProps
-}: DietProps & {
+function StepExcursionsCustom({
+  excursionsByDestination, selectedExcursions, availableExcursions, onToggleExcursion, onBack, onContinue,
+}: {
   excursionsByDestination: Record<string, Excursion[]>;
   selectedExcursions: string[];
-  excursionCap: number;
+  availableExcursions: Excursion[];
   onToggleExcursion: (id: string) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
   return (
     <div>
-      <StepHeading title="Customize your trip" subtitle={`Select up to ${excursionCap} excursions across your destinations.`} />
-      <div className="space-y-8">
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white text-sm font-semibold">Excursions</p>
-            <span className="text-white/40 text-xs">{selectedExcursions.length} / {excursionCap} selected</span>
-          </div>
-          <div className="space-y-6">
-            {Object.entries(excursionsByDestination).map(([slug, excursions]) => {
-              const dest = destinations.find((d) => d.slug === slug);
-              return (
-                <ExcursionSection
-                  key={slug}
-                  excursions={excursions}
-                  selectedIds={selectedExcursions}
-                  cap={excursionCap}
-                  onToggle={onToggleExcursion}
-                  groupLabel={dest?.name ?? slug}
-                />
-              );
-            })}
-          </div>
-        </div>
-        <TransportAndDining {...dietProps} />
+      <StepHeading title="Choose your excursions" subtitle={`Pick up to ${EXCURSIONS_PER_DESTINATION} per destination.`} />
+      <div className="space-y-6">
+        {Object.entries(excursionsByDestination).map(([slug, excursions]) => {
+          const dest = destinations.find((d) => d.slug === slug);
+          const countForDest = selectedExcursions.filter((eid) =>
+            availableExcursions.find((e) => e.id === eid)?.destinationSlug === slug
+          ).length;
+          return (
+            <ExcursionSection
+              key={slug}
+              excursions={excursions}
+              selectedIds={selectedExcursions}
+              perDestCap={EXCURSIONS_PER_DESTINATION}
+              destCount={countForDest}
+              allExcursions={availableExcursions}
+              onToggle={onToggleExcursion}
+              groupLabel={dest?.name ?? slug}
+            />
+          );
+        })}
       </div>
+      <StepNav onBack={onBack} onContinue={onContinue} />
+    </div>
+  );
+}
+
+function StepPreferences({
+  onBack, onContinue, ...dietProps
+}: DietProps & {
+  onBack: () => void;
+  onContinue: () => void;
+}) {
+  return (
+    <div>
+      <StepHeading title="Travel preferences" subtitle="Transport, accommodation, guide, and dining." />
+      <TransportAndDining {...dietProps} />
       <StepNav onBack={onBack} onContinue={onContinue} />
     </div>
   );
@@ -953,21 +1116,32 @@ function Step3Mice({
   );
 }
 
-function Step4Review({
+function Step5Review({
   state,
   activePackage,
   availableExcursions,
   estimatedPrice,
+  isAuthenticated,
   onBack,
-  onConfirm,
+  onSignIn,
+  onArrivalDate,
+  onDepartureDate,
 }: {
   state: WizardState;
   activePackage: typeof packages[number] | null;
   availableExcursions: Excursion[];
   estimatedPrice: number | null;
+  isAuthenticated: boolean;
   onBack: () => void;
-  onConfirm: () => void;
+  onSignIn: () => void;
+  onArrivalDate: (v: string) => void;
+  onDepartureDate: (v: string) => void;
 }) {
+  const [guestEmail, setGuestEmail] = useState("");
+  const [guestName, setGuestName] = useState("");
+  const [submitResult, setSubmitResult] = useState<GuestQuoteResult | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   const selectedExcursionNames = availableExcursions
     .filter((e) => state.excursionIds.includes(e.id))
     .map((e) => e.name);
@@ -986,9 +1160,67 @@ function Step4Review({
     mice: "MICE & Groups",
   };
 
+  function handleGuestSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitResult(null);
+    const formData = new FormData(e.currentTarget);
+    const turnstileToken = formData.get("cf-turnstile-response") as string ?? "";
+
+    startTransition(async () => {
+      const result = await submitGuestQuoteRequest({
+        email: guestEmail.trim(),
+        name: guestName.trim() || undefined,
+        turnstileToken,
+        state: {
+          tripType: state.tripType as "package" | "custom" | "mice",
+          packageSlug: state.packageSlug,
+          destinations: state.destinations,
+          excursionIds: state.excursionIds,
+          transport: state.transport,
+          mealPlan: state.mealPlan,
+          allergies: state.allergies,
+          dietaryPreferences: state.dietaryPreferences,
+          dietaryNotes: state.dietaryNotes,
+          guests: state.guests,
+          arrivalDate: state.arrivalDate,
+          departureDate: state.departureDate,
+          guideLanguage: state.guideLanguage,
+          accommodation: state.accommodation,
+          miceEventType: state.miceEventType,
+          miceGroupSize: state.miceGroupSize,
+          miceVenuePrefs: state.miceVenuePrefs,
+          miceRequirements: state.miceRequirements,
+          miceBudgetRange: state.miceBudgetRange,
+        },
+      });
+      setSubmitResult(result);
+    });
+  }
+
+  if (submitResult?.success) {
+    return (
+      <div>
+        <StepHeading title="Quote request sent!" subtitle="We will be in touch soon." />
+        <div className="surface-card border border-white/10 rounded-2xl p-8 text-center space-y-4">
+          <div className="w-16 h-16 mx-auto bg-green-500/20 rounded-full flex items-center justify-center">
+            <CheckIcon className="w-8 h-8 text-green-400" />
+          </div>
+          <p className="text-white text-lg font-medium">Thank you!</p>
+          <p className="text-white/60 max-w-md mx-auto">
+            Check your inbox at <span className="text-white font-medium">{guestEmail}</span>. A travel
+            specialist is reviewing your trip and will send you a personalized quote within 24 hours.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <StepHeading title="Review your trip" subtitle="Everything looks right? Sign in to receive your quote." />
+      <StepHeading
+        title="Review your trip"
+        subtitle={isAuthenticated ? "Everything looks right? Request your quote." : "Enter your email to receive a personalized quote."}
+      />
 
       <div className="surface-card border border-white/10 rounded-2xl p-6 space-y-5">
         <div className="flex items-center gap-3">
@@ -996,6 +1228,18 @@ function Step4Review({
             {tripTypeBadge[state.tripType ?? "package"]}
           </span>
         </div>
+
+        {state.arrivalDate && state.departureDate && (
+          <ReviewRow label="Travel Dates">
+            <span className="text-white">{state.arrivalDate} to {state.departureDate}</span>
+          </ReviewRow>
+        )}
+
+        {state.tripType !== "mice" && state.guests > 0 && (
+          <ReviewRow label="Travelers">
+            <span className="text-white">{state.guests} {state.guests === 1 ? "guest" : "guests"}</span>
+          </ReviewRow>
+        )}
 
         {state.tripType !== "mice" && (
           <>
@@ -1038,8 +1282,14 @@ function Step4Review({
               <span className="text-white">{mealPlanLabel}</span>
             </ReviewRow>
 
+            {state.dietaryPreferences.length > 0 && (
+              <ReviewRow label="Dietary Preferences">
+                <span className="text-white">{state.dietaryPreferences.join(", ")}</span>
+              </ReviewRow>
+            )}
+
             {state.allergies.length > 0 && (
-              <ReviewRow label="Dietary Restrictions">
+              <ReviewRow label="Allergies">
                 <span className="text-white">{state.allergies.join(", ")}</span>
               </ReviewRow>
             )}
@@ -1072,6 +1322,44 @@ function Step4Review({
           </>
         )}
 
+        {state.tripType === "custom" && state.arrivalDate && state.departureDate && (() => {
+          const days = Math.round((new Date(state.departureDate).getTime() - new Date(state.arrivalDate).getTime()) / 86400000);
+          const minDays = state.destinations.length * 2;
+          return days > 0 && days < minDays ? (
+            <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-4 space-y-3">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                </svg>
+                <p className="text-amber-200/80 text-sm">
+                  Your {days}-day trip may be tight for {state.destinations.length} destinations. We recommend at least {minDays} days for 2 excursions per destination.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 pl-8">
+                <div>
+                  <label className="block text-xs text-white/40 mb-1">Arrival</label>
+                  <input
+                    type="date"
+                    value={state.arrivalDate}
+                    onChange={(e) => onArrivalDate(e.target.value)}
+                    className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/40 mb-1">Departure</label>
+                  <input
+                    type="date"
+                    value={state.departureDate}
+                    min={state.arrivalDate}
+                    onChange={(e) => onDepartureDate(e.target.value)}
+                    className="w-full bg-white/5 border border-white/15 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-amber-500/50"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : null;
+        })()}
+
         <div className="pt-4 border-t border-white/10 flex items-center justify-between">
           <span className="text-white/60 text-sm">Estimated Price</span>
           {estimatedPrice !== null ? (
@@ -1084,17 +1372,80 @@ function Step4Review({
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
-        <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
-          Back
-        </button>
-        <button
-          onClick={onConfirm}
-          className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-bold hover:brightness-110 transition-colors"
-        >
-          Get My Quote — Sign In to Continue
-        </button>
-      </div>
+      {isAuthenticated ? (
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+          <button onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
+            Back
+          </button>
+          <button
+            onClick={onSignIn}
+            className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-bold hover:brightness-110 transition-colors"
+          >
+            Request My Quote
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={handleGuestSubmit} className="mt-8 pt-6 border-t border-white/10 space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="guest-email" className="block text-sm text-white/60 mb-1.5">Email address *</label>
+              <input
+                id="guest-email"
+                type="email"
+                required
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+            </div>
+            <div>
+              <label htmlFor="guest-name" className="block text-sm text-white/60 mb-1.5">Your name</label>
+              <input
+                id="guest-name"
+                type="text"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                placeholder="Optional"
+                className="w-full bg-white/5 border border-white/15 rounded-lg px-4 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+            </div>
+          </div>
+
+          <Turnstile className="flex justify-center" />
+
+          {submitResult?.existingAccount && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-sm">
+              <p className="text-amber-200">An account with this email already exists.</p>
+              <button type="button" onClick={onSignIn} className="text-primary font-medium mt-1 hover:underline">
+                Sign in to continue
+              </button>
+            </div>
+          )}
+
+          {submitResult?.error && !submitResult.existingAccount && (
+            <p className="text-red-400 text-sm">{submitResult.error}</p>
+          )}
+
+          <div className="flex items-center justify-between">
+            <button type="button" onClick={onBack} className="bg-white/10 border border-white/20 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-white/15 transition-colors">
+              Back
+            </button>
+            <button
+              type="submit"
+              disabled={isPending || !guestEmail.trim()}
+              className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-bold hover:brightness-110 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPending ? "Sending..." : "Request My Quote"}
+            </button>
+          </div>
+
+          <p className="text-center text-white/40 text-xs">
+            Already have an account?{" "}
+            <button type="button" onClick={onSignIn} className="text-primary hover:underline">Sign in</button>
+          </p>
+        </form>
+      )}
     </div>
   );
 }

@@ -11,6 +11,16 @@ export const COMMON_ALLERGIES = [
 
 export type CommonAllergy = (typeof COMMON_ALLERGIES)[number];
 
+export const DIETARY_PREFERENCES = [
+  "Vegetarian",
+  "Vegan",
+  "Pescatarian",
+  "Halal",
+  "Kosher",
+] as const;
+
+export type DietaryPreference = (typeof DIETARY_PREFERENCES)[number];
+
 export const MEAL_PLANS = [
   {
     id: "full-board",
