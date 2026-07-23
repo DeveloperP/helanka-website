@@ -2,6 +2,7 @@ import { requireAdmin } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { BookingDetailClient } from "./booking-detail-client";
+import { getBookingFeedback } from "@/actions/feedback-actions";
 
 export default async function BookingDetailPage({
   params,
@@ -42,6 +43,8 @@ export default async function BookingDetailPage({
   });
 
   if (!booking) redirect("/admin/bookings");
+
+  const feedback = await getBookingFeedback(bookingId);
 
   return (
     <BookingDetailClient
@@ -94,6 +97,7 @@ export default async function BookingDetailPage({
           status: s.status,
         })),
       }}
+      feedback={feedback}
     />
   );
 }

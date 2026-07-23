@@ -15,6 +15,7 @@ import {
   Cell,
 } from "recharts";
 import type { FunnelStage, UtmRow, RevenueData } from "@/actions/report-actions";
+import type { FeedbackReportItem } from "@/actions/feedback-actions";
 import { toCSV } from "@/lib/csv-export";
 
 const PRESETS = [
@@ -33,12 +34,14 @@ export function ReportsClient({
   utm,
   from,
   to,
+  feedbackReport = [],
 }: {
   revenue: RevenueData | null;
   funnel: FunnelStage[];
   utm: UtmRow[];
   from?: string;
   to?: string;
+  feedbackReport?: FeedbackReportItem[];
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -407,8 +410,92 @@ export function ReportsClient({
           <EmptyState text="No payments in selected period" />
         )}
       </GlassCard>
+
+      {/* Feedback Aggregate */}
+      <GlassCard>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-lg font-bold text-slate-800 tracking-tight">Customer Feedback</h2>
+          {feedbackReport.length > 0 && (
+            <span className="text-xs text-slate-400">{feedbackReport.length} booking{feedbackReport.length !== 1 ? "s" : ""} with feedback</span>
+          )}
+        </div>
+
+        {feedbackReport.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
+              {[
+                { label: "Overall", value: avgOf(feedbackReport, "avgOverall") },
+                { label: "Transport", value: avgOf(feedbackReport, "avgTransport") },
+                { label: "Food", value: avgOf(feedbackReport, "avgFood") },
+                { label: "Guide", value: avgOf(feedbackReport, "avgGuide") },
+                { label: "Accommodation", value: avgOf(feedbackReport, "avgAccommodation") },
+              ].map((k) => (
+                <div key={k.label} className="bg-white/60 backdrop-blur-xl rounded-2xl border border-white/80 shadow-sm shadow-slate-200/50 p-4 text-center">
+                  <p className="text-xl font-bold text-slate-800">{k.value !== null ? k.value.toFixed(1) : "—"}</p>
+                  <p className="text-[11px] font-semibold text-slate-400 mt-0.5 uppercase tracking-wide">{k.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="overflow-x-auto -mx-2">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    <th className="text-left py-2.5 font-semibold text-slate-400 text-[11px] uppercase tracking-wider">Customer</th>
+                    <th className="text-left py-2.5 font-semibold text-slate-400 text-[11px] uppercase tracking-wider">Arrival</th>
+                    <th className="text-center py-2.5 font-semibold text-slate-400 text-[11px] uppercase tracking-wider">Days</th>
+                    <th className="text-center py-2.5 font-semibold text-slate-400 text-[11px] uppercase tracking-wider">Avg</th>
+                    <th className="text-center py-2.5 font-semibold text-slate-400 text-[11px] uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {feedbackReport.map((r) => {
+                    const flagged = r.avgOverall !== null && r.avgOverall <= 2;
+                    return (
+                      <tr key={r.bookingId} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/60 transition-colors">
+                        <td className="py-3">
+                          <p className="font-medium text-slate-700">{r.customerName ?? "—"}</p>
+                          <p className="text-[11px] text-slate-400">{r.customerEmail}</p>
+                        </td>
+                        <td className="py-3 text-slate-600">
+                          {r.arrivalDate ? new Date(r.arrivalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "—"}
+                        </td>
+                        <td className="py-3 text-center text-slate-600">
+                          {r.feedbackCount}/{r.totalDays}
+                        </td>
+                        <td className="py-3 text-center">
+                          <span className={`font-bold ${flagged ? "text-red-500" : "text-slate-800"}`}>
+                            {r.avgOverall !== null ? r.avgOverall.toFixed(1) : "—"}
+                          </span>
+                        </td>
+                        <td className="py-3 text-center">
+                          {flagged ? (
+                            <span className="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-md bg-red-50 text-red-600">Flagged</span>
+                          ) : r.hasSurvey ? (
+                            <span className="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600">Complete</span>
+                          ) : (
+                            <span className="inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-600">In Progress</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : (
+          <EmptyState text="No customer feedback submitted yet" />
+        )}
+      </GlassCard>
     </div>
   );
+}
+
+function avgOf(items: FeedbackReportItem[], key: keyof FeedbackReportItem): number | null {
+  const vals = items.map((i) => i[key]).filter((v): v is number => typeof v === "number");
+  if (vals.length === 0) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
 // --- Shared components ---

@@ -84,6 +84,7 @@ model User {
   sessions           Session[]
   bookings           Booking[]
   reviews            Review[]
+  dailyFeedback      DailyFeedback[]
   customerTripSessions  TripSession[] @relation("CustomerSessions")
   specialistTripSessions TripSession[] @relation("SpecialistSessions")
   chatMessages       ChatMessage[]
@@ -269,8 +270,9 @@ model Booking {
   items        BookingItem[]
   quotes       Quote[]
   payments     Payment[]
-  reviews      Review[]
-  tripSessions TripSession[]
+  reviews        Review[]
+  tripSessions   TripSession[]
+  dailyFeedback  DailyFeedback[]
 
   @@map("bookings")
 }
@@ -451,19 +453,43 @@ model BlogPost {
 }
 
 model Review {
-  id          String   @id @default(cuid())
-  userId      String
-  bookingId   String
-  rating      Int
-  title       String?
-  body        String
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  id                 String   @id @default(cuid())
+  userId             String
+  bookingId          String   @unique
+  rating             Int
+  title              String?
+  body               String
+  isPublished        Boolean  @default(false)
+  wouldRecommend     Boolean?
+  referralSource     String?
+  socialMediaConsent Boolean  @default(false)
+  createdAt          DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 
   @@map("reviews")
+}
+
+model DailyFeedback {
+  id                  String   @id @default(cuid())
+  bookingId           String
+  userId              String
+  dayNumber           Int
+  overallRating       Int
+  transportRating     Int?
+  foodRating          Int?
+  guideRating         Int?
+  accommodationRating Int?
+  comment             String?
+  submittedAt         DateTime @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bookingId, dayNumber])
+  @@index([bookingId])
+  @@map("daily_feedback")
 }
 
 model AnalyticsEvent {

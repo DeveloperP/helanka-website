@@ -304,6 +304,38 @@ export type RespondToSuggestionInput = z.infer<typeof respondToSuggestionSchema>
 // Guest checkout
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Feedback schemas
+// ---------------------------------------------------------------------------
+
+export const submitDailyFeedbackSchema = z.object({
+  bookingId: z.string().min(1),
+  dayNumber: z.number().int().positive(),
+  overallRating: z.number().int().min(1).max(5),
+  transportRating: z.number().int().min(1).max(5).optional(),
+  foodRating: z.number().int().min(1).max(5).optional(),
+  guideRating: z.number().int().min(1).max(5).optional(),
+  accommodationRating: z.number().int().min(1).max(5).optional(),
+  comment: z.string().max(2000).optional(),
+});
+
+export type SubmitDailyFeedbackInput = z.infer<typeof submitDailyFeedbackSchema>;
+
+export const submitTripSurveySchema = z.object({
+  bookingId: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  body: z.string().min(1).max(5000),
+  wouldRecommend: z.boolean(),
+  referralSource: z.string().max(200).optional(),
+  socialMediaConsent: z.boolean().default(false),
+});
+
+export type SubmitTripSurveyInput = z.infer<typeof submitTripSurveySchema>;
+
+// ---------------------------------------------------------------------------
+// Guest checkout
+// ---------------------------------------------------------------------------
+
 export const guestQuoteRequestSchema = z.object({
   email: z.string().email().trim(),
   name: z.string().max(100).trim().optional(),

@@ -2,8 +2,11 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
 import { updateBookingStatus } from "@/actions/booking-actions";
 import { recordPayment } from "@/actions/quote-actions";
+import { exportBookingFeedbackCSV } from "@/actions/feedback-actions";
+import type { TripFeedbackSummary } from "@/actions/feedback-actions";
 
 interface BookingItem {
   id: string;
@@ -65,7 +68,13 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   BALANCE_DUE: ["COMPLETED", "CANCELLED"],
 };
 
-export function BookingDetailClient({ booking: initial }: { booking: BookingData }) {
+export function BookingDetailClient({
+  booking: initial,
+  feedback,
+}: {
+  booking: BookingData;
+  feedback: TripFeedbackSummary | null;
+}) {
   const [booking, setBooking] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -296,8 +305,18 @@ export function BookingDetailClient({ booking: initial }: { booking: BookingData
               </div>
             </Section>
           )}
+
+          {/* QR Code for customer access */}
+          {["CONFIRMED", "BALANCE_DUE", "COMPLETED"].includes(booking.status) && (
+            <QRCodeSection bookingId={booking.id} />
+          )}
         </div>
       </div>
+
+      {/* Feedback Section */}
+      {feedback && feedback.feedbackByDay.length > 0 && (
+        <FeedbackSection feedback={feedback} bookingId={booking.id} arrivalDate={booking.arrivalDate} />
+      )}
 
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -384,4 +403,197 @@ function Row({ label, value }: { label: string; value: string }) {
 
 function formatStatus(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function QRCodeSection({ bookingId }: { bookingId: string }) {
+  const [showQR, setShowQR] = useState(false);
+  const dashboardUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/dashboard`;
+
+  return (
+    <Section title="Customer QR Code">
+      <p className="text-xs text-slate-500 mb-3">
+        Generate a QR code for the customer to scan and access their trip feedback dashboard.
+      </p>
+      {!showQR ? (
+        <button
+          onClick={() => setShowQR(true)}
+          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+        >
+          Generate QR Code
+        </button>
+      ) : (
+        <div className="flex flex-col items-center gap-3 py-2">
+          <div className="bg-white p-4 rounded-xl border border-slate-200">
+            <QRCodeSVG value={dashboardUrl} size={160} level="M" />
+          </div>
+          <p className="text-xs text-slate-400 text-center max-w-[200px]">
+            Scan to open the dashboard and submit daily trip feedback
+          </p>
+          <button
+            onClick={() => {
+              const svg = document.querySelector(".qr-print-target svg");
+              if (!svg) return;
+              const svgData = new XMLSerializer().serializeToString(svg);
+              const blob = new Blob([svgData], { type: "image/svg+xml" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `helanka-qr-${bookingId.slice(0, 8)}.svg`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
+            className="text-xs text-primary hover:underline font-medium"
+          >
+            Download SVG
+          </button>
+          <div className="qr-print-target hidden">
+            <QRCodeSVG value={dashboardUrl} size={400} level="M" />
+          </div>
+        </div>
+      )}
+    </Section>
+  );
+}
+
+function FeedbackSection({
+  feedback,
+  bookingId,
+  arrivalDate,
+}: {
+  feedback: TripFeedbackSummary;
+  bookingId: string;
+  arrivalDate: string | null;
+}) {
+  const [isExporting, startExport] = useTransition();
+
+  function handleExport() {
+    startExport(async () => {
+      const csv = await exportBookingFeedbackCSV(bookingId);
+      if (!csv) return;
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `feedback-${bookingId.slice(0, 8)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  const arrival = arrivalDate ? new Date(arrivalDate) : null;
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 p-5 mt-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-bold text-slate-900">
+          Daily Feedback ({feedback.feedbackByDay.length}/{feedback.totalDays} days)
+        </h2>
+        <button
+          onClick={handleExport}
+          disabled={isExporting}
+          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50 transition-colors"
+        >
+          {isExporting ? "Exporting..." : "Export CSV"}
+        </button>
+      </div>
+
+      {/* Averages */}
+      <div className="grid grid-cols-5 gap-2 mb-4">
+        {[
+          { label: "Overall", value: feedback.averages.overall },
+          { label: "Transport", value: feedback.averages.transport },
+          { label: "Food", value: feedback.averages.food },
+          { label: "Guide", value: feedback.averages.guide },
+          { label: "Accommodation", value: feedback.averages.accommodation },
+        ].map(({ label, value }) => (
+          <div key={label} className="text-center bg-slate-50 rounded-lg py-2 px-1">
+            <p className="text-[10px] text-slate-400 mb-0.5">{label}</p>
+            <p className="text-lg font-bold text-slate-900">
+              {value != null ? value.toFixed(1) : "—"}
+            </p>
+            {value != null && (
+              <div className="flex justify-center gap-0.5 mt-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <svg
+                    key={s}
+                    className={`w-2.5 h-2.5 ${s <= Math.round(value) ? "text-amber-400" : "text-slate-200"}`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Day-by-day */}
+      <div className="space-y-2">
+        {feedback.feedbackByDay.map((f) => {
+          const dayDate = arrival
+            ? new Date(arrival.getTime() + (f.dayNumber - 1) * 86400000).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })
+            : "";
+          return (
+            <div key={f.id} className="flex items-start gap-3 py-2 border-b border-slate-100 last:border-0">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-emerald-700">{f.dayNumber}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs text-slate-400">{dayDate}</span>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <svg
+                        key={s}
+                        className={`w-3 h-3 ${s <= f.overallRating ? "text-amber-400" : "text-slate-200"}`}
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                {f.comment && (
+                  <p className="text-xs text-slate-600 italic">&ldquo;{f.comment}&rdquo;</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Survey */}
+      {feedback.survey && (
+        <div className="mt-4 pt-4 border-t border-slate-200">
+          <h3 className="text-xs font-bold text-slate-700 mb-2">End-of-Trip Survey</h3>
+          <div className="space-y-1 text-sm">
+            <Row label="Overall Rating" value={`${feedback.survey.rating}/5`} />
+            <Row
+              label="Would Recommend"
+              value={
+                feedback.survey.wouldRecommend === true
+                  ? "Yes"
+                  : feedback.survey.wouldRecommend === false
+                  ? "No"
+                  : "—"
+              }
+            />
+            {feedback.survey.referralSource && (
+              <Row label="Heard About Us" value={feedback.survey.referralSource} />
+            )}
+            <Row label="Social Media Consent" value={feedback.survey.socialMediaConsent ? "Yes" : "No"} />
+          </div>
+          {feedback.survey.body && (
+            <p className="text-xs text-slate-600 italic mt-2">&ldquo;{feedback.survey.body}&rdquo;</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }

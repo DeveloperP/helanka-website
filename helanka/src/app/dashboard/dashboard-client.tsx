@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { MyTripTab } from "@/components/dashboard/my-trip-tab";
+import type { ActiveTripData } from "@/actions/feedback-actions";
 import { packages as allPackages, getExcursionsForDestination } from "@/lib/packages";
 import { COMMON_ALLERGIES, DIETARY_PREFERENCES } from "@/lib/dietary";
 import { destinations as allDestinations } from "@/lib/destinations";
@@ -27,6 +29,7 @@ interface DashboardClientProps {
     totalPaid: number;
     createdAt: string;
   }>;
+  activeTrips?: ActiveTripData[];
 }
 
 // --- Trip Type & Tab types from Zustand store ---
@@ -137,7 +140,8 @@ allPackages.forEach((pkg) =>
   })
 );
 
-export default function DashboardClient({ user, bookings }: DashboardClientProps) {
+export default function DashboardClient({ user, bookings, activeTrips = [] }: DashboardClientProps) {
+  const [activeTripId, setActiveTripId] = useState<string | null>(null);
   const store = useTripSessionStore();
   useSessionSync();
   useSSE(store.sessionId);
@@ -339,6 +343,22 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
     setSelectedExcursionIds([]);
     setGuests(Math.min(Math.max(guests, pkg.minGuests), pkg.maxGuests));
     setShowPackagePicker(false);
+  }
+
+  // My Trip view — intercepts before trip planner
+  const activeTrip = activeTrips.find((t) => t.id === activeTripId);
+  if (activeTrip) {
+    return (
+      <div
+        className="min-h-screen pt-24 pb-12 bg-cover bg-center bg-fixed relative"
+        style={{ backgroundImage: "url('/images/bg-dashboard.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
+        <div className="relative z-10 max-w-[800px] mx-auto px-4 md:px-8">
+          <MyTripTab booking={activeTrip} onBack={() => setActiveTripId(null)} />
+        </div>
+      </div>
+    );
   }
 
   // Trip type selector screen
@@ -1055,6 +1075,32 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                   </div>
                 </div>
 
+                {/* Active Trip Banner */}
+                {activeTrips.length > 0 && (() => {
+                  const trip = activeTrips[0];
+                  const dates = `${new Date(trip.arrivalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${new Date(trip.departureDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+                  return (
+                    <button
+                      onClick={() => setActiveTripId(trip.id)}
+                      className="w-full bg-gradient-to-r from-primary to-primary-light rounded-2xl p-5 shadow-sm text-left text-white hover:brightness-110 transition-[filter]"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-white/70 uppercase tracking-wider mb-1">Active Trip</p>
+                          <p className="font-bold text-lg">{dates}</p>
+                          <p className="text-sm text-white/80 mt-0.5">{trip.numTravelers} traveler{trip.numTravelers !== 1 ? "s" : ""} · {trip.items.length} activities</p>
+                        </div>
+                        <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2.5">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                          </svg>
+                          <span className="text-sm font-semibold">Daily Feedback</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })()}
+
                 {/* My Bookings */}
                 {bookings.length > 0 && (
                   <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -1084,37 +1130,52 @@ export default function DashboardClient({ user, bookings }: DashboardClientProps
                           ? `${new Date(b.arrivalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${new Date(b.departureDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
                           : "Dates TBD";
 
+                        const hasActiveTrip = activeTrips.some((t) => t.id === b.id);
+                        const isQuoteLink = b.status === "QUOTE_SENT" || b.status === "CONFIRMED";
+
                         return (
-                          <Link
-                            key={b.id}
-                            href={b.status === "QUOTE_SENT" || b.status === "CONFIRMED" ? `/dashboard/quotes/${b.id}` : "#"}
-                            className={`block rounded-xl border p-4 transition-[border-color,background-color] ${
-                              b.status === "QUOTE_SENT" ? "border-amber-200 bg-amber-50/30 hover:border-amber-300" : "border-slate-100 hover:border-slate-200"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
-                                    {statusLabels[b.status] ?? b.status}
-                                  </span>
-                                  <span className="text-xs text-slate-400">{b.numTravelers} traveler{b.numTravelers !== 1 ? "s" : ""}</span>
+                          <div key={b.id} className={`rounded-xl border p-4 transition-[border-color,background-color] ${
+                            b.status === "QUOTE_SENT" ? "border-amber-200 bg-amber-50/30" : "border-slate-100"
+                          }`}>
+                            <Link
+                              href={isQuoteLink ? `/dashboard/quotes/${b.id}` : "#"}
+                              className="block"
+                            >
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${colorClass}`}>
+                                      {statusLabels[b.status] ?? b.status}
+                                    </span>
+                                    <span className="text-xs text-slate-400">{b.numTravelers} traveler{b.numTravelers !== 1 ? "s" : ""}</span>
+                                  </div>
+                                  <p className="text-sm text-slate-600">{dates}</p>
                                 </div>
-                                <p className="text-sm text-slate-600">{dates}</p>
+                                <div className="text-right shrink-0">
+                                  {b.latestQuoteTotal != null && (
+                                    <p className="text-sm font-bold text-slate-900">${b.latestQuoteTotal.toLocaleString()}</p>
+                                  )}
+                                  {b.totalPaid > 0 && (
+                                    <p className="text-[10px] text-emerald-600 font-medium">${b.totalPaid.toLocaleString()} paid</p>
+                                  )}
+                                </div>
                               </div>
-                              <div className="text-right shrink-0">
-                                {b.latestQuoteTotal != null && (
-                                  <p className="text-sm font-bold text-slate-900">${b.latestQuoteTotal.toLocaleString()}</p>
-                                )}
-                                {b.totalPaid > 0 && (
-                                  <p className="text-[10px] text-emerald-600 font-medium">${b.totalPaid.toLocaleString()} paid</p>
-                                )}
-                              </div>
-                            </div>
-                            {b.status === "QUOTE_SENT" && (
-                              <p className="text-xs text-amber-600 font-medium mt-2">Review your quote →</p>
+                              {b.status === "QUOTE_SENT" && (
+                                <p className="text-xs text-amber-600 font-medium mt-2">Review your quote →</p>
+                              )}
+                            </Link>
+                            {hasActiveTrip && (
+                              <button
+                                onClick={() => setActiveTripId(b.id)}
+                                className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl bg-primary text-white hover:brightness-110 transition-all"
+                              >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                                </svg>
+                                My Trip - Daily Feedback
+                              </button>
                             )}
-                          </Link>
+                          </div>
                         );
                       })}
                     </div>
