@@ -730,7 +730,7 @@ export function QuoteBuilderClient({ data: initialData }: QuoteBuilderClientProp
                     const t = accomTotal(s, item.nights ?? 1);
                     const stayIndex = accommodations.indexOf(item) + 1;
                     const destinationHotels = item.destinationId ? (hotelsByDestination[item.destinationId] ?? []) : [];
-                    const tierOrder = ["4-star", "5-star", "boutique", "luxury-boutique"];
+                    const tierOrder = ["boutique", "4-star", "5-star", "luxury-stay"];
                     const hotelsByTier = tierOrder.reduce<Record<string, typeof destinationHotels>>((acc, tier) => {
                       const group = destinationHotels.filter((h) => h.tier === tier);
                       if (group.length > 0) acc[tier] = group;

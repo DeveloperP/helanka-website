@@ -476,7 +476,7 @@ function Step1TripAndDates({
           <button
             key={type}
             onClick={() => onTripType(type)}
-            className={`surface-card p-7 rounded-2xl text-left group transition-all ${
+            className={`surface-card p-5 sm:p-7 rounded-2xl text-left group transition-all ${
               tripType === type
                 ? "border-primary ring-1 ring-primary/20 border"
                 : "border border-white/10 hover:border-white/25"
@@ -834,7 +834,7 @@ function TransportAndDining({
 
       <div>
         <p className="text-white text-sm font-semibold mb-3">Accommodation</p>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 grid-cols-2">
           {ACCOMMODATION_TIERS.map((tier) => (
             <button
               key={tier.id}
@@ -1452,8 +1452,8 @@ function Step5Review({
 
 function ReviewRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex gap-4">
-      <span className="text-white/40 text-sm w-36 flex-shrink-0">{label}</span>
+    <div className="flex flex-col sm:flex-row gap-1 sm:gap-4">
+      <span className="text-white/40 text-sm sm:w-36 sm:flex-shrink-0">{label}</span>
       <div className="flex-1 text-sm">{children}</div>
     </div>
   );

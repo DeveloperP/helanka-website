@@ -10,15 +10,13 @@ interface PackageData {
   image: string;
   durationDays: number;
   difficulty: string;
-  price: number;
 }
 
 interface FeaturedPackagesProps {
   packages: PackageData[];
-  priceEstimates: Record<string, number>;
 }
 
-export default function FeaturedPackages({ packages, priceEstimates }: FeaturedPackagesProps) {
+export default function FeaturedPackages({ packages }: FeaturedPackagesProps) {
   const headingRef = useScrollReveal<HTMLDivElement>();
   const gridRef = useStaggerReveal<HTMLDivElement>();
 
@@ -72,22 +70,9 @@ export default function FeaturedPackages({ packages, priceEstimates }: FeaturedP
                 <h3 className="font-[family-name:var(--font-display)] text-lg text-white mb-2 group-hover:text-primary transition-colors duration-200">
                   {pkg.name}
                 </h3>
-                <p className="text-sm text-on-surface-muted mb-4 leading-relaxed line-clamp-2">
+                <p className="text-sm text-on-surface-muted leading-relaxed line-clamp-2">
                   {pkg.description}
                 </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[11px] text-on-surface-subtle uppercase tracking-widest mr-1">
-                      from
-                    </span>
-                    <span className="font-[family-name:var(--font-display)] text-xl text-primary">
-                      ${(priceEstimates[pkg.slug] ?? pkg.price).toLocaleString()}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-on-surface-subtle uppercase tracking-widest">
-                    per person
-                  </span>
-                </div>
               </div>
             </Link>
           ))}

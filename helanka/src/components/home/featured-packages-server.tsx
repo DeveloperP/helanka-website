@@ -1,5 +1,4 @@
 import { packages as allPackages } from "@/lib/packages";
-import { getPackagePriceEstimates } from "@/actions/pricing-actions";
 import FeaturedPackages from "./featured-packages";
 
 const FEATURED_SLUGS = [
@@ -10,7 +9,6 @@ const FEATURED_SLUGS = [
 ];
 
 export default async function FeaturedPackagesServer() {
-  const priceEstimates = await getPackagePriceEstimates();
   const featured = FEATURED_SLUGS
     .map((slug) => allPackages.find((p) => p.slug === slug))
     .filter(Boolean) as (typeof allPackages)[number][];
@@ -22,8 +20,7 @@ export default async function FeaturedPackagesServer() {
     image: pkg.image,
     durationDays: pkg.durationDays,
     difficulty: pkg.difficulty,
-    price: pkg.price,
   }));
 
-  return <FeaturedPackages packages={serialized} priceEstimates={priceEstimates} />;
+  return <FeaturedPackages packages={serialized} />;
 }

@@ -6,6 +6,8 @@ export interface GuideLanguage {
 export const GUIDE_LANGUAGES: GuideLanguage[] = [
   { id: "english", label: "English" },
   { id: "mandarin", label: "Mandarin" },
+  { id: "cantonese", label: "Cantonese" },
+  { id: "italian", label: "Italian" },
   { id: "japanese", label: "Japanese" },
   { id: "german", label: "German" },
   { id: "french", label: "French" },
