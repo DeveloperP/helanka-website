@@ -15,7 +15,7 @@ const posts = [
     readTime: "6 min",
     featured: true,
     excerpt: "Year after year, Sri Lanka turns up in the pages of the world's most respected travel magazines. Here is what keeps pulling the editors back, and why our guests keep confirming what they write.",
-    coverImage: "/images/blog/placeholder-1.jpg",
+    coverImage: "/images/blog/placeholder-1.webp",
     metaTitle: "Why Condé Nast Traveler Features Sri Lanka Every Year | Helanka Vacations",
     metaDescription: "Discover why Sri Lanka remains on the Condé Nast Traveler Gold List. Helanka Vacations breaks down what makes the island irresistible to luxury travel editors and discerning travellers.",
     content: `There is a reason the editors at Condé Nast Traveler cannot stop writing about this island. It is not one thing. It is the accumulation of small, unrepeatable moments that stack up over a two-week trip and leave you feeling like you somehow visited five countries without ever crossing a border.
@@ -41,7 +41,7 @@ For travellers who read magazines like Condé Nast not for status but for genuin
     readTime: "7 min",
     featured: true,
     excerpt: "When Lonely Planet crowned Sri Lanka as the number one country for travel, some called it overdue. Others called it a bold pick. Having planned hundreds of trips since, we can confirm the verdict.",
-    coverImage: "/images/blog/placeholder-2.jpg",
+    coverImage: "/images/blog/placeholder-2.webp",
     metaTitle: "Lonely Planet's #1 Country: Sri Lanka Travel Guide | Helanka Vacations",
     metaDescription: "Lonely Planet named Sri Lanka the best country to visit. Helanka Vacations examines whether the island lived up to the hype and what travellers actually find when they arrive.",
     content: `Back in 2019, Lonely Planet placed Sri Lanka at the very top of its Best in Travel list. The announcement made waves. Here was a small island nation, still recovering from decades of conflict, being told it was the single best country on Earth to visit that year.
@@ -67,7 +67,7 @@ For the independent traveller who trusts Lonely Planet's instincts over glossy r
     readTime: "5 min",
     featured: false,
     excerpt: "A slow blue train, misty tea plantations, and six hours of scenery that no high-speed rail could ever replicate. We book this for nearly every guest, and it never fails to deliver.",
-    coverImage: "/images/blog/placeholder-3.jpg",
+    coverImage: "/images/blog/placeholder-3.webp",
     metaTitle: "Kandy to Ella Train Journey Sri Lanka | Helanka Vacations Guide",
     metaDescription: "Travel + Leisure named the Kandy to Ella train one of the world's best journeys. Helanka Vacations shares insider tips on tickets, timing, and what to expect on board.",
     content: `Travel + Leisure has featured this route multiple times, and each time the language gets more emphatic. "One of the most beautiful train journeys on earth," they wrote, before adding that no amount of photography truly prepares you for the real thing.
@@ -93,7 +93,7 @@ Travel + Leisure got it right. No first-class cabin on a European express can to
     readTime: "8 min",
     featured: true,
     excerpt: "From leopard density in Yala to ancient frescoes at Sigiriya, the island is a visual goldmine. Here is why the world's top photographers keep coming back.",
-    coverImage: "/images/blog/placeholder-4.jpg",
+    coverImage: "/images/blog/placeholder-4.webp",
     metaTitle: "Why National Geographic Photographs Sri Lanka | Helanka Vacations",
     metaDescription: "Eight reasons Sri Lanka remains a favourite for National Geographic photographers. Helanka Vacations explains the island's extraordinary photographic diversity.",
     content: `National Geographic has published more features on Sri Lanka in the last decade than on countries ten times its size. That is not an accident. The island is a photographer's fever dream, compact enough to shoot multiple stories in a single assignment yet diverse enough that no two spreads look alike.
@@ -127,7 +127,7 @@ For any aspiring travel photographer building a portfolio, Sri Lanka is arguably
     readTime: "5 min",
     featured: false,
     excerpt: "The Times included Sri Lanka with a focus on sustainable tourism and community-led travel. Their reasoning holds up, and it aligns with how we have always operated.",
-    coverImage: "/images/blog/placeholder-5.jpg",
+    coverImage: "/images/blog/placeholder-5.webp",
     metaTitle: "New York Times 52 Places: Sri Lanka Sustainable Tourism | Helanka",
     metaDescription: "How the NYT 52 Places list positioned Sri Lanka as a leader in sustainable, community-driven tourism. Helanka Vacations shares why this matters for your trip.",
     content: `The New York Times' annual "52 Places to Go" list carries enormous weight in the travel industry. When Sri Lanka appeared on it, the editors focused not on luxury resorts or Instagram spots but on something quieter: the island's growing commitment to community-based tourism.
@@ -151,7 +151,7 @@ What the Times got right was the angle. Sri Lanka does not need to compete with 
     readTime: "6 min",
     featured: false,
     excerpt: "With the highest leopard density on the planet, Yala offers wildlife encounters that rival the great African parks. Here is what a safari with Helanka actually looks like.",
-    coverImage: "/images/blog/placeholder-6.jpg",
+    coverImage: "/images/blog/placeholder-6.webp",
     metaTitle: "Yala National Park Leopard Safari Sri Lanka | Helanka Vacations",
     metaDescription: "Yala National Park has the world's highest leopard density. Helanka Vacations explains what to expect on safari, best times to visit, and how to maximise sightings.",
     content: `Most people associate big cat safaris with East Africa. The Serengeti. The Masai Mara. Kruger. What they do not know is that a small national park on the southeastern tip of Sri Lanka offers better leopard sighting odds than any of them.
@@ -177,7 +177,7 @@ For the wildlife traveller who thought they needed to fly to Africa for a seriou
     readTime: "6 min",
     featured: false,
     excerpt: "Architectural Digest and Wallpaper* have both turned their attention to the boutique hotels transforming Sri Lanka's south. We know these properties inside out.",
-    coverImage: "/images/blog/placeholder-7.jpg",
+    coverImage: "/images/blog/placeholder-7.webp",
     metaTitle: "Sri Lanka Southern Coast Boutique Hotels & Design | Helanka Vacations",
     metaDescription: "How Sri Lanka's southern coast became a design destination featured in Architectural Digest and Wallpaper*. Helanka Vacations curates stays in the best architect-designed properties.",
     content: `Something happened along the southern coast of Sri Lanka in the last decade. Between Galle and Tangalle, a string of architect-designed boutique hotels emerged that caught the attention of publications like Architectural Digest, Wallpaper*, and Monocle.
@@ -205,7 +205,7 @@ Architectural Digest was right to pay attention. The south coast is not just a b
     readTime: "9 min",
     featured: false,
     excerpt: "Forget the rushed five-day circuits. Here is how to structure a proper two-week trip that covers the highlights without burning out. This is the framework we use for most Helanka guests.",
-    coverImage: "/images/blog/placeholder-8.jpg",
+    coverImage: "/images/blog/placeholder-8.webp",
     metaTitle: "Two-Week Sri Lanka Itinerary 2026 | Helanka Vacations Planning Guide",
     metaDescription: "The perfect two-week Sri Lanka itinerary covering cultural triangle, hill country, wildlife, and beaches. Built by Helanka Vacations from hundreds of guest trips.",
     content: `Every travel blog has a Sri Lanka itinerary. Most of them try to cram too much into too few days. They send you ricocheting from Sigiriya to Ella to Yala to Galle in a week, and you arrive home more exhausted than when you left.
@@ -239,7 +239,7 @@ If you want us to build a version of this itinerary tailored to your dates, inte
     readTime: "5 min",
     featured: false,
     excerpt: "The waters off Mirissa host one of the most accessible blue whale migrations on Earth. Scientists and travellers agree: this is a rare gift. We help you experience it responsibly.",
-    coverImage: "/images/blog/placeholder-9.jpg",
+    coverImage: "/images/blog/placeholder-9.webp",
     metaTitle: "Mirissa Blue Whale Watching Sri Lanka | Helanka Vacations Guide",
     metaDescription: "Blue whale watching in Mirissa, Sri Lanka. Helanka Vacations shares peak season timing, responsible operators, and what to expect on the water.",
     content: `Blue whales are the largest animals that have ever lived on this planet. Seeing one in the wild is not something most people expect to tick off a holiday checklist. But off the coast of Mirissa, between November and April, these animals pass so close to shore that a three-hour boat ride can put you within viewing distance.
@@ -265,7 +265,7 @@ We build whale watching into south coast itineraries during season, timing it so
     readTime: "6 min",
     featured: false,
     excerpt: "Forget the myth that good travel costs a fortune. Sri Lanka remains one of the best-value destinations in Asia, and Helanka can help at every budget level.",
-    coverImage: "/images/blog/placeholder-10.jpg",
+    coverImage: "/images/blog/placeholder-10.webp",
     metaTitle: "Sri Lanka Budget Travel 2026: $50/Day Breakdown | Helanka Vacations",
     metaDescription: "A realistic breakdown of what $50 a day covers in Sri Lanka in 2026. Helanka Vacations shows how to travel well on a budget without sacrificing quality.",
     content: `Budget travel guides often quote unrealistic figures. They assume you will sleep in dormitories, skip meals, and walk everywhere. That is not what we are talking about here. Fifty US dollars per day in Sri Lanka gets you a genuinely comfortable trip.
@@ -293,7 +293,7 @@ At Helanka, we plan trips across all budget levels. Our most popular itineraries
     readTime: "5 min",
     featured: false,
     excerpt: "A 1,500-year-old palace built on top of a 200-metre rock, surrounded by the most sophisticated ancient gardens ever designed. We send every guest here, and it never disappoints.",
-    coverImage: "/images/blog/placeholder-11.jpg",
+    coverImage: "/images/blog/placeholder-11.webp",
     metaTitle: "Sigiriya Rock Fortress Sunrise Guide Sri Lanka | Helanka Vacations",
     metaDescription: "What it is like to climb Sigiriya Rock at dawn. Helanka Vacations shares timing tips, what to expect, and why this UNESCO site deserves a full morning.",
     content: `You have seen the photos. The orange rock rising abruptly from flat green jungle. The steep metal stairways clinging to the cliff face. The ruins of a palace at the top. But photographs flatten Sigiriya into something manageable. The real thing is not manageable. It is enormous in a way that makes you reconsider what people could accomplish 1,500 years ago with no machinery.
@@ -319,7 +319,7 @@ Helanka tip: we always book our guests into accommodation within 15 minutes of t
     readTime: "7 min",
     featured: false,
     excerpt: "From street-side hoppers to fine-dining curry tasting menus, Sri Lankan food is having a moment. We build food-focused itineraries for guests who eat first and sightsee second.",
-    coverImage: "/images/blog/placeholder-12.jpg",
+    coverImage: "/images/blog/placeholder-12.webp",
     metaTitle: "Sri Lanka Food & Culinary Travel Guide 2026 | Helanka Vacations",
     metaDescription: "Sri Lanka's food scene is world-class. Helanka Vacations explores the island's culinary culture from street food to fine dining, and how to plan a food-focused trip.",
     content: `For decades, Sri Lankan food lived in the shadow of Indian cuisine in the Western imagination. That is changing, and fast. The Guardian's food section, Eater, Bon Appétit, and the Netflix food docuseries have all turned their attention to the island in recent years, and the consensus is uniform: this is one of the world's great undiscovered food cultures.
@@ -345,7 +345,7 @@ For the food traveller who has done Thailand and Vietnam and Japan, Sri Lanka is
     readTime: "5 min",
     featured: false,
     excerpt: "A 17th-century Dutch fort turned vibrant neighbourhood. Boutique hotels in colonial buildings. Cafes in old warehouses. Cricket on the ramparts at sunset.",
-    coverImage: "/images/blog/placeholder-13.jpg",
+    coverImage: "/images/blog/placeholder-13.webp",
     metaTitle: "Galle Fort Sri Lanka Travel Guide | Helanka Vacations",
     metaDescription: "Explore Galle Fort, Sri Lanka's UNESCO-listed living heritage town. Helanka Vacations shares how to spend a day wandering its streets, ramparts, and hidden courtyards.",
     content: `Most historic sites ask you to look but not touch. Galle Fort does the opposite. This UNESCO World Heritage Site is not a preserved ruin or a gated monument. It is a functioning neighbourhood where 400 families live, businesses operate, and daily life unfolds inside 17th-century Dutch colonial walls.
@@ -371,7 +371,7 @@ Galle Fort is best experienced without a plan. Walk the streets. Duck into doorw
     readTime: "6 min",
     featured: false,
     excerpt: "Sri Lanka has two monsoons hitting different coasts at different times. That sounds complicated but means there is no bad time to visit. Here is how we plan around it.",
-    coverImage: "/images/blog/placeholder-14.jpg",
+    coverImage: "/images/blog/placeholder-14.webp",
     metaTitle: "Best Time to Visit Sri Lanka 2026 Monthly Guide | Helanka Vacations",
     metaDescription: "When to visit Sri Lanka month by month. Helanka Vacations explains the two-monsoon system and how to choose the right coast for every season.",
     content: `The single most common question we receive at Helanka is "when should I go?" The answer is refreshingly simple once you understand the island's two-monsoon system.
@@ -401,7 +401,7 @@ At Helanka, we adjust itineraries to the season automatically. If you are travel
     readTime: "6 min",
     featured: false,
     excerpt: "Cool mountain air, tea plantations that stretch beyond sight, colonial bungalows, and a pace of life that makes the coast feel hectic. Our guests consistently rate the hills as the trip highlight.",
-    coverImage: "/images/blog/placeholder-15.jpg",
+    coverImage: "/images/blog/placeholder-15.webp",
     metaTitle: "Sri Lanka Hill Country Tea Estates & Hiking | Helanka Vacations",
     metaDescription: "Why Sri Lanka's hill country deserves more than a train pass-through. Helanka Vacations shares the best tea estate stays, hikes, and experiences in the central highlands.",
     content: `Most first-time visitors to Sri Lanka allocate one or two days to the hill country, usually just the train ride from Kandy to Ella. That is a mistake. The central highlands deserve a week of their own, and the travellers who give them that time consistently report it as the highlight of their trip.
