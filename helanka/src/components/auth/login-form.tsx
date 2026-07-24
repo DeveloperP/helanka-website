@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { loginUser, type ActionResult } from "@/actions/auth-actions";
-import Turnstile from "@/components/turnstile";
 
 const initialState: ActionResult = { success: false };
 
@@ -57,8 +56,6 @@ export default function LoginForm() {
             Forgot password?
           </Link>
         </div>
-
-        <Turnstile className="flex justify-center" />
 
         <button
           type="submit"
