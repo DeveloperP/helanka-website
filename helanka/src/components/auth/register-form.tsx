@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { registerUser, type ActionResult } from "@/actions/auth-actions";
+import Turnstile from "@/components/turnstile";
 
 export default function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +88,8 @@ export default function RegisterForm() {
             <p className="text-xs text-red-600 mt-1 pl-1">{fieldErrors.password[0]}</p>
           )}
         </div>
+
+        <Turnstile className="flex justify-center" />
 
         <button
           type="submit"

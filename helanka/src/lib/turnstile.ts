@@ -3,11 +3,7 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 export async function verifyTurnstile(token: string | null): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return true;
-
-  if (!token) {
-    console.warn("[Turnstile] no token received from client");
-    return true;
-  }
+  if (!token) return false;
 
   try {
     const body = new URLSearchParams();
@@ -23,11 +19,10 @@ export async function verifyTurnstile(token: string | null): Promise<boolean> {
     const data = await res.json();
     if (!data.success) {
       console.error("[Turnstile] verification failed:", data["error-codes"]);
-      return true;
     }
-    return true;
+    return data.success === true;
   } catch (err) {
     console.error("[Turnstile] fetch error:", err);
-    return true;
+    return false;
   }
 }
