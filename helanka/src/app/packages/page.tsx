@@ -29,7 +29,7 @@ export default async function PackagesPage() {
       <section className="relative h-[50vh] min-h-[400px] flex items-end overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/bg-featured-packages.jpg')" }}
+          style={{ backgroundImage: "url('/images/bg-featured-packages.webp')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">

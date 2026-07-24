@@ -25,7 +25,7 @@ export const experiences: GroupExperience[] = [
       "Conference and AV support",
       "Gala dinners and networking events",
     ],
-    image: "/images/groups/grp-incentives.jpg",
+    image: "/images/groups/grp-incentives.webp",
   },
   {
     slug: "cricket-tours",
@@ -42,7 +42,7 @@ export const experiences: GroupExperience[] = [
       "Accommodation and meals",
       "Cultural excursions included",
     ],
-    image: "/images/groups/grp-cricket-tours.jpg",
+    image: "/images/groups/grp-cricket-tours.webp",
   },
   {
     slug: "rugby-tours",
@@ -59,7 +59,7 @@ export const experiences: GroupExperience[] = [
       "Dedicated tour coordinator",
       "Accommodation and transport",
     ],
-    image: "/images/groups/grp-rugby-tours.jpg",
+    image: "/images/groups/grp-rugby-tours.webp",
   },
   {
     slug: "golf-holidays",
@@ -76,7 +76,7 @@ export const experiences: GroupExperience[] = [
       "Caddie and tee-time arrangements",
       "Sightseeing experiences",
     ],
-    image: "/images/groups/grp-golf-holidays.jpg",
+    image: "/images/groups/grp-golf-holidays.webp",
   },
 ];
 

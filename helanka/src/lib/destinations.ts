@@ -24,7 +24,7 @@ export const destinations: Destination[] = [
       "Lion's Paw entrance gateway",
       "Royal gardens and water features",
     ],
-    image: "/images/destinations/dest-sigiriya.jpg",
+    image: "/images/destinations/dest-sigiriya.webp",
     facts: [
       { label: "Best Time", value: "Jan – Apr" },
       { label: "Elevation", value: "349m" },
@@ -45,7 +45,7 @@ export const destinations: Destination[] = [
       "Ravana Falls",
       "Scenic train from Kandy",
     ],
-    image: "/images/destinations/dest-ella.jpg",
+    image: "/images/destinations/dest-ella.webp",
     facts: [
       { label: "Best Time", value: "Jan – Mar" },
       { label: "Elevation", value: "1,041m" },
@@ -66,7 +66,7 @@ export const destinations: Destination[] = [
       "Artisan boutiques and galleries",
       "Cricket ground inside the fort",
     ],
-    image: "/images/destinations/dest-galle.jpg",
+    image: "/images/destinations/dest-galle.webp",
     facts: [
       { label: "Best Time", value: "Dec – Apr" },
       { label: "Elevation", value: "Sea level" },
@@ -87,7 +87,7 @@ export const destinations: Destination[] = [
       "Coastal lagoon birdwatching",
       "Dawn and dusk game drives",
     ],
-    image: "/images/destinations/dest-yala.jpg",
+    image: "/images/destinations/dest-yala.webp",
     facts: [
       { label: "Best Time", value: "Feb – Jul" },
       { label: "Area", value: "979 km²" },
@@ -108,7 +108,7 @@ export const destinations: Destination[] = [
       "Surf breaks for all levels",
       "Beachside seafood barbecues",
     ],
-    image: "/images/destinations/dest-mirissa.jpg",
+    image: "/images/destinations/dest-mirissa.webp",
     facts: [
       { label: "Best Time", value: "Nov – Apr" },
       { label: "Elevation", value: "Sea level" },
@@ -129,7 +129,7 @@ export const destinations: Destination[] = [
       "Traditional Kandyan dance show",
       "Start of the scenic train to Ella",
     ],
-    image: "/images/destinations/dest-kandy.jpg",
+    image: "/images/destinations/dest-kandy.webp",
     facts: [
       { label: "Best Time", value: "Jan – Apr" },
       { label: "Elevation", value: "465m" },
@@ -150,7 +150,7 @@ export const destinations: Destination[] = [
       "Independence Square",
       "Galle Face Green",
     ],
-    image: "/images/destinations/dest-colombo.jpg",
+    image: "/images/destinations/dest-colombo.webp",
     facts: [
       { label: "Best Time", value: "Dec – Apr" },
       { label: "Elevation", value: "Sea level" },
@@ -171,7 +171,7 @@ export const destinations: Destination[] = [
       "Catamaran sailing",
       "Beach sunsets",
     ],
-    image: "/images/destinations/dest-negombo.jpg",
+    image: "/images/destinations/dest-negombo.webp",
     facts: [
       { label: "Best Time", value: "Dec – Apr" },
       { label: "Elevation", value: "Sea level" },
@@ -192,7 +192,7 @@ export const destinations: Destination[] = [
       "World's End",
       "Hakgala Gardens",
     ],
-    image: "/images/destinations/dest-nuwara-eliya.jpg",
+    image: "/images/destinations/dest-nuwara-eliya.webp",
     facts: [
       { label: "Best Time", value: "Jan – Apr" },
       { label: "Elevation", value: "1,868m" },
@@ -213,7 +213,7 @@ export const destinations: Destination[] = [
       "Turtle Hatchery",
       "Cinnamon Island",
     ],
-    image: "/images/destinations/dest-bentota.jpg",
+    image: "/images/destinations/dest-bentota.webp",
     facts: [
       { label: "Best Time", value: "Dec – Apr" },
       { label: "Elevation", value: "Sea level" },

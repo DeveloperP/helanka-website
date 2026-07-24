@@ -34,7 +34,7 @@ export default function GroupExperiencesPage() {
       <section className="relative py-20 px-6 sm:px-8 md:px-24 lg:px-32 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed opacity-[0.07]"
-          style={{ backgroundImage: "url('/images/public-sigiriya.jpg')" }}
+          style={{ backgroundImage: "url('/images/public-sigiriya.webp')" }}
         />
         <div className="relative z-10 max-w-[1440px] mx-auto space-y-24">
         {experiences.map((exp, i) => (

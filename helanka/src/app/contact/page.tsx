@@ -44,7 +44,7 @@ export default function ContactPage() {
       <section className="relative h-[50vh] min-h-[400px] flex items-end overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/public-sigiriya.jpg')" }}
+          style={{ backgroundImage: "url('/images/public-sigiriya.webp')" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
         <div ref={heroRef} className="reveal relative z-10 w-full px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto pb-16">
@@ -318,20 +318,58 @@ export default function ContactPage() {
                 </h3>
                 <div className="flex gap-3">
                   {[
-                    { label: "Instagram", href: "https://instagram.com/helankavacations" },
-                    { label: "Facebook", href: "https://facebook.com/helankavacations" },
-                    { label: "YouTube", href: "https://youtube.com/@helankavacations" },
-                    { label: "TripAdvisor", href: "https://tripadvisor.com" },
+                    {
+                      label: "Instagram",
+                      href: "https://instagram.com/helankavacations",
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                          <circle cx="12" cy="12" r="4" />
+                          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      label: "Facebook",
+                      href: "https://facebook.com/helankavacations",
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+                          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      label: "YouTube",
+                      href: "https://youtube.com/@helankavacations",
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+                          <rect x="2" y="4" width="20" height="16" rx="4" ry="4" />
+                          <polygon points="10 8.5 16 12 10 15.5 10 8.5" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      label: "TripAdvisor",
+                      href: "https://tripadvisor.com",
+                      icon: (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="w-[18px] h-[18px]">
+                          <circle cx="12" cy="12" r="10" />
+                          <circle cx="8.5" cy="12" r="2" />
+                          <circle cx="15.5" cy="12" r="2" />
+                          <path d="M8.5 7.5L12 5l3.5 2.5" />
+                        </svg>
+                      ),
+                    },
                   ].map((s) => (
                     <a
                       key={s.label}
                       href={s.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-10 h-10 rounded-xl bg-surface-raised border border-outline flex items-center justify-center text-on-surface-muted hover:text-primary hover:border-primary/30 transition-all text-xs font-bold"
+                      className="w-10 h-10 rounded-xl bg-surface-raised border border-outline flex items-center justify-center text-on-surface-muted hover:text-primary hover:border-primary/30 transition-all"
                       title={s.label}
                     >
-                      {s.label[0]}
+                      {s.icon}
                     </a>
                   ))}
                 </div>

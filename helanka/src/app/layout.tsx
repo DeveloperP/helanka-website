@@ -33,14 +33,14 @@ export const metadata: Metadata = {
     title: "Helanka Vacations | Sri Lanka Holiday Tours",
     description:
       "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
-    images: [{ url: "/images/public-ella-nine-arch.jpg", width: 1200, height: 630, alt: "Sri Lanka — Nine Arch Bridge in Ella" }],
+    images: [{ url: "/images/public-ella-nine-arch.webp", width: 1200, height: 630, alt: "Sri Lanka — Nine Arch Bridge in Ella" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Helanka Vacations | Sri Lanka Holiday Tours",
     description:
       "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
-    images: ["/images/public-ella-nine-arch.jpg"],
+    images: ["/images/public-ella-nine-arch.webp"],
   },
   robots: {
     index: true,

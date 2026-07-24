@@ -30,7 +30,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-05-10",
     readTime: "6 min",
-    image: "/images/public-ella-nine-arch.jpg",
+    image: "/images/public-ella-nine-arch.webp",
     featured: true,
   },
   {
@@ -51,7 +51,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Amara Silva",
     date: "2026-04-28",
     readTime: "5 min",
-    image: "/images/destinations/dest-yala.jpg",
+    image: "/images/destinations/dest-yala.webp",
     featured: true,
   },
   {
@@ -72,7 +72,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-04-15",
     readTime: "4 min",
-    image: "/images/destinations/dest-galle.jpg",
+    image: "/images/destinations/dest-galle.webp",
   },
   {
     slug: "best-time-visit-sri-lanka",
@@ -94,7 +94,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Amara Silva",
     date: "2026-03-20",
     readTime: "4 min",
-    image: "/images/destinations/dest-mirissa.jpg",
+    image: "/images/destinations/dest-mirissa.webp",
   },
   {
     slug: "sri-lanka-surf-guide-beginners",
@@ -116,7 +116,7 @@ We include this train journey in our Hill Country Explorer and Grand Tour packag
     author: "Kavinda Perera",
     date: "2026-03-05",
     readTime: "5 min",
-    image: "/images/packages/pkg-east-coast-escape.jpg",
+    image: "/images/packages/pkg-east-coast-escape.webp",
   },
 ];
 

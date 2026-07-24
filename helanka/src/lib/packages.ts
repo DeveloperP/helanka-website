@@ -284,7 +284,7 @@ export const packages: Package[] = [
       "Temple of the Sacred Tooth",
       "Kandyan cultural dance",
     ],
-    image: "/images/packages/pkg-heritage-hill-country.jpg",
+    image: "/images/packages/pkg-heritage-hill-country.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Habarana", description: "Arrive at Bandaranaike International Airport and transfer to Habarana through Sri Lanka's Cultural Triangle heartland. Settle into your hotel surrounded by ancient reservoir country. Drive time approximately 4-5 hours." },
@@ -327,7 +327,7 @@ export const packages: Package[] = [
       "Madu River mangrove safari",
       "Colombo city tour",
     ],
-    image: "/images/packages/pkg-golden-sands-south.jpg",
+    image: "/images/packages/pkg-golden-sands-south.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Bentota", description: "Arrive at Bandaranaike International Airport and transfer south along the coastal highway to Bentota. Settle into your beachfront hotel and enjoy the sunset over the Indian Ocean." },
@@ -369,7 +369,7 @@ export const packages: Package[] = [
       "Sigiriya Rock Fortress",
       "Minneriya elephant gathering",
     ],
-    image: "/images/packages/pkg-jaffna-escape.jpg",
+    image: "/images/packages/pkg-jaffna-escape.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Chilaw", description: "Arrive at Bandaranaike International Airport and transfer to Chilaw. Visit the ancient Munneswaram Temple, one of Sri Lanka's most sacred Hindu shrines." },
@@ -409,7 +409,7 @@ export const packages: Package[] = [
       "Romantic beach getaway",
       "Traditional village experience",
     ],
-    image: "/images/packages/pkg-honeymoon.jpg",
+    image: "/images/packages/pkg-honeymoon.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Negombo", description: "Arrive at Bandaranaike International Airport and transfer to your beachfront hotel in Negombo. Evening at leisure with a welcome dinner." },
@@ -455,7 +455,7 @@ export const packages: Package[] = [
       "Elephant swimming between islands",
       "Blue whale watching",
     ],
-    image: "/images/packages/pkg-wildlife-getaway.jpg",
+    image: "/images/packages/pkg-wildlife-getaway.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Negombo", description: "Arrive at Bandaranaike International Airport and transfer to your Negombo hotel. Evening at leisure on the beach." },
@@ -499,7 +499,7 @@ export const packages: Package[] = [
       "Royal Colombo Golf Club",
       "Yala safari",
     ],
-    image: "/images/packages/pkg-elite-golf-escape.jpg",
+    image: "/images/packages/pkg-elite-golf-escape.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Negombo", description: "Arrive at Bandaranaike International Airport and transfer to Amagi Aria Negombo. Welcome dinner and briefing." },
@@ -549,7 +549,7 @@ export const packages: Package[] = [
       "Ocean-view fairways",
       "Luxury resort",
     ],
-    image: "/images/packages/pkg-birdies-beach.jpg",
+    image: "/images/packages/pkg-birdies-beach.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Colombo", description: "Arrive at Bandaranaike International Airport and transfer to Shangri-La Colombo. Welcome dinner and trip briefing." },
@@ -584,7 +584,7 @@ export const packages: Package[] = [
       "Royal Colombo Golf Club",
       "Tea plantation tour",
     ],
-    image: "/images/packages/pkg-fairways-greens.jpg",
+    image: "/images/packages/pkg-fairways-greens.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Negombo", description: "Arrive at Bandaranaike International Airport and transfer to Jetwing Blue Negombo. Evening beach walk and welcome dinner." },
@@ -625,7 +625,7 @@ export const packages: Package[] = [
       "Shangri-La Hambantota",
       "Tea plantation tour",
     ],
-    image: "/images/packages/pkg-golf-misty-hills.jpg",
+    image: "/images/packages/pkg-golf-misty-hills.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Colombo", description: "Arrive at Bandaranaike International Airport and transfer to Shangri-La Colombo. Welcome dinner and trip briefing." },
@@ -668,7 +668,7 @@ export const packages: Package[] = [
       "Snorkelling and water sports",
       "Multi-island holiday",
     ],
-    image: "/images/packages/pkg-maldives-holidays.jpg",
+    image: "/images/packages/pkg-maldives-holidays.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Arrival & Resort", description: "Arrive at Velana International Airport and transfer to your resort island by speedboat or seaplane. Check in to your overwater or beachfront villa. Afternoon at leisure." },
@@ -699,7 +699,7 @@ export const packages: Package[] = [
       "Udawalawe safari and camping",
       "Sinharaja rainforest (UNESCO)",
     ],
-    image: "/images/packages/pkg-throbbing-adventure.jpg",
+    image: "/images/packages/pkg-throbbing-adventure.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Kitulgala", description: "Arrive at Bandaranaike International Airport and transfer to Kitulgala, the adventure capital of Sri Lanka set along the Kelani River." },
@@ -743,7 +743,7 @@ export const packages: Package[] = [
       "The Kandy House heritage",
       "World-class luxury throughout",
     ],
-    image: "/images/packages/pkg-luxury-travel.jpg",
+    image: "/images/packages/pkg-luxury-travel.webp",
     gallery: [],
     itinerary: [
       { day: 1, title: "Airport to Negombo", description: "Arrive at Bandaranaike International Airport and transfer to The Walawwa, a restored 18th-century country manor in Negombo. Welcome dinner in the garden courtyard." },

@@ -24,7 +24,7 @@ export default function FeaturedPackages({ packages }: FeaturedPackagesProps) {
     <section className="relative py-28 overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/images/bg-featured-packages.jpg')" }}
+        style={{ backgroundImage: "url('/images/bg-featured-packages.webp')" }}
       />
       <div className="absolute inset-0 bg-surface/80" />
       <div className="relative z-10 px-6 md:px-20 max-w-[1440px] mx-auto">

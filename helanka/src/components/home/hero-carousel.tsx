@@ -22,7 +22,7 @@ const slides: Slide[] = [
     tagline:
       "Climb a 1,200-year-old fortress that rises 200 metres above the plains. Ancient frescoes, royal gardens, and views that reach the horizon.",
     slug: "sigiriya",
-    image: "/images/heroes/hero-sigiriya.jpg",
+    image: "/images/heroes/hero-sigiriya.webp",
   },
   {
     destination: "Emerald\nHighlands",
@@ -31,7 +31,7 @@ const slides: Slide[] = [
     tagline:
       "Watch the highlands roll past your train window. Tea estates, waterfalls, and the famous Nine Arch Bridge. The pace here is slow and that is the whole point.",
     slug: "ella",
-    image: "/images/heroes/hero-ella.jpg",
+    image: "/images/heroes/hero-ella.webp",
   },
   {
     destination: "Shores of\nMirissa",
@@ -40,7 +40,7 @@ const slides: Slide[] = [
     tagline:
       "Golden sand, whale watching boats heading out at dawn, and fresh seafood grilled on the beach. The south coast at its simplest.",
     slug: "galle",
-    image: "/images/heroes/hero-mirissa.jpg",
+    image: "/images/heroes/hero-mirissa.webp",
   },
   {
     destination: "Wild Heart\nof Yala",
@@ -49,7 +49,7 @@ const slides: Slide[] = [
     tagline:
       "One of the highest leopard densities anywhere on Earth. Safari jeeps leave at sunrise. Crocodiles, painted storks, and spotted cats.",
     slug: "yala",
-    image: "/images/heroes/hero-yala.jpg",
+    image: "/images/heroes/hero-yala.webp",
   },
   {
     destination: "Fortress\nof Galle",
@@ -58,7 +58,7 @@ const slides: Slide[] = [
     tagline:
       "Walk along 350-year-old ramparts with the ocean below. The old town has bookshops, galleries, and restaurants where the salt air comes right in.",
     slug: "galle",
-    image: "/images/heroes/hero-galle.jpg",
+    image: "/images/heroes/hero-galle.webp",
   },
 ];
 

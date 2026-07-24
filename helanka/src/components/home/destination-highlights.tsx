@@ -19,31 +19,31 @@ const destinations: Destination[] = [
     name: "Yala National Park",
     slug: "yala",
     region: "WILDLIFE",
-    image: "/images/destinations/dest-yala.jpg",
+    image: "/images/destinations/dest-yala.webp",
   },
   {
     name: "Ella Nine Arch",
     slug: "ella",
     region: "HILL COUNTRY",
-    image: "/images/destinations/dest-ella.jpg",
+    image: "/images/destinations/dest-ella.webp",
   },
   {
     name: "Galle Fort",
     slug: "galle",
     region: "HERITAGE",
-    image: "/images/destinations/dest-galle.jpg",
+    image: "/images/destinations/dest-galle.webp",
   },
   {
     name: "Mirissa Coast",
     slug: "mirissa",
     region: "COASTAL",
-    image: "/images/destinations/dest-mirissa.jpg",
+    image: "/images/destinations/dest-mirissa.webp",
   },
   {
     name: "Kandy Temple",
     slug: "kandy",
     region: "CULTURAL",
-    image: "/images/destinations/dest-kandy.jpg",
+    image: "/images/destinations/dest-kandy.webp",
   },
 ];
 

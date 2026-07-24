@@ -50,7 +50,7 @@ const socials = [
     label: "Facebook",
     href: "https://facebook.com/helankavacations",
     icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-[18px] h-[18px]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-[18px] h-[18px]">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
       </svg>
     ),
@@ -59,9 +59,9 @@ const socials = [
     label: "YouTube",
     href: "https://youtube.com/@helankavacations",
     icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-[18px] h-[18px]">
-        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-        <polygon fill="var(--primary)" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-[18px] h-[18px]">
+        <rect x="2" y="4" width="20" height="16" rx="4" ry="4" />
+        <polygon points="10 8.5 16 12 10 15.5 10 8.5" />
       </svg>
     ),
   },
@@ -69,8 +69,11 @@ const socials = [
     label: "TripAdvisor",
     href: "https://tripadvisor.com",
     icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="w-[18px] h-[18px]">
-        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 3a7 7 0 0 1 5.39 2.54A4.5 4.5 0 0 0 12 9a4.5 4.5 0 0 0-5.39-1.46A7 7 0 0 1 12 5zm-4.5 6.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm9 0a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-4.5 5c-2 0-3.5-1-4.33-2.5h8.66C15.5 15.5 14 16.5 12 16.5z" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="w-[18px] h-[18px]">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="8.5" cy="12" r="2" />
+        <circle cx="15.5" cy="12" r="2" />
+        <path d="M8.5 7.5L12 5l3.5 2.5" />
       </svg>
     ),
   },
