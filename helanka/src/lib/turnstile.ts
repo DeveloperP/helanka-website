@@ -2,7 +2,12 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export async function verifyTurnstile(token: string | null): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return true;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("[Turnstile] TURNSTILE_SECRET_KEY is not set in production");
+    }
+    return false;
+  }
   if (!token) return false;
 
   try {

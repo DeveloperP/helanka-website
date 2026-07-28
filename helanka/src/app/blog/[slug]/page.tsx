@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedPostBySlug, getPublishedPosts } from "@/actions/blog-actions";
 import { db } from "@/lib/db";
+import sanitizeHtml from "sanitize-html";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -74,7 +75,16 @@ export default async function BlogPostPage({ params }: Props) {
       <article className="py-16 px-6 sm:px-8 md:px-24 lg:px-32 max-w-[1440px] mx-auto">
         <div
           className="prose prose-invert prose-lg max-w-3xl mx-auto prose-p:text-on-surface-muted prose-p:leading-relaxed prose-h2:text-on-surface prose-h3:text-on-surface prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-2xl"
-          dangerouslySetInnerHTML={{ __html: post.content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content, {
+            allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "figure", "figcaption", "video", "source", "iframe"]),
+            allowedAttributes: {
+              ...sanitizeHtml.defaults.allowedAttributes,
+              img: ["src", "alt", "title", "width", "height", "loading"],
+              iframe: ["src", "width", "height", "frameborder", "allowfullscreen"],
+              "*": ["class", "style", "id"],
+            },
+            allowedIframeHostnames: ["www.youtube.com", "www.google.com"],
+          }) }}
         />
       </article>
 

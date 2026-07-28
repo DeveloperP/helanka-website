@@ -48,7 +48,8 @@ export async function createOrder(amount: number, currency: string, bookingId: s
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`PayPal create order failed: ${err}`);
+    console.error("[PayPal] create order failed:", err);
+    throw new Error("Failed to create payment order");
   }
 
   return (await res.json()) as { id: string; status: string };
@@ -67,7 +68,8 @@ export async function captureOrder(orderId: string) {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`PayPal capture failed: ${err}`);
+    console.error("[PayPal] capture failed:", err);
+    throw new Error("Failed to capture payment");
   }
 
   return (await res.json()) as {
