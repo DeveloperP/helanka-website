@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Helanka Vacations — PayPal Finance Setup Brief</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #1a1a1a;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    h2 { font-size: 17px; margin-top: 36px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    .subtitle { color: #666; font-size: 13px; margin-bottom: 30px; }
+    .step-group { margin: 20px 0; }
+    .step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      background: #1a1a1a;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-content strong { display: block; margin-bottom: 2px; }
+    .step-content p { margin: 0; color: #444; font-size: 14px; }
+    .note {
+      background: #f7f7f7;
+      border-left: 3px solid #333;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .warning {
+      background: #fff8e6;
+      border-left: 3px solid #e6a800;
+      padding: 12px 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .flow-box {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .flow-box code { font-size: 13px; }
+    .arrow { color: #888; margin: 4px 0; display: block; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #eee; }
+    th { font-weight: 600; border-bottom: 2px solid #ddd; }
+    .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 6px; }
+    hr { border: none; border-top: 1px solid #eee; margin: 30px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>PayPal Finance Setup Brief</h1>
+  <div class="subtitle">Helanka Vacations &mdash; Finance Team &mdash; June 2026</div>
+
+  <!-- ============================================ -->
+  <h2>Part A: One-Time Bank & PayPal Setup</h2>
+  <p class="section-label">What the finance team needs to do before we go live</p>
+
+  <div class="step-group">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Open a Sampath Bank Foreign Currency (USD) Account</strong>
+        <p>Contact your Sampath branch relationship manager. Request a USD-denominated foreign currency account. You will need the business registration documents. Collect and save:</p>
+        <ul>
+          <li>USD account number</li>
+          <li>SWIFT code: <strong>BSAMLKLX</strong></li>
+          <li>Branch name and full branch address</li>
+          <li>Account holder name (must match your PayPal business name exactly)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Set Up a PayPal Business Account</strong>
+        <p>Go to <a href="https://www.paypal.com">paypal.com</a> and register a Business account under the Helanka Vacations business name. Complete identity verification (KYC). Make sure the account is registered in Sri Lanka.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Link the Sampath USD Account to PayPal</strong>
+        <p>In PayPal, go to <strong>Wallet &rarr; Link a bank account</strong>. Enter the Sampath USD account details (account number, SWIFT code, branch). PayPal may take 2&ndash;3 days to verify the link with small test deposits.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Test a Small Withdrawal</strong>
+        <p>Before handling real client payments, withdraw a small amount (e.g. $10) from PayPal to the Sampath USD account. Confirm the full process works end-to-end and note how many days it takes. This is critical &mdash; do not skip this.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Confirm Environment Variables Are Set to Live</strong>
+        <p>Coordinate with the development team to switch <code>PAYPAL_MODE</code> from <code>sandbox</code> to <code>live</code> in the website's environment variables. Do a test transaction on the live site to verify the payment appears in the PayPal dashboard and the booking status updates in the system.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="warning">
+    <strong>If PayPal doesn't allow direct withdrawal to Sampath:</strong> Some Sri Lankan accounts may not have bank withdrawal enabled. If this is the case, the fallback is to use Payoneer as an intermediary (PayPal &rarr; Payoneer &rarr; Sampath USD). This adds ~2% cost and 3&ndash;5 extra days. Contact PayPal support first to check eligibility before setting up Payoneer.
+  </div>
+
+  <hr>
+
+  <!-- ============================================ -->
+  <h2>Part B: What Happens When a Client Pays</h2>
+  <p class="section-label">The payment flow from client to your bank account</p>
+
+  <div class="flow-box">
+    <strong>1. Client pays deposit via PayPal on the website</strong>
+    <span class="arrow">&darr;</span>
+    <strong>2. PayPal processes the payment and deducts fees (~5% + $0.49)</strong>
+    <span class="arrow">&darr;</span>
+    <strong>3. Net amount lands in Helanka's PayPal USD balance</strong>
+    <span class="arrow">&darr;</span>
+    <strong>4. Website automatically records the payment and confirms the booking</strong>
+    <span class="arrow">&darr;</span>
+    <strong>5. Finance team transfers the PayPal balance to Sampath USD account</strong>
+    <span class="arrow">&darr;</span>
+    <strong>6. Funds arrive in Sampath USD account in 3&ndash;5 business days (free from PayPal)</strong>
+    <span class="arrow">&darr;</span>
+    <strong>7. Sampath deducts a small incoming wire fee (~$2&ndash;$5)</strong>
+  </div>
+
+  <div class="note">
+    <strong>Key rule:</strong> Always withdraw to the Sampath <em>USD</em> account, not an LKR account. Converting currency inside PayPal costs an extra 3&ndash;4%. If you need LKR, convert at Sampath &mdash; the bank rate is better.
+  </div>
+
+  <hr>
+
+  <!-- ============================================ -->
+  <h2>Part C: How to Withdraw from PayPal</h2>
+  <p class="section-label">Steps to transfer money from PayPal to Sampath</p>
+
+  <div class="step-group">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Log in to PayPal</strong>
+        <p>Go to <a href="https://www.paypal.com">paypal.com</a> and sign in with the business account.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Go to Wallet &rarr; USD Balance</strong>
+        <p>Click on your USD balance to see the available funds.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Click "Transfer to Bank"</strong>
+        <p>Select the linked Sampath USD account as the destination.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Enter the Amount and Confirm</strong>
+        <p>Choose "Standard transfer" (free, 3&ndash;5 business days). Instant transfer is not available for international bank accounts.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ============================================ -->
+  <h2>Part D: Fee Summary</h2>
+  <p class="section-label">What you actually receive for each deposit amount</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Client Pays</th>
+        <th>PayPal Fee (4.99%)</th>
+        <th>Fixed Fee</th>
+        <th>You Receive (PayPal)</th>
+        <th>You Receive (Sampath, est.)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>$200</td><td>$9.98</td><td>$0.49</td><td>$189.53</td><td>~$187.53</td></tr>
+      <tr><td>$500</td><td>$24.95</td><td>$0.49</td><td>$474.56</td><td>~$472.56</td></tr>
+      <tr><td>$1,000</td><td>$49.90</td><td>$0.49</td><td>$949.61</td><td>~$947.61</td></tr>
+      <tr><td>$2,000</td><td>$99.80</td><td>$0.49</td><td>$1,899.71</td><td>~$1,897.71</td></tr>
+      <tr><td>$5,000</td><td>$249.50</td><td>$0.49</td><td>$4,750.01</td><td>~$4,748.01</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <strong>Quick formula:</strong> Net received = (Deposit &times; 0.9501) &minus; $0.49<br>
+    <strong>Effective total loss to fees: ~5.2%</strong> of the amount charged to the client.
+  </div>
+
+  <hr>
+
+  <!-- ============================================ -->
+  <h2>Part E: Monthly Finance Routine</h2>
+  <p class="section-label">What to do each month</p>
+
+  <div class="step-group">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Download PayPal Monthly Statement</strong>
+        <p>PayPal &rarr; Activity &rarr; Statements &rarr; Monthly (CSV or PDF).</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Reconcile Against Client Invoices</strong>
+        <p>Match each PayPal transaction to a booking. The amount charged to the client is your revenue figure. The amount received in PayPal is your bank receipt.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Record PayPal Fees as an Expense</strong>
+        <p>The difference between what the client paid and what you received is the "payment processing fee" expense.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Transfer Accumulated Balance to Sampath</strong>
+        <p>Follow the withdrawal steps in Part C. Note the Sampath incoming wire fee for your records.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ============================================ -->
+  <h2>Part F: Important Warnings</h2>
+
+  <div class="warning">
+    <strong>Refunds:</strong> If you refund a client via PayPal, PayPal does NOT refund the transaction fee back to you. You lose the ~5% even on cancelled bookings. Factor this into your cancellation policy.
+  </div>
+
+  <div class="warning">
+    <strong>Currency conversion:</strong> Never convert USD to LKR inside PayPal. The PayPal conversion rate costs an additional 3&ndash;4%. Always withdraw as USD to Sampath, then convert at the bank if needed.
+  </div>
+
+  <div class="note">
+    <strong>Balance payments:</strong> The deposit is the only payment handled through PayPal/the website. The remaining balance is collected separately via bank transfer &mdash; the client contacts you directly for this.
+  </div>
+
+  <hr>
+  <p style="font-size: 12px; color: #999; margin-top: 30px;">
+    Helanka Vacations &mdash; Internal Finance Brief &mdash; June 2026<br>
+    Fee rates based on PayPal published structure (2025&ndash;2026). Verify current rates in PayPal dashboard before quoting.
+  </p>
+
+</body>
+</html>

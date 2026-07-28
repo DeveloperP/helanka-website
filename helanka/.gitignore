@@ -49,3 +49,7 @@ next-env.d.ts
 
 # reference images (too large for repo)
 /refs/
+
+# image generation utility scripts
+generate-images.sh
+generate-new-images.sh
