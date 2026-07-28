@@ -2,15 +2,29 @@
 
 Complete these items before pointing `helanka.co` to the Vercel deployment.
 
-## Domain & DNS
+## 1. Security Fixes (DONE)
+
+- [x] Server-validate PayPal payment amounts against quote deposit
+- [x] Add booking ownership checks on payment endpoints
+- [x] Fail Turnstile closed when secret key is missing
+- [x] Sanitize blog HTML with sanitize-html before rendering
+- [x] HTML-escape contact form inputs in email templates
+- [x] Use timing-safe comparison for cron endpoint auth
+- [x] Stop leaking PayPal API error details to clients
+- [x] Move business spreadsheet out of public/ directory
+- [x] Pin next-auth to exact version (5.0.0-beta.31)
+- [ ] Rotate all credentials (database password, AUTH_SECRET, PayPal keys, Resend key, Turnstile secret)
+- [ ] Implement PayPal webhook endpoint for disputes/refunds/chargebacks
+
+## 2. Domain & DNS
 
 - [ ] Add `helanka.co` domain in Vercel project settings (mendisones-projects/helanka)
 - [ ] Point DNS A record (`76.76.21.21`) or CNAME to Vercel
 - [ ] Verify SSL certificate is issued
 
-## Vercel Environment Variables
+## 3. Vercel Environment Variables
 
-Set all of these in the Vercel dashboard (Settings > Environment Variables). Remove the `.env` file from the deployment once Vercel env vars are configured.
+Set all of these in the Vercel dashboard (Settings > Environment Variables).
 
 - [ ] `DATABASE_URL` -- fresh production Neon database connection string
 - [ ] `AUTH_SECRET` -- generate with `npx auth secret`
@@ -31,21 +45,22 @@ Set all of these in the Vercel dashboard (Settings > Environment Variables). Rem
 - [ ] `NEXT_PUBLIC_POSTHOG_KEY` -- PostHog project key (optional)
 - [ ] `NEXT_PUBLIC_GA4_MEASUREMENT_ID` -- Google Analytics 4 ID (optional)
 
-## OAuth Redirect URIs
+## 4. OAuth Redirect URIs
 
 Register these callback URLs in each provider's console:
 
 - [ ] Google Cloud Console: `https://helanka.co/api/auth/callback/google`
 - [ ] Microsoft Entra (Azure AD): `https://helanka.co/api/auth/callback/microsoft-entra-id`
 
-## Database
+## 5. Database
 
 - [ ] Provision fresh Neon Postgres database for production
 - [ ] Run `npx prisma db push` against the new database
-- [ ] Seed admin user with a strong password (change the default `Admin123!`)
-- [ ] Purge all mock data from dev database (20 fake customers, test bookings, test traveler `sarah.test@gmail.com`)
+- [ ] Run `npx tsx prisma/seed.ts` to seed destinations, packages, rate cards, excursions, and blog posts
+- [ ] Run `npx tsx prisma/seed-production.ts --force` to create admin with a strong random password
+- [ ] Run `npx tsx prisma/purge-mock-data.ts --confirm` to delete all 21 mock users and their data
 
-## Final Verification
+## 6. Final Verification
 
 - [ ] Visit `https://helanka.co` and confirm homepage loads
 - [ ] Test Build Your Trip wizard end-to-end
