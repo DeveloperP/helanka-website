@@ -83,7 +83,7 @@ export default function CancellationPolicyPage() {
             <div className="space-y-4">
               <h2 className="font-[family-name:var(--font-display)] text-2xl text-on-surface">Refund Processing</h2>
               <p className="text-on-surface/70 leading-relaxed">
-                Approved refunds are processed within 14 business days via the original payment method (PayPal). Bank transfer refunds may take additional time depending on your financial institution. Refunds are issued in the original currency of payment.
+                Approved refunds are processed within 14 business days via the original payment method. Bank transfer refunds may take additional time depending on your financial institution. Refunds are issued in the original currency of payment.
               </p>
             </div>
 

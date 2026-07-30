@@ -48,7 +48,7 @@ export default function PrivacyPage() {
               <ul className="list-disc pl-6 space-y-2 text-on-surface/70">
                 <li>Process and manage your bookings</li>
                 <li>Communicate with you about your trip, including itinerary updates and travel advisories</li>
-                <li>Process payments through our payment partner (PayPal)</li>
+                <li>Process payments through our banking partner (Sampath Bank)</li>
                 <li>Send booking confirmations and receipts</li>
                 <li>Improve our services and website experience</li>
                 <li>Comply with legal obligations</li>
@@ -64,14 +64,14 @@ export default function PrivacyPage() {
                 We share your information only as necessary to deliver your trip experience. This includes sharing relevant details with hotels, transport providers, and activity operators in Sri Lanka. We do not sell your personal information to third parties.
               </p>
               <p className="text-on-surface/70 leading-relaxed">
-                We may also share information with payment processors (PayPal), analytics providers, and law enforcement when required by law.
+                We may also share information with payment processors (Sampath Bank), analytics providers, and law enforcement when required by law.
               </p>
             </div>
 
             <div className="space-y-4">
               <h2 className="font-[family-name:var(--font-display)] text-2xl text-on-surface">4. Data Security</h2>
               <p className="text-on-surface/70 leading-relaxed">
-                We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. Payment processing is handled by PayPal and is subject to their security standards and PCI DSS compliance.
+                We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. Payment processing is handled through Sampath Bank and is subject to their security standards and banking regulations.
               </p>
             </div>
 
