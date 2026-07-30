@@ -48,6 +48,36 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "TourOperator",
+  name: "Helanka Vacations",
+  url: "https://helanka.co",
+  logo: "https://helanka.co/images/logo.png",
+  description:
+    "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+  telephone: "+94 11 7400 857",
+  email: "tours@helanka.co",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "LK",
+  },
+  areaServed: {
+    "@type": "Country",
+    name: "Sri Lanka",
+  },
+  sameAs: [
+    "https://www.facebook.com/helankaholidays",
+    "https://www.instagram.com/helankavacations",
+  ],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "500",
+    bestRating: "5",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -58,6 +88,12 @@ export default function RootLayout({
       lang="en"
       className={`${dmSerif.variable} ${manrope.variable}`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="min-h-screen bg-background text-foreground font-[family-name:var(--font-body)] antialiased">
         <a
           href="#main-content"
