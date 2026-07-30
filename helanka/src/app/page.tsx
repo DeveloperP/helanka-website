@@ -5,9 +5,9 @@ import FeaturedPackagesServer from "@/components/home/featured-packages-server";
 import CtaSection from "@/components/home/cta-section";
 
 export const metadata: Metadata = {
-  title: "Sri Lanka Holiday Tours | Helanka Vacations",
+  title: "Helanka Vacations | Sri Lanka Holiday Tours & Packages",
   description:
-    "Plan your Sri Lanka trip with local experts. Browse holiday packages, build a custom itinerary, or let us design the perfect vacation for you.",
+    "Helanka Vacations plans your Sri Lanka trip with local experts. Browse holiday packages, build a custom itinerary, or let us design the perfect vacation for you.",
 };
 
 export default function HomePage() {

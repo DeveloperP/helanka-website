@@ -3,9 +3,9 @@ import { packages } from "@/lib/packages";
 import PackagesGrid from "./packages-grid";
 
 export const metadata: Metadata = {
-  title: "Sri Lanka Travel Packages",
+  title: "Curated Sri Lanka Travel Packages",
   description:
-    "Browse 5+ holiday packages across Sri Lanka. Hill country trains, wildlife safaris, southern beaches, and adventure tours. All flexible and led by local guides.",
+    "Browse Helanka Vacations' holiday packages across Sri Lanka. Hill country trains, wildlife safaris, southern beaches, and adventure tours. All flexible and led by local guides.",
 };
 
 export default async function PackagesPage() {

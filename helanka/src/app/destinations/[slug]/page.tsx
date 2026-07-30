@@ -18,9 +18,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dest = getDestinationBySlug(slug);
   if (!dest) return { title: "Destination Not Found" };
   return {
-    title: dest.name,
+    title: `${dest.name} - Sri Lanka`,
     description: dest.description,
+    alternates: {
+      canonical: `https://helanka.co/destinations/${slug}`,
+    },
     openGraph: {
+      url: `https://helanka.co/destinations/${slug}`,
       images: [{ url: dest.image, width: 1200, height: 630, alt: dest.name }],
     },
   };
@@ -43,6 +47,7 @@ export default async function DestinationDetailPage({ params }: Props) {
     "@type": "TouristDestination",
     name: dest.name,
     description: dest.description,
+    url: `https://helanka.co/destinations/${slug}`,
     image: dest.image.startsWith("http") ? dest.image : `https://helanka.co${dest.image}`,
     containedInPlace: {
       "@type": "Country",
@@ -51,11 +56,25 @@ export default async function DestinationDetailPage({ params }: Props) {
     touristType: ["Leisure", "Adventure", "Cultural"],
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://helanka.co" },
+      { "@type": "ListItem", position: 2, name: "Destinations", item: "https://helanka.co/destinations" },
+      { "@type": "ListItem", position: 3, name: dest.name, item: `https://helanka.co/destinations/${slug}` },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[500px] flex flex-col justify-between overflow-hidden">

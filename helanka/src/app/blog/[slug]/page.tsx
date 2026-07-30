@@ -25,11 +25,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.metaTitle || post.title,
     description: post.metaDescription || post.excerpt,
+    alternates: {
+      canonical: `https://helanka.co/blog/${slug}`,
+    },
     openGraph: {
       type: "article",
+      url: `https://helanka.co/blog/${slug}`,
       publishedTime: post.publishedAt,
       authors: [post.author],
-      images: [post.coverImage],
+      images: [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.metaTitle || post.title,
+      description: post.metaDescription || post.excerpt,
     },
   };
 }
@@ -62,11 +71,25 @@ export default async function BlogPostPage({ params }: Props) {
     mainEntityOfPage: { "@type": "WebPage", "@id": `https://helanka.co/blog/${post.slug}` },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://helanka.co" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://helanka.co/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: `https://helanka.co/blog/${post.slug}` },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       <section className="relative h-[60vh] min-h-[450px] flex items-end overflow-hidden">
         <div

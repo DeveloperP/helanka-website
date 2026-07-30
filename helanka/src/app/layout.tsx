@@ -19,27 +19,27 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Helanka Vacations",
-    default: "Helanka Vacations | Sri Lanka Holiday Tours",
+    template: "Helanka Vacations: %s | Sri Lanka Holidays",
+    default: "Helanka Vacations | Sri Lanka Holiday Tours & Packages",
   },
   description:
-    "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services. Talk to our team for a free consultation.",
+    "Helanka Vacations crafts custom Sri Lanka holiday packages with local experts. Wildlife safaris, hill country trains, beach escapes, and MICE services. Book your free consultation today.",
   metadataBase: new URL("https://helanka.co"),
   openGraph: {
     type: "website",
     siteName: "Helanka Vacations",
     locale: "en_US",
     url: "https://helanka.co",
-    title: "Helanka Vacations | Sri Lanka Holiday Tours",
+    title: "Helanka Vacations | Sri Lanka Holiday Tours & Packages",
     description:
-      "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+      "Helanka Vacations crafts custom Sri Lanka holiday packages with local experts. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
     images: [{ url: "/images/public-ella-nine-arch.webp", width: 1200, height: 630, alt: "Sri Lanka — Nine Arch Bridge in Ella" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Helanka Vacations | Sri Lanka Holiday Tours",
+    title: "Helanka Vacations | Sri Lanka Holiday Tours & Packages",
     description:
-      "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+      "Helanka Vacations crafts custom Sri Lanka holiday packages with local experts. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
     images: ["/images/public-ella-nine-arch.webp"],
   },
   robots: {
@@ -48,35 +48,85 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "TourOperator",
-  name: "Helanka Vacations",
-  url: "https://helanka.co",
-  logo: "https://helanka.co/images/logo.png",
-  description:
-    "Custom Sri Lanka holiday packages designed by locals. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
-  telephone: "+94 11 7400 857",
-  email: "tours@helanka.co",
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "LK",
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "TourOperator",
+    "@id": "https://helanka.co/#organization",
+    name: "Helanka Vacations",
+    url: "https://helanka.co",
+    logo: "https://helanka.co/images/logo.png",
+    description:
+      "Helanka Vacations crafts custom Sri Lanka holiday packages with local experts. Wildlife safaris, hill country trains, beach escapes, and MICE services.",
+    telephone: "+94 11 7400 857",
+    email: "tours@helanka.co",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "23 Pereira Lane, Wellawatte",
+      addressLocality: "Colombo",
+      addressRegion: "Western Province",
+      postalCode: "00600",
+      addressCountry: "LK",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: "6.8649",
+      longitude: "79.8613",
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Sri Lanka",
+    },
+    sameAs: [
+      "https://www.facebook.com/helankaholidays",
+      "https://www.instagram.com/helankavacations",
+    ],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "4.9",
+      reviewCount: "500",
+      bestRating: "5",
+    },
   },
-  areaServed: {
-    "@type": "Country",
-    name: "Sri Lanka",
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": "https://helanka.co/#localbusiness",
+    name: "Helanka Vacations",
+    image: "https://helanka.co/images/logo.png",
+    url: "https://helanka.co",
+    telephone: "+94 11 7400 857",
+    email: "tours@helanka.co",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "23 Pereira Lane, Wellawatte",
+      addressLocality: "Colombo",
+      addressRegion: "Western Province",
+      postalCode: "00600",
+      addressCountry: "LK",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: "6.8649",
+      longitude: "79.8613",
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      opens: "09:00",
+      closes: "18:00",
+    },
+    priceRange: "$$",
   },
-  sameAs: [
-    "https://www.facebook.com/helankaholidays",
-    "https://www.instagram.com/helankavacations",
-  ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "500",
-    bestRating: "5",
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://helanka.co/#website",
+    name: "Helanka Vacations",
+    url: "https://helanka.co",
+    publisher: { "@id": "https://helanka.co/#organization" },
   },
-};
+];
 
 export default function RootLayout({
   children,
@@ -89,10 +139,13 @@ export default function RootLayout({
       className={`${dmSerif.variable} ${manrope.variable}`}
     >
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {jsonLd.map((schema, i) => (
+          <script
+            key={i}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
       </head>
       <body className="min-h-screen bg-background text-foreground font-[family-name:var(--font-body)] antialiased">
         <a

@@ -5,15 +5,16 @@ import { packages } from "@/lib/packages";
 const BASE = "https://helanka.co";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
   const staticPages: MetadataRoute.Sitemap = [
-    { url: BASE, changeFrequency: "weekly", priority: 1.0 },
-    { url: `${BASE}/packages`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${BASE}/destinations`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${BASE}/build`, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${BASE}/group-experiences`, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE}/blog`, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${BASE}/about`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE}/contact`, changeFrequency: "monthly", priority: 0.6 },
+    { url: BASE, lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: `${BASE}/packages`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE}/destinations`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE}/build`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/group-experiences`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${BASE}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/cancellation-policy`, changeFrequency: "yearly", priority: 0.3 },

@@ -18,7 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: pkg.name,
     description: pkg.description,
+    alternates: {
+      canonical: `https://helanka.co/packages/${slug}`,
+    },
     openGraph: {
+      url: `https://helanka.co/packages/${slug}`,
       images: [{ url: pkg.image, width: 1200, height: 630, alt: pkg.name }],
     },
   };
@@ -41,6 +45,7 @@ export default async function PackageDetailPage({ params }: Props) {
     "@type": "TouristTrip",
     name: pkg.name,
     description: pkg.description,
+    url: `https://helanka.co/packages/${slug}`,
     touristType: "Leisure",
     itinerary: {
       "@type": "ItemList",
@@ -57,6 +62,12 @@ export default async function PackageDetailPage({ params }: Props) {
       priceCurrency: "USD",
       price: pkg.price,
       availability: "https://schema.org/InStock",
+      validFrom: new Date().toISOString(),
+      offeredBy: {
+        "@type": "TourOperator",
+        name: "Helanka Vacations",
+        url: "https://helanka.co",
+      },
     },
     provider: {
       "@type": "TourOperator",
@@ -65,11 +76,25 @@ export default async function PackageDetailPage({ params }: Props) {
     },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://helanka.co" },
+      { "@type": "ListItem", position: 2, name: "Packages", item: "https://helanka.co/packages" },
+      { "@type": "ListItem", position: 3, name: pkg.name, item: `https://helanka.co/packages/${slug}` },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       {/* Hero */}
       <section className="relative h-screen min-h-[700px] flex flex-col justify-between overflow-hidden">
