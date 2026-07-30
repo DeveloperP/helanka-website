@@ -2,6 +2,8 @@ import TripWizard from "./trip-wizard";
 
 export const metadata = {
   title: "Build Your Trip",
+  description:
+    "Design your custom Sri Lanka itinerary. Choose destinations, activities, accommodation tier, and travel dates. Connect with a specialist for a personalized quote.",
 };
 
 const DEV_USER = { name: "Traveler", email: "demo@helanka.co" };

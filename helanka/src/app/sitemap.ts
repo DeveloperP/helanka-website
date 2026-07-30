@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
+import { packages } from "@/lib/packages";
 
 const BASE = "https://helanka.co";
 
@@ -17,6 +18,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/cancellation-policy`, changeFrequency: "yearly", priority: 0.3 },
   ];
+
+  const packagePages: MetadataRoute.Sitemap = packages.map((pkg) => ({
+    url: `${BASE}/packages/${pkg.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
 
   const dynamicPages: MetadataRoute.Sitemap = [];
 
@@ -47,5 +54,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticPages, ...dynamicPages];
+  return [...staticPages, ...packagePages, ...dynamicPages];
 }

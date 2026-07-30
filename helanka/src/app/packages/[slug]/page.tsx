@@ -18,6 +18,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: pkg.name,
     description: pkg.description,
+    openGraph: {
+      images: [{ url: pkg.image, width: 1200, height: 630, alt: pkg.name }],
+    },
   };
 }
 
@@ -33,11 +36,46 @@ export default async function PackageDetailPage({ params }: Props) {
     { value: `${pkg.minGuests}–${pkg.maxGuests}`, label: "guests" },
   ];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: pkg.name,
+    description: pkg.description,
+    touristType: "Leisure",
+    itinerary: {
+      "@type": "ItemList",
+      numberOfItems: pkg.itinerary.length,
+      itemListElement: pkg.itinerary.map((day, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: day.title,
+        description: day.description,
+      })),
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      price: pkg.price,
+      availability: "https://schema.org/InStock",
+    },
+    provider: {
+      "@type": "TourOperator",
+      name: "Helanka Vacations",
+      url: "https://helanka.co",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
       <section className="relative h-screen min-h-[700px] flex flex-col justify-between overflow-hidden">
         <div
+          role="img"
+          aria-label={`${pkg.name} tour package`}
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${pkg.image}')` }}
         />
@@ -127,6 +165,8 @@ export default async function PackageDetailPage({ params }: Props) {
                     {i < 3 && (
                       <div className="flex gap-2 mt-4">
                         <div
+                          role="img"
+                          aria-label={`Day ${day.day} - ${day.title}`}
                           className="w-20 h-14 rounded-lg bg-cover bg-center"
                           style={{ backgroundImage: `url('${pkg.image}')` }}
                         />
@@ -218,6 +258,8 @@ export default async function PackageDetailPage({ params }: Props) {
       {/* CTA */}
       <section id="book" className="relative min-h-[500px] flex items-center overflow-hidden">
         <div
+          role="img"
+          aria-label={pkg.name}
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${pkg.image}')` }}
         />

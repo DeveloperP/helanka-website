@@ -25,6 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.metaTitle || post.title,
     description: post.metaDescription || post.excerpt,
+    openGraph: {
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author],
+      images: [post.coverImage],
+    },
   };
 }
 
@@ -38,10 +44,34 @@ export default async function BlogPostPage({ params }: Props) {
     .filter((p) => p.slug !== post.slug && p.category === post.category)
     .slice(0, 2);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    image: post.coverImage.startsWith("http")
+      ? post.coverImage
+      : `https://helanka.co${post.coverImage}`,
+    datePublished: post.publishedAt,
+    author: { "@type": "Person", name: post.author },
+    publisher: {
+      "@type": "Organization",
+      name: "Helanka Vacations",
+      logo: { "@type": "ImageObject", url: "https://helanka.co/images/logo.png" },
+    },
+    description: post.excerpt,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `https://helanka.co/blog/${post.slug}` },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="relative h-[60vh] min-h-[450px] flex items-end overflow-hidden">
         <div
+          role="img"
+          aria-label={post.title}
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${post.coverImage}')` }}
         />
@@ -102,6 +132,8 @@ export default async function BlogPostPage({ params }: Props) {
               >
                 <div className="shrink-0 w-24 sm:w-32 h-20 sm:h-24 rounded-xl overflow-hidden">
                   <div
+                    role="img"
+                    aria-label={r.title}
                     className="w-full h-full bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
                     style={{ backgroundImage: `url('${r.coverImage}')`, transitionTimingFunction: "var(--ease-out)" }}
                   />

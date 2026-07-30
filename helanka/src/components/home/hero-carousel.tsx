@@ -110,6 +110,8 @@ export default function HeroCarousel() {
       {slides.map((s, i) => (
         <div
           key={s.slug + i}
+          role="img"
+          aria-label={`${s.destination.replace(/\n/g, " ")}, ${s.region.replace(/_/g, " ")}`}
           className={cn(
             "absolute inset-0 z-0 bg-cover bg-center hero-slide",
             i === active ? "hero-slide-active" : "hero-slide-inactive"

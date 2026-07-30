@@ -20,6 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: dest.name,
     description: dest.description,
+    openGraph: {
+      images: [{ url: dest.image, width: 1200, height: 630, alt: dest.name }],
+    },
   };
 }
 
@@ -35,11 +38,30 @@ export default async function DestinationDetailPage({ params }: Props) {
 
   const priceEstimates = await getPackagePriceEstimates();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristDestination",
+    name: dest.name,
+    description: dest.description,
+    image: dest.image.startsWith("http") ? dest.image : `https://helanka.co${dest.image}`,
+    containedInPlace: {
+      "@type": "Country",
+      name: "Sri Lanka",
+    },
+    touristType: ["Leisure", "Adventure", "Cultural"],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[500px] flex flex-col justify-between overflow-hidden">
         <div
+          role="img"
+          aria-label={`${dest.name} - ${dest.tagline}`}
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${dest.image}')` }}
         />
@@ -169,6 +191,8 @@ export default async function DestinationDetailPage({ params }: Props) {
               >
                 <div className="relative h-48 overflow-hidden">
                   <div
+                    role="img"
+                    aria-label={pkg.name}
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                     style={{ backgroundImage: `url('${pkg.image}')`, transitionTimingFunction: "var(--ease-out)" }}
                   />

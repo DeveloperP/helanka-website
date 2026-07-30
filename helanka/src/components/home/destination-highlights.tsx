@@ -110,6 +110,8 @@ export default function DestinationHighlights() {
             className="group relative flex-none w-[240px] sm:w-[280px] md:w-[320px] h-[400px] rounded-2xl overflow-hidden cursor-pointer snap-start"
           >
             <div
+              role="img"
+              aria-label={dest.name}
               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
               style={{
                 backgroundImage: `url('${dest.image}')`,

@@ -30,6 +30,8 @@ export default function DestinationsPage() {
         {heroDestinations.map((d, i) => (
           <div
             key={d.slug}
+            role="img"
+            aria-label={`${d.name}, Sri Lanka`}
             className={cn(
               "absolute inset-0 bg-cover bg-center hero-slide",
               i === active ? "hero-slide-active" : "hero-slide-inactive"
@@ -163,6 +165,8 @@ export default function DestinationsPage() {
               className="group relative h-[350px] rounded-2xl overflow-hidden"
             >
               <div
+                role="img"
+                aria-label={d.name}
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
                 style={{ backgroundImage: `url('${d.image}')`, transitionTimingFunction: "var(--ease-out)" }}
               />

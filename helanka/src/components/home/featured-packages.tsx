@@ -50,6 +50,8 @@ export default function FeaturedPackages({ packages }: FeaturedPackagesProps) {
             >
               <div className="relative h-52 overflow-hidden">
                 <div
+                  role="img"
+                  aria-label={pkg.name}
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{
                     backgroundImage: `url('${pkg.image}')`,
