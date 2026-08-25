@@ -1,4 +1,4 @@
-import { requireAdminOrSpecialist } from "@/lib/auth-guard";
+import { requireStaff } from "@/lib/auth-guard";
 import { AdminShell } from "@/components/admin/admin-shell";
 
 export default async function AdminLayout({
@@ -6,7 +6,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await requireAdminOrSpecialist();
+  const session = await requireStaff();
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-white">

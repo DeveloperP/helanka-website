@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { NewInquiryButton } from "./new-inquiry-form";
 
 interface CustomerSession {
   id: string;
@@ -67,11 +68,14 @@ export function CustomerListClient({
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Customers</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          {isAdmin ? `${customers.length} total customers` : `${customers.length} assigned customers`}
-        </p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Customers</h1>
+          <p className="text-sm text-slate-500 mt-1">
+            {isAdmin ? `${customers.length} total customers` : `${customers.length} assigned customers`}
+          </p>
+        </div>
+        <NewInquiryButton role={role} />
       </div>
 
       <div className="flex flex-wrap gap-3 mb-6">

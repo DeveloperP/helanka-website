@@ -10,6 +10,7 @@ enum UserRole {
   CUSTOMER
   ADMIN
   SPECIALIST
+  FINANCE
 }
 
 enum TripSessionStatus {
@@ -23,6 +24,7 @@ enum ChatMessageType {
   TEXT
   SUGGESTION
   SYSTEM
+  EMAIL_NOTE
 }
 
 enum SuggestionStatus {
@@ -88,6 +90,7 @@ model User {
   customerTripSessions  TripSession[] @relation("CustomerSessions")
   specialistTripSessions TripSession[] @relation("SpecialistSessions")
   chatMessages       ChatMessage[]
+  paymentLinks       PaymentLink[]
 
   @@map("users")
 }
@@ -548,4 +551,22 @@ model ChatMessage {
 
   @@index([sessionId, createdAt])
   @@map("chat_messages")
+}
+
+model PaymentLink {
+  id            String    @id @default(cuid())
+  invoiceNumber String    @unique
+  customerName  String
+  amount        Float
+  currency      String    @default("USD")
+  description   String
+  cybersourceUrl String
+  notifyEmails  String[]
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  paidAt        DateTime?
+
+  creator User @relation(fields: [createdBy], references: [id])
+
+  @@map("payment_links")
 }

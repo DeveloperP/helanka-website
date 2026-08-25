@@ -139,9 +139,11 @@ export async function loginUser(_prev: ActionResult, formData: FormData): Promis
   }
 
   const redirectTo =
-    user.role === "ADMIN" || user.role === "SPECIALIST"
-      ? "/admin/sessions"
-      : "/dashboard";
+    user.role === "FINANCE"
+      ? "/admin/payments"
+      : user.role === "ADMIN" || user.role === "SPECIALIST"
+        ? "/admin/sessions"
+        : "/dashboard";
 
   try {
     await signIn("credentials", { email, password, redirectTo });

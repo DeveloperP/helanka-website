@@ -90,3 +90,38 @@ export function buildQuoteDeliveryEmail(
     </p>
   ${WRAPPER_END}`;
 }
+
+export function buildPaymentConfirmationEmail(
+  name: string,
+  reference: string,
+  amount: string,
+  description: string,
+): string {
+  return `${WRAPPER_START}
+    <h2>Payment Confirmation</h2>
+    <p style="color:#475569;">Hi ${name},</p>
+    <p style="color:#475569;">
+      We have received your payment. Thank you for choosing Helanka Vacations.
+    </p>
+    <div style="background:#f0fdf4;border-radius:8px;padding:16px;margin:20px 0;">
+      <table style="width:100%;border-collapse:collapse;font-size:15px;">
+        <tr>
+          <td style="color:#334155;padding:6px 0;">Reference</td>
+          <td style="color:#334155;padding:6px 0;text-align:right;font-weight:600;">${reference}</td>
+        </tr>
+        <tr>
+          <td style="color:#334155;padding:6px 0;">Description</td>
+          <td style="color:#334155;padding:6px 0;text-align:right;">${description}</td>
+        </tr>
+        <tr>
+          <td style="color:#334155;padding:6px 0;">Amount Paid</td>
+          <td style="color:#334155;padding:6px 0;text-align:right;font-weight:600;">${amount}</td>
+        </tr>
+      </table>
+    </div>
+    <p style="color:#475569;font-size:14px;">
+      Our team will be in touch with your next steps. If you have any questions,
+      reach out at <a href="mailto:tours@helanka.co" style="color:#1e293b;">tours@helanka.co</a>.
+    </p>
+  ${WRAPPER_END}`;
+}

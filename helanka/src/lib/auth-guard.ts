@@ -51,6 +51,18 @@ export async function requireAdminOrSpecialist(): Promise<Session> {
   return session;
 }
 
+export async function requireStaff(): Promise<Session> {
+  const session = await auth();
+  if (!session) {
+    redirect("/login");
+  }
+  const staffRoles = ["ADMIN", "SPECIALIST", "FINANCE"];
+  if (!staffRoles.includes(session.user.role)) {
+    redirect("/dashboard");
+  }
+  return session;
+}
+
 /**
  * Returns the current session or null without any redirects.
  * Safe to call in public Server Components.

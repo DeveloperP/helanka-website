@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 const { auth } = NextAuth(authConfig);
 
 const specialistAllowed = ["/admin/sessions", "/admin/customers", "/admin/account"];
+const financeAllowed = ["/admin/payments", "/admin/account"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
@@ -40,6 +41,14 @@ export default auth((req) => {
         specialistAllowed.some((prefix) => pathname.startsWith(prefix));
       if (isAllowed) return NextResponse.next();
       return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+    }
+
+    if (role === "FINANCE") {
+      const isAllowed =
+        pathname === "/admin" ||
+        financeAllowed.some((prefix) => pathname.startsWith(prefix));
+      if (isAllowed) return NextResponse.next();
+      return NextResponse.redirect(new URL("/admin/payments", req.nextUrl.origin));
     }
 
     return NextResponse.redirect(new URL("/dashboard", req.nextUrl.origin));

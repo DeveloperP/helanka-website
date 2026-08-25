@@ -168,6 +168,63 @@ export async function respondToSuggestion(input: {
   }
 }
 
+export async function logEmailNote(input: {
+  sessionId: string;
+  direction: "sent" | "received";
+  subject?: string;
+  content: string;
+}): Promise<ChatMessageRecord | null> {
+  try {
+    const { db } = await import("@/lib/db");
+    if (!db) return null;
+    const { auth } = await import("@/lib/auth");
+    const session = await auth();
+    if (!session?.user?.id) return null;
+
+    const role = session.user.role;
+    if (role !== "ADMIN" && role !== "SPECIALIST") return null;
+
+    const tripSession = await db.tripSession.findUnique({
+      where: { id: input.sessionId },
+      select: { specialistId: true },
+    });
+    if (!tripSession) return null;
+    if (role === "SPECIALIST" && tripSession.specialistId !== session.user.id) return null;
+
+    const message = await db.chatMessage.create({
+      data: {
+        sessionId: input.sessionId,
+        senderId: session.user.id,
+        senderRole: role,
+        content: input.content,
+        messageType: "EMAIL_NOTE",
+        suggestionData: JSON.parse(
+          JSON.stringify({ direction: input.direction, subject: input.subject })
+        ),
+      },
+    });
+
+    await db.tripSession.update({
+      where: { id: input.sessionId },
+      data: { lastActivityAt: new Date(), idleSince: null },
+    });
+
+    return {
+      id: message.id,
+      sessionId: message.sessionId,
+      senderId: message.senderId,
+      senderRole: message.senderRole,
+      content: message.content,
+      messageType: message.messageType,
+      suggestionData: message.suggestionData as Record<string, unknown> | null,
+      suggestionStatus: message.suggestionStatus,
+      createdAt: message.createdAt,
+    };
+  } catch {
+    return null;
+  }
+}
+
 export async function getChatHistory(input: {
   sessionId: string;
   cursor?: string;

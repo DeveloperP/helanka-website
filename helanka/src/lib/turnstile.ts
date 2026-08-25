@@ -5,8 +5,9 @@ export async function verifyTurnstile(token: string | null): Promise<boolean> {
   if (!secret) {
     if (process.env.NODE_ENV === "production") {
       console.error("[Turnstile] TURNSTILE_SECRET_KEY is not set in production");
+      return false;
     }
-    return false;
+    return true;
   }
   if (!token) return false;
 

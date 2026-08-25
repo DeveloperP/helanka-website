@@ -1,9 +1,15 @@
-import { requireAdminOrSpecialist } from "@/lib/auth-guard";
+import { redirect } from "next/navigation";
+import { requireStaff } from "@/lib/auth-guard";
 import { getDashboardStats, getRecentActivity } from "@/actions/admin-actions";
 import { DashboardClient } from "./dashboard-client";
 
 export default async function AdminDashboardPage() {
-  const session = await requireAdminOrSpecialist();
+  const session = await requireStaff();
+
+  if (session.user.role === "FINANCE") {
+    redirect("/admin/payments");
+  }
+
   const [stats, activity] = await Promise.all([
     getDashboardStats(),
     getRecentActivity(),

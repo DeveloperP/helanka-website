@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { sendChatMessage, sendSuggestion } from "@/actions/chat-actions";
+import { sendChatMessage, sendSuggestion, logEmailNote } from "@/actions/chat-actions";
 import type { SuggestionData } from "@/lib/validations";
 
 interface SessionData {
@@ -49,6 +49,11 @@ export function SessionDetailClient({
   const [chatInput, setChatInput] = useState("");
   const [isSending, startTransition] = useTransition();
   const [showSuggestionPicker, setShowSuggestionPicker] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailDirection, setEmailDirection] = useState<"sent" | "received">("sent");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailContent, setEmailContent] = useState("");
+  const [isSendingEmail, startEmailTransition] = useTransition();
   const chatEndRef = useRef<HTMLDivElement>(null);
   const esRef = useRef<EventSource | null>(null);
 
@@ -138,14 +143,12 @@ export function SessionDetailClient({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {(session.status === "QUOTE_REQUESTED" || session.status === "CLOSED") && (
-              <Link
-                href={`/admin/sessions/${initialSession.id}/quote`}
-                className="text-xs font-medium px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors"
-              >
-                {session.status === "QUOTE_REQUESTED" ? "Create Quote" : "View Quote"}
-              </Link>
-            )}
+            <Link
+              href={`/admin/sessions/${initialSession.id}/quote`}
+              className="text-xs font-medium px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+            >
+              {session.status === "CLOSED" ? "View Quote" : session.status === "QUOTE_REQUESTED" ? "Create Quote" : "Start Quote"}
+            </Link>
             {session.idleSince && (
               <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
                 Customer may be stuck
@@ -203,13 +206,86 @@ export function SessionDetailClient({
         <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 flex flex-col" style={{ height: "calc(100vh - 180px)" }}>
           <div className="border-b border-slate-100 px-5 py-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-900">Chat</p>
-            <button
-              onClick={() => setShowSuggestionPicker(!showSuggestionPicker)}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
-            >
-              Send Suggestion
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setShowEmailForm(!showEmailForm); setShowSuggestionPicker(false); }}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors cursor-pointer"
+              >
+                Log Email
+              </button>
+              <button
+                onClick={() => { setShowSuggestionPicker(!showSuggestionPicker); setShowEmailForm(false); }}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors cursor-pointer"
+              >
+                Send Suggestion
+              </button>
+            </div>
           </div>
+
+          {showEmailForm && (
+            <div className="border-b border-slate-100 px-5 py-3 bg-indigo-50/50 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-slate-600">Direction:</span>
+                <button
+                  type="button"
+                  onClick={() => setEmailDirection("sent")}
+                  className={`text-xs px-3 py-1 rounded-lg border transition-colors cursor-pointer ${emailDirection === "sent" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                >
+                  Sent
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmailDirection("received")}
+                  className={`text-xs px-3 py-1 rounded-lg border transition-colors cursor-pointer ${emailDirection === "received" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"}`}
+                >
+                  Received
+                </button>
+              </div>
+              <input
+                type="text"
+                value={emailSubject}
+                onChange={(e) => setEmailSubject(e.target.value)}
+                placeholder="Subject (optional)"
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              />
+              <textarea
+                value={emailContent}
+                onChange={(e) => setEmailContent(e.target.value)}
+                placeholder="Email content or summary..."
+                rows={3}
+                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 resize-none"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={!emailContent.trim() || isSendingEmail}
+                  onClick={() => {
+                    startEmailTransition(async () => {
+                      await logEmailNote({
+                        sessionId: initialSession.id,
+                        direction: emailDirection,
+                        subject: emailSubject.trim() || undefined,
+                        content: emailContent.trim(),
+                      });
+                      setEmailContent("");
+                      setEmailSubject("");
+                      setShowEmailForm(false);
+                    });
+                  }}
+                  className="text-xs font-medium px-4 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-colors cursor-pointer"
+                >
+                  {isSendingEmail ? "Saving..." : "Save"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEmailForm(false)}
+                  className="text-xs text-slate-500 hover:text-slate-700 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           {showSuggestionPicker && (
             <div className="border-b border-slate-100 px-5 py-3 bg-amber-50/50">
@@ -262,6 +338,28 @@ export function SessionDetailClient({
                           {msg.suggestionStatus}
                         </span>
                       )}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (msg.messageType === "EMAIL_NOTE") {
+                const meta = msg.suggestionData as { direction?: string; subject?: string } | null;
+                const dir = meta?.direction === "received" ? "Received from customer" : "Sent to customer";
+                return (
+                  <div key={msg.id} className="flex justify-start">
+                    <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3 max-w-[80%]">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <svg className="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        <span className="text-xs font-medium text-indigo-600">{dir}</span>
+                      </div>
+                      {meta?.subject && (
+                        <p className="text-sm font-semibold text-slate-800 mb-1">{meta.subject}</p>
+                      )}
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{msg.content}</p>
+                      <p className="text-[10px] text-indigo-400 mt-2">{new Date(msg.createdAt).toLocaleString()}</p>
                     </div>
                   </div>
                 );
