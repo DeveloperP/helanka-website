@@ -7,12 +7,14 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient {
+  const connStr = process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
+  if (!connStr) throw new Error("No database connection string");
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL!,
+    connectionString: connStr,
     max: process.env.NODE_ENV === "development" ? 3 : 20,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 5000,
-    ssl: process.env.DATABASE_URL!.includes("sslmode=require")
+    ssl: connStr.includes("sslmode=require")
       ? { rejectUnauthorized: false }
       : undefined,
   });
