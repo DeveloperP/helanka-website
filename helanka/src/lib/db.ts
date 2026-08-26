@@ -7,16 +7,16 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient(): PrismaClient {
-  const connStr = process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
-  if (!connStr) throw new Error("No database connection string");
+  const rawConnStr = process.env.DATABASE_URL || process.env.POSTGRES_URL_NON_POOLING;
+  if (!rawConnStr) throw new Error("No database connection string");
+  const needsSsl = rawConnStr.includes("sslmode=require");
+  const connStr = rawConnStr.replace(/[?&]sslmode=require/g, (m) => m.startsWith("?") ? "?" : "").replace(/\?$/, "");
   const pool = new Pool({
     connectionString: connStr,
     max: process.env.NODE_ENV === "development" ? 3 : 20,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 5000,
-    ssl: connStr.includes("sslmode=require")
-      ? { rejectUnauthorized: false }
-      : undefined,
+    ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
   });
   const adapter = new PrismaPg(pool);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
