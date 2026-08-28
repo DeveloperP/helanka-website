@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const { auth } = NextAuth(authConfig);
 
 const specialistAllowed = ["/admin/sessions", "/admin/customers", "/admin/account"];
-const financeAllowed = ["/admin/payments", "/admin/account"];
+const financeAllowed = ["/admin/payments", "/admin/reports", "/admin/account"];
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;

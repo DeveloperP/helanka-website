@@ -12,14 +12,14 @@ interface AdminShellProps {
 }
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "dashboard", roles: ["ADMIN", "SPECIALIST"] },
+  { href: "/admin", label: "Dashboard", icon: "dashboard", roles: ["ADMIN", "SPECIALIST", "FINANCE"] },
   { href: "/admin/sessions", label: "Sessions", icon: "sessions", roles: ["ADMIN", "SPECIALIST"] },
   { href: "/admin/customers", label: "Customers", icon: "customers", roles: ["ADMIN", "SPECIALIST"] },
   { href: "/admin/payments", label: "Payment Links", icon: "payments", roles: ["ADMIN", "FINANCE"] },
   { href: "/admin/bookings", label: "Bookings", icon: "bookings", roles: ["ADMIN"] },
   { href: "/admin/pricing", label: "Pricing", icon: "pricing", roles: ["ADMIN"] },
   { href: "/admin/blog", label: "Blog", icon: "blog", roles: ["ADMIN"] },
-  { href: "/admin/reports", label: "Reports", icon: "reports", roles: ["ADMIN"] },
+  { href: "/admin/reports", label: "Reports", icon: "reports", roles: ["ADMIN", "FINANCE"] },
   { href: "/admin/specialists", label: "Team", icon: "team", roles: ["ADMIN"] },
 ];
 

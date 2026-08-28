@@ -6,9 +6,6 @@ import { DashboardClient } from "./dashboard-client";
 export default async function AdminDashboardPage() {
   const session = await requireStaff();
 
-  if (session.user.role === "FINANCE") {
-    redirect("/admin/payments");
-  }
 
   const [stats, activity] = await Promise.all([
     getDashboardStats(),
