@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdminOrSpecialist } from "@/lib/auth-guard";
+import { requireStaff } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 
 export interface DashboardStats {
@@ -26,7 +26,7 @@ export interface ActivityItem {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats | null> {
-  const session = await requireAdminOrSpecialist();
+  const session = await requireStaff();
   if (!db) return null;
 
   const isSpecialist = session.user.role === "SPECIALIST";
@@ -66,7 +66,7 @@ export async function getDashboardStats(): Promise<DashboardStats | null> {
 }
 
 export async function getRecentActivity(): Promise<ActivityItem[]> {
-  const session = await requireAdminOrSpecialist();
+  const session = await requireStaff();
   if (!db) return [];
 
   const isSpecialist = session.user.role === "SPECIALIST";

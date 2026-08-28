@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAdmin } from "@/lib/auth-guard";
+import { requireStaff } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 
 export interface RevenueDataPoint {
@@ -53,7 +53,7 @@ export async function getRevenueReport(
   from?: string,
   to?: string
 ): Promise<RevenueData | null> {
-  await requireAdmin();
+  await requireStaff();
   if (!db) return null;
 
   const dateFilter: { paidAt?: { gte?: Date; lte?: Date } } = {};
@@ -218,7 +218,7 @@ export async function getRevenueReport(
 }
 
 export async function getConversionFunnel(from?: string, to?: string): Promise<FunnelStage[]> {
-  await requireAdmin();
+  await requireStaff();
   if (!db) return [];
 
   const dateFilter: { createdAt?: { gte?: Date; lte?: Date } } = {};
@@ -258,7 +258,7 @@ export async function getConversionFunnel(from?: string, to?: string): Promise<F
 }
 
 export async function getUtmAttribution(from?: string, to?: string): Promise<UtmRow[]> {
-  await requireAdmin();
+  await requireStaff();
   if (!db) return [];
 
   const dateFilter: { createdAt?: { gte?: Date; lte?: Date } } = {};
